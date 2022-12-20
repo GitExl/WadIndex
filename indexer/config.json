@@ -1,0 +1,42 @@
+{
+  "paths": {
+    "idgames": "/var/idgames",
+    "iwads": "/var/iwads",
+    "logs": "/var/log/indexer"
+  },
+  "extractors": {
+    "game": {
+      "lump_score_table": "game_lump_scores.json"
+    },
+    "engine": {
+      "lump_table": "engine_lumps.json",
+      "doomednum_table": "engine_doomednums.json",
+      "doomednum_scores": "engine_doomednum_scores.json"
+    }
+  },
+  "writers": {
+    "graphics": {
+      "output_path": "/var/indexer/storage/graphics"
+    },
+    "music": {
+      "output_path": "/var/indexer/storage/music"
+    }
+  },
+  "ignore": [
+    "idstuff",
+    "incoming",
+    "newstuff",
+    "ls-laR.gz"
+  ],
+  "mirrors": [
+    "https://www.quaddicted.com/files/idgames",
+    "https://ftpmirror1.infania.net/pub/idgames",
+    "https://youfailit.net/pub/idgames"
+  ],
+  "db": {
+    "host": "$MARIADB_HOST",
+    "database": "$MARIADB_DATABASE",
+    "user": "$MARIADB_USER",
+    "password": "$MARIADB_PASSWORD"
+  }
+}

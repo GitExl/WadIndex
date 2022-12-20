@@ -1,0 +1,70 @@
+services:
+
+  nginx:
+    build: ./nginx
+    env_file: .env
+    networks:
+      - internal
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./api/:/var/www/html/api:ro
+      - ./app/dist:/var/www/html/app:ro
+    depends_on:
+      - php
+      - app
+    extra_hosts:
+      api.idgames.local: 127.0.0.1
+      app.idgames.local: 127.0.0.1
+
+  php:
+    build: ./php
+    env_file: .env
+    networks:
+      - internal
+    expose:
+      - 9000
+    volumes:
+      - ./api/:/var/www/html/api:ro
+    depends_on:
+      - db
+
+  db:
+    build: ./db
+    env_file: .env
+    networks:
+      - internal
+    expose:
+      - 3306
+    volumes:
+      - ./storage/db:/var/lib/mysql/
+
+  app:
+    build: ./app
+    env_file: .env
+    networks:
+      - internal
+    volumes:
+      - ./app/:/var/app
+
+  indexer:
+    build: ./indexer
+    env_file: .env
+    init: true
+    networks:
+      - internal
+    volumes:
+      - ./indexer:/usr/src/app
+      - "$INDEXER_PATH_IDGAMES:/var/idgames"
+      - "$INDEXER_PATH_IWADS:/var/iwads:ro"
+      - ./storage/logs:/var/log/indexer
+      - ./storage/graphics:/var/indexer/storage/graphics
+      - ./storage/music:/var/indexer/storage/music
+    depends_on:
+      - db
+
+networks:
+
+  internal:
+    driver: bridge
