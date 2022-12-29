@@ -8,9 +8,13 @@ from doom.level import Level, LEVEL_FORMAT_TO_INT
 from extractors.musicextractor import MusicInfo
 from idgames.entry import Entry
 from utils.config import Config
+import re
 
 
 class DBStorage:
+
+    RE_URL_CLEAN = re.compile(r'[^\w\-]')
+    RE_URL_DEDUP = re.compile(r'[\-]{2,}')
 
     def __init__(self, config: Config):
         self.config: Config = config
@@ -62,6 +66,10 @@ class DBStorage:
 
         known_author_ids = set()
         for author_name in authors:
+            path_alias = self.url_clean(author_name)
+            if len(path_alias) < 2:
+                continue
+
             self.cursor.execute('SELECT id FROM author WHERE name=%s LIMIT 1', (author_name,))
             author_row = self.cursor.fetchone()
             if author_row is not None:
@@ -72,7 +80,7 @@ class DBStorage:
                     continue
 
             else:
-                self.cursor.execute('INSERT INTO author (name) VALUES (%s)', (author_name,))
+                self.cursor.execute('INSERT INTO author (name, path_alias) VALUES (%s, %s)', (author_name[:255], path_alias))
                 author_id = self.cursor.lastrowid
 
             self.cursor.execute('INSERT INTO entry_authors VALUES (%s, %s)', (entry.id, author_id))
@@ -198,3 +206,9 @@ class DBStorage:
 
     def commit(self):
         self.db.commit()
+
+    def url_clean(self, url: str) -> str:
+        url = url.replace(' ', '-').replace('_', '-').lower()
+        url = self.RE_URL_CLEAN.sub('', url)
+        url = self.RE_URL_DEDUP.sub('-', url)
+        return url[:255].strip()
