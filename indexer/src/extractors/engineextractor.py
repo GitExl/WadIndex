@@ -1,6 +1,8 @@
 import json
 from typing import Dict, Set, List
 
+from archives.archivebase import ArchiveBase
+from archives.archivelist import ArchiveList
 from doom.level import Level
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
@@ -72,6 +74,12 @@ class EngineExtractor(ExtractorBase):
             if engine != Game.UNKNOWN:
                 self.logger.decision('Detected engine "{}" from level data.'.format(engine.name))
 
+        # Detect from lump names.
+        if engine == Engine.UNKNOWN and info.main_archive is not None:
+            engine = self.detect_from_lumps(info.archive)
+            if engine != Game.UNKNOWN:
+                self.logger.decision('Detected engine "{}" from lump names.'.format(engine.name))
+
         # Last ditch effort, just use the entire text file.
         if engine == Engine.UNKNOWN and info.text_contents:
             engine = self.detect_from_text(info.text_contents)
@@ -84,6 +92,24 @@ class EngineExtractor(ExtractorBase):
             return
 
         info.engine = engine
+
+    def detect_from_lumps(self, archive: ArchiveBase) -> Engine:
+        scores: Dict[str, float] = {}
+        for engine_key, lump_set in self.engine_lumps.items():
+
+            for lump_name in lump_set:
+                if archive.file_find_basename(lump_name) is not None:
+                    if engine_key not in scores:
+                        scores[engine_key] = 1
+                    else:
+                        scores[engine_key] += 1
+
+        if len(scores):
+            engine = max(scores.keys(), key=(lambda k: scores[k]))
+            if scores[engine] >= 1:
+                return Engine(engine)
+
+        return Engine.UNKNOWN
 
     def detect_from_levels(self, levels: List[Level]) -> Engine:
         scores: Dict[str, float] = {}
