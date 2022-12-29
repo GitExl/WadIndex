@@ -23,7 +23,7 @@ class SZArchive:
         self._read_info()
 
     def _read_info(self):
-        proc = subprocess.Popen(['7z', 'l', '-slt', '-so', '-sccUTF-8', self.path.as_posix()], stdout=subprocess.PIPE, encoding='utf8')
+        proc = subprocess.Popen(['7z', 'l', '-slt', '-so', '-sccUTF-8', self.path.as_posix()], stdout=subprocess.PIPE)
 
         mode = SZParseMode.NONE
         file: Optional[SZFile] = None
