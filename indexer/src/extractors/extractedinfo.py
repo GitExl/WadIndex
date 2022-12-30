@@ -25,14 +25,14 @@ class MusicInfo:
     type: MusicType
     data: bytes
     hash: bytes
+    duration: Optional[int] = None
     id: Optional[int] = None
 
     def to_row(self) -> Dict[str, any]:
         return {
             'type': self.type.value,
             'hash': self.hash,
-            'author_id': None,
-            'title': None,
+            'duration': self.duration,
         }
 
 
