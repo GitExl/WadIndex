@@ -1,4 +1,9 @@
 #!/bin/sh
 
 npm install
-npm run build
+
+if [[ -z ${DEV_ENV+x} ]]; then
+  npm run build
+else
+  npm run dev -- --host
+fi
