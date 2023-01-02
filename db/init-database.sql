@@ -1,16 +1,13 @@
-CREATE DATABASE IF NOT EXISTS `idgames`;
-USE `idgames`;
-
--- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
+-- MariaDB dump 10.19  Distrib 10.10.2-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: idgames
 -- ------------------------------------------------------
--- Server version	5.5.5-10.6.8-MariaDB
+-- Server version 10.10.2-MariaDB-1:10.10.2+maria~ubu2204
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -23,12 +20,15 @@ USE `idgames`;
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `author` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` text NOT NULL,
+  `full_name` varchar(255) DEFAULT NULL,
+  `nickname` varchar(127) DEFAULT NULL,
+  `path_alias` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9998 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10018 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -36,26 +36,26 @@ CREATE TABLE IF NOT EXISTS `author` (
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `entry` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `collection` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `path` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `collection` varchar(32) NOT NULL,
+  `path` varchar(127) NOT NULL,
   `file_modified` int(10) unsigned NOT NULL,
   `entry_updated` int(10) unsigned NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `game` tinyint(4) DEFAULT NULL,
-  `engine` tinyint(4) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `game` tinyint(4) NOT NULL DEFAULT 0,
+  `engine` tinyint(4) NOT NULL DEFAULT 0,
   `is_singleplayer` tinyint(1) DEFAULT NULL,
   `is_cooperative` tinyint(1) DEFAULT NULL,
   `is_deathmatch` tinyint(1) DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description_preview` varchar(199) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `tools_used` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `known_bugs` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `credits` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `build_time` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `comments` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `description_preview` varchar(199) DEFAULT NULL,
+  `tools_used` text DEFAULT NULL,
+  `known_bugs` text DEFAULT NULL,
+  `credits` text DEFAULT NULL,
+  `build_time` text DEFAULT NULL,
+  `comments` text DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `entries_updated_IDX` (`entry_updated`) USING BTREE,
   KEY `entries_game_IDX` (`game`) USING BTREE,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `entry` (
   KEY `entry_is_deathmatch_IDX` (`is_deathmatch`) USING BTREE,
   KEY `entry_collection_IDX` (`collection`,`path`) USING BTREE,
   FULLTEXT KEY `entry_path_IDX` (`path`,`title`)
-) ENGINE=InnoDB AUTO_INCREMENT=19567 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=39173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `entry` (
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `entry_authors` (
   `entry_id` int(10) unsigned NOT NULL,
   `author_id` int(10) unsigned NOT NULL,
@@ -86,10 +86,10 @@ CREATE TABLE IF NOT EXISTS `entry_authors` (
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `entry_images` (
   `entry_id` int(10) unsigned NOT NULL,
-  `name` varchar(27) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(27) NOT NULL,
   `width` smallint(5) unsigned NOT NULL,
   `height` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`entry_id`,`name`)
@@ -101,11 +101,11 @@ CREATE TABLE IF NOT EXISTS `entry_images` (
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `entry_levels` (
   `entry_id` int(10) unsigned NOT NULL,
-  `name` char(8) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(1022) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` char(8) NOT NULL,
+  `title` varchar(1022) DEFAULT NULL,
   `format` tinyint(4) NOT NULL,
   `line_count` int(10) unsigned NOT NULL,
   `side_count` int(10) unsigned NOT NULL,
@@ -114,9 +114,9 @@ CREATE TABLE IF NOT EXISTS `entry_levels` (
   `allow_jump` tinyint(1) unsigned DEFAULT NULL,
   `allow_crouch` tinyint(1) unsigned DEFAULT NULL,
   `par_time` int(10) unsigned DEFAULT NULL,
-  `music` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `next` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `next_secret` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `music` varchar(255) DEFAULT NULL,
+  `next` varchar(255) DEFAULT NULL,
+  `next_secret` varchar(255) DEFAULT NULL,
   `cluster` int(11) DEFAULT NULL,
   PRIMARY KEY (`entry_id`,`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -127,13 +127,13 @@ CREATE TABLE IF NOT EXISTS `entry_levels` (
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `entry_music` (
   `entry_id` int(10) unsigned NOT NULL,
   `music_id` int(10) unsigned NOT NULL,
   `name` varchar(27) NOT NULL,
   KEY `entry_music_entry_id_IDX` (`entry_id`,`name`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -141,12 +141,12 @@ CREATE TABLE IF NOT EXISTS `entry_music` (
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `entry_tags` (
   `entry_id` int(10) unsigned NOT NULL,
   `tag_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`entry_id`,`tag_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -154,10 +154,10 @@ CREATE TABLE IF NOT EXISTS `entry_tags` (
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `entry_textfile` (
   `entry_id` int(10) unsigned NOT NULL,
-  `text` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text` mediumtext NOT NULL,
   PRIMARY KEY (`entry_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -167,18 +167,15 @@ CREATE TABLE IF NOT EXISTS `entry_textfile` (
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `music` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `type` varchar(8) NOT NULL,
   `hash` binary(20) NOT NULL,
-  `author_id` int(10) unsigned DEFAULT NULL,
-  `title` varchar(255) DEFAULT NULL,
   `duration` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `music_hash_IDX` (`hash`) USING BTREE,
-  KEY `music_author_id_IDX` (`author_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12710 DEFAULT CHARSET=utf8mb4;
+  UNIQUE KEY `music_hash_IDX` (`hash`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=12818 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -186,18 +183,14 @@ CREATE TABLE IF NOT EXISTS `music` (
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `tags` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `key` varchar(32) NOT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`,`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping routines for database 'idgames'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -208,4 +201,4 @@ CREATE TABLE IF NOT EXISTS `tags` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-12-10 19:50:01
+-- Dump completed on 2023-01-02 14:23:08
