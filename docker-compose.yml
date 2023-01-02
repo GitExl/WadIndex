@@ -27,7 +27,7 @@ services:
       - 9000
     volumes:
       - ./api/:/var/www/html/api
-      - ./api/php-extra.ini:/usr/local/etc/php/conf.d/php-extra.ini
+      - ./php/php-extra.ini:/usr/local/etc/php/conf.d/php-extra.ini
     depends_on:
       - db
 

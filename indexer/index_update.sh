@@ -1,1 +1,1 @@
-python /usr/src/app/src/index.py update
+python /usr/src/app/src/extract.py --clean
