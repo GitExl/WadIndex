@@ -18,14 +18,14 @@ class ArchiveListExtractor(ExtractorBase):
 
         self.iwads: Dict[Game, WADArchive] = {}
 
-        self._add_iwad(Game.DOOM2, 'doom2.wad')
-        self._add_iwad(Game.DOOM, 'doom.wad')
-        self._add_iwad(Game.HERETIC, 'heretic.wad')
-        self._add_iwad(Game.HEXEN, 'hexen.wad')
-        self._add_iwad(Game.TNT, 'tnt.wad')
-        self._add_iwad(Game.PLUTONIA, 'plutonia.wad')
-        self._add_iwad(Game.STRIFE, 'strife0.wad')
-        self._add_iwad(Game.HACX, 'hacx.wad')
+        self._add_iwad(Game.DOOM2, 'DOOM2.WAD')
+        self._add_iwad(Game.DOOM, 'DOOM.WAD')
+        self._add_iwad(Game.HERETIC, 'HERETIC.WAD')
+        self._add_iwad(Game.HEXEN, 'HEXEN.WAD')
+        self._add_iwad(Game.TNT, 'TNT.WAD')
+        self._add_iwad(Game.PLUTONIA, 'PLUTONIA.WAD')
+        self._add_iwad(Game.STRIFE, 'STRIFE0.WAD')
+        self._add_iwad(Game.HACX, 'HACX.WAD')
 
     def extract(self, info: ExtractedInfo):
         if info.archive is None:

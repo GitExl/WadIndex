@@ -45,6 +45,7 @@ class FileIndex:
 
             stat = file_path.stat()
             date = datetime.fromtimestamp(stat.st_mtime)
+            date = date.replace(hour=0, minute=0, second=0, microsecond=0)
             size = stat.st_size
             files[path_str] = FileIndexEntry(path_str, size, date)
 
@@ -83,13 +84,17 @@ class FileIndex:
                         continue
 
                     month, day, year = parts[1:4]
+                    recent = False
                     if year.find(':') >= 0:
-                        time = year
+                        recent = True
                         year = path_mtime.year
-                    else:
-                        time = '0:00'
 
+                    time = '0:00'
                     date = datetime.strptime('{} {} {} {}'.format(year, month, day, time), '%Y %b %d %H:%M')
+
+                    # Adjust for "recent" dates lacking a year.
+                    if recent and date.month > path_mtime.month:
+                        date = date.replace(year=date.year - 1)
 
                     size = int(parts[0])
                     files[path_str] = FileIndexEntry(path_str, size, date)
