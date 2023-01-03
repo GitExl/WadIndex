@@ -26,7 +26,11 @@
     "idstuff",
     "incoming",
     "newstuff",
-    "ls-laR.gz"
+    "ls-laR.gz",
+    "LAST.24hours",
+    "fullsort.gz",
+    "lmps/COMPET-N/doom2/movie/10nm####.txt",
+    "lmps/COMPET-N/doom2/movie/10nm####.zip"
   ],
   "mirrors": [
     "https://www.quaddicted.com/files/idgames",
