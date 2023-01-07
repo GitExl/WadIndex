@@ -37,12 +37,21 @@ class MusicInfo:
 
 
 @dataclass
+class GraphicInfo:
+    image: Image
+    image_thumb: Image
+    is_primary: bool = False
+
+
+@dataclass
 class ExtractedInfo:
     path_local: Path
     path_local_base: Path
     path_idgames: Path
     path_idgames_base: Path
     filename_base: str
+    file_size: int
+    file_modified: int
     entry: Optional[Entry] = None
 
     main_archive: Optional[ZipFile] = None
@@ -65,6 +74,6 @@ class ExtractedInfo:
     credits: Optional[str] = None
     comments: Optional[str] = None
     authors: List[str] = field(default_factory=lambda: [])
-    graphics: Dict[str, Image] = field(default_factory=lambda: {})
+    graphics: Dict[str, GraphicInfo] = field(default_factory=lambda: {})
     levels: List[Level] = field(default_factory=lambda: [])
     music: Dict[str, MusicInfo] = field(default_factory=lambda: {})

@@ -10,84 +10,147 @@ components:
     Level:
       type: object
       properties:
+        collection:
+          type: string
+        path:
+          type: string
         name:
           type: string
         title:
           type: string
+          nullable: true
         par_time:
           type: integer
         music:
-          type: string
+          $ref: '#/components/schemas/LevelMusic'
+          nullable: true
         next:
-          type: string
+          $ref: '#/components/schemas/LevelTeaser'
+          nullable: true
         next_secret:
-          type: string
+          $ref: '#/components/schemas/LevelTeaser'
+          nullable: true
         cluster:
           type: string
+          nullable: true
         format:
           type: string
         allow_jump:
           type: boolean
+          nullable: true
         allow_crouch:
           type: boolean
-        stats:
-          $ref: '#/components/schemas/LevelStats'
-        screenshots:
-          type: array
-          items:
-            $ref: '#/components/schemas/Image'
+          nullable: true
+        thing_count:
+          type: integer
+        line_count:
+          type: integer
+        sector_count:
+          type: integer
+        side_count:
+          type: integer
 
-    LevelStats:
+    LevelTeaser:
       type: object
       properties:
-        things:
-          type: integer
-        lines:
-          type: integer
-        sectors:
-          type: integer
-        sides:
-          type: integer
+        collection:
+          type: string
+        path:
+          type: string
+        name:
+          type: string
+        title:
+          type: string
+          nullable: true
+        music_name:
+          type: string
+          nullable: true
+        format:
+          type: string
 
     Music:
       type: object
       properties:
-        file_path:
+        href:
           type: string
         type:
           type: string
+        duration:
+          type: integer
+          nullable: true
         hash:
+          type: string
+        heard_in:
+          type: array
+          items:
+            $ref: '#/components/schemas/MusicEntryLink'
+
+    MusicEntryLink:
+      type: object
+      properties:
+        collection:
+          type: string
+        path:
+          type: string
+        name:
+          type: string
+        title:
+          type: string
+          nullable: true
+
+    LevelMusic:
+      type: object
+      properties:
+        name:
+          type: string
+        href:
+          type: string
+        type:
           type: string
         duration:
           type: integer
+          nullable: true
+        hash:
+          type: string
 
     Entry:
       type: object
       properties:
-        title:
+        collection:
           type: string
         path:
           type: string
+        title:
+          type: string
+          nullable: true
         size:
           type: integer
         timestamp:
           type: string
         game:
           type: string
+          nullable: true
         engine:
           type: string
+          nullable: true
         description:
           type: string
+          nullable: true
         tools_used:
           type: string
+          nullable: true
         build_time:
           type: string
+          nullable: true
         credits:
           type: string
+          nullable: true
         known_bugs:
           type: string
+          nullable: true
         comments:
           type: string
+          nullable: true
         authors:
           type: array
           items:
@@ -95,16 +158,12 @@ components:
         levels:
           type: array
           items:
-            $ref: '#/components/schemas/Level'
+            $ref: '#/components/schemas/LevelTeaser'
         music:
           type: array
           items:
-            $ref: '#/components/schemas/Music'
+            $ref: '#/components/schemas/LevelMusic'
         images:
-          type: array
-          items:
-            $ref: '#/components/schemas/Image'
-        screenshots:
           type: array
           items:
             $ref: '#/components/schemas/Image'
@@ -112,33 +171,36 @@ components:
     EntryTeaser:
       type: object
       properties:
-        title:
+        collection:
           type: string
         path:
           type: string
+        title:
+          type: string
+          nullable: true
         timestamp:
           type: string
         game:
           type: string
+          nullable: true
         description:
           type: string
+          nullable: true
         authors:
           type: array
           items:
             $ref: '#/components/schemas/Author'
         level_count:
           type: integer
-        thumbnail:
-          type: array
-          items:
-            $ref: '#/components/schemas/Image'
+        image:
+          $ref: '#/components/schemas/Image'
 
     Image:
       type: object
       properties:
-        path:
+        href:
           type: string
-        path_thumbnail:
+        href_thumbnail:
           type: string
         name:
           type: string
@@ -146,8 +208,6 @@ components:
           type: integer
         height:
           type: integer
-        source:
-          type: string
 
     Author:
       type: object
@@ -156,15 +216,19 @@ components:
           type: string
         full_name:
           type: string
+          nullable: true
         nickname:
+          type: string
+          nullable: true
+        path_alias:
           type: string
 
     Directory:
       type: object
       properties:
-        name:
-          type: string
         path:
+          type: string
+        name:
           type: string
 
     DirectoryListing:

@@ -9,9 +9,35 @@ from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from doom.doomimage import DoomImage
 from doom.palette import Palette
+from extractors.extractedinfo import GraphicInfo
 
 
-TITLE_GRAPHICS: List[str] = ['titlepic', 'title', 'interpic', 'bossback', 'endpic', 'pfub1', 'victory2', 'pfub2', 'wimap0', 'wimap1', 'wimap2', 'credit', 'help', 'help1', 'help2']
+GRAPHIC_LUMP_NAMES: List[str] = [
+    'titlepic',
+    'title',
+    'interpic',
+    'bossback',
+    'endpic',
+    'pfub1',
+    'victory2',
+    'pfub2',
+    'wimap0',
+    'wimap1',
+    'wimap2',
+    'credit',
+    'help',
+    'help1',
+    'help2',
+]
+
+GRAPHIC_LUMP_NAMES_PRIMARY: List[str] = [
+    'titlepic',
+    'title',
+    'interpic',
+]
+
+THUMB_WIDTH = 280
+THUMB_HEIGHT = 210
 
 
 class GraphicsExtractor(ExtractorBase):
@@ -28,16 +54,30 @@ class GraphicsExtractor(ExtractorBase):
             return
         palette = Palette.from_playpal_data(playpal.get_data())
 
-        for filename in TITLE_GRAPHICS:
+        for filename in GRAPHIC_LUMP_NAMES:
             file = archive_list.file_find_basename(filename, include_main=False)
             if not file:
                 continue
 
-            graphic = self.read_graphic(file, palette)
-            if graphic:
-                info.graphics[filename] = graphic
+            image = self.read_lump_as_image(file, palette)
+            if image:
+                if image.width > image.height:
+                    thumb_width = THUMB_WIDTH
+                    thumb_height = ceil(image.height * (THUMB_WIDTH / image.width))
+                else:
+                    thumb_width = ceil(image.width * (THUMB_HEIGHT / image.height))
+                    thumb_height = THUMB_HEIGHT
 
-    def read_graphic(self, file: ArchiveFileBase, palette: Palette) -> Optional[Image.Image]:
+                image_thumb = image.resize((thumb_width, thumb_height), Image.BICUBIC)
+                info.graphics[filename] = GraphicInfo(image, image_thumb)
+
+        # Determine primary graphic.
+        for name in GRAPHIC_LUMP_NAMES_PRIMARY:
+            if name in info.graphics:
+                info.graphics[name].is_primary = True
+                break
+
+    def read_lump_as_image(self, file: ArchiveFileBase, palette: Palette) -> Optional[Image.Image]:
         image: Optional[Image.Image] = None
 
         # Attempt to identify the file looking for PNG or partial JPEG magic bytes.

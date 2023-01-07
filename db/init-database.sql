@@ -28,7 +28,25 @@ CREATE TABLE IF NOT EXISTS `author` (
   `nickname` varchar(127) DEFAULT NULL,
   `path_alias` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10018 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3525 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `directories`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `directories` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(10) unsigned DEFAULT NULL,
+  `collection` varchar(15) NOT NULL,
+  `path` varchar(127) NOT NULL,
+  `name` varchar(31) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `directories_collection_IDX` (`collection`,`path`) USING BTREE,
+  KEY `directories_parent_id_IDX` (`parent_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,9 +57,11 @@ CREATE TABLE IF NOT EXISTS `author` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `entry` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `collection` varchar(32) NOT NULL,
+  `collection` varchar(15) NOT NULL,
   `path` varchar(127) NOT NULL,
+  `directory_id` int(10) unsigned DEFAULT NULL,
   `file_modified` int(10) unsigned NOT NULL,
+  `file_size` int(10) unsigned NOT NULL,
   `entry_updated` int(10) unsigned NOT NULL,
   `title` varchar(255) DEFAULT NULL,
   `game` tinyint(4) NOT NULL DEFAULT 0,
@@ -63,9 +83,9 @@ CREATE TABLE IF NOT EXISTS `entry` (
   KEY `entry_is_singleplayer_IDX` (`is_singleplayer`) USING BTREE,
   KEY `entry_is_cooperative_IDX` (`is_cooperative`) USING BTREE,
   KEY `entry_is_deathmatch_IDX` (`is_deathmatch`) USING BTREE,
-  KEY `entry_collection_IDX` (`collection`,`path`) USING BTREE,
-  FULLTEXT KEY `entry_path_IDX` (`path`,`title`)
-) ENGINE=InnoDB AUTO_INCREMENT=39173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `entry_directory_id_IDX` (`directory_id`) USING BTREE,
+  KEY `entry_collection_IDX` (`collection`,`path`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=5088 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -92,7 +112,9 @@ CREATE TABLE IF NOT EXISTS `entry_images` (
   `name` varchar(27) NOT NULL,
   `width` smallint(5) unsigned NOT NULL,
   `height` smallint(5) unsigned NOT NULL,
-  PRIMARY KEY (`entry_id`,`name`)
+  `is_primary` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`entry_id`,`name`),
+  KEY `entry_images_is_primary_IDX` (`is_primary`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -175,7 +197,7 @@ CREATE TABLE IF NOT EXISTS `music` (
   `duration` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `music_hash_IDX` (`hash`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12818 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3601 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -189,7 +211,7 @@ CREATE TABLE IF NOT EXISTS `tags` (
   `key` varchar(32) NOT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`,`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -201,4 +223,4 @@ CREATE TABLE IF NOT EXISTS `tags` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-02 14:23:08
+-- Dump completed on 2023-01-07 12:57:30

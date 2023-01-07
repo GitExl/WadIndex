@@ -87,12 +87,15 @@ class Extract:
             self.logger.decision('Ignoring {} because: {}'.format(path_idgames, ignore_reason))
             return None, None
 
+        stat = path_local.stat()
         info = ExtractedInfo(
             path_local,
             path_local_base,
             path_idgames,
             path_idgames_base,
             filename_base,
+            stat.st_size,
+            int(stat.st_mtime),
         )
 
         # Run all extractors and writers in sequence.
@@ -145,6 +148,7 @@ def run():
     else:
         idgames_local_root = Path(config.get('paths.idgames'))
         paths_system = list(idgames_local_root.rglob('*.zip'))
+    paths_system.sort()
 
     for path_system in paths_system:
         info, entry = extract.process_file(path_system, options.force)
@@ -154,8 +158,9 @@ def run():
         if entry is None:
             entry = Entry(
                 info.path_idgames.as_posix(),
-                int(info.path_local.stat().st_mtime),
-                time_now,
+                info.file_modified,
+                info.file_size,
+                time_now
             )
         else:
             entry.entry_updated = time_now
@@ -198,6 +203,8 @@ def run():
         storage.remove_orphan_images()
         logger.info('Removing orphaned music...')
         storage.remove_orphan_music()
+        logger.info('Removing empty directories...')
+        storage.remove_orphan_directories()
 
     storage.commit()
 

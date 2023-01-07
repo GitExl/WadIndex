@@ -77,12 +77,15 @@ ENGINE_TO_INT: Dict[Engine, int] = {
 
 class Entry:
 
-    def __init__(self, path: str, file_modified: int, entry_updated: int):
+    def __init__(self, path: str, file_modified: int, file_size: int, entry_updated: int):
+        self.collection: str = 'idgames'
         self.path: str = path
         self.file_modified: int = file_modified
         self.entry_updated: int = entry_updated
+        self.file_size: int = file_size
 
         self.id: Optional[int] = None
+        self.directory_id: Optional[int] = None
 
         self.title: Optional[str] = None
         self.game: Optional[Game] = None
@@ -110,10 +113,12 @@ class Entry:
             engine = ENGINE_TO_INT.get(self.engine)
 
         return {
-            'collection': 'idgames',
+            'collection': self.collection,
             'path': self.path,
+            'directory_id': self.directory_id,
             'file_modified': self.file_modified,
             'entry_updated': self.entry_updated,
+            'file_size': self.file_size,
             'title': self.title,
             'game': game,
             'engine': engine,
@@ -142,12 +147,16 @@ class Entry:
         entry = Entry(
             row['path'],
             row['file_modified'],
+            row['file_size'],
             row['entry_updated']
         )
+        entry.collection = row['collection']
         entry.id = row['id']
         entry.title = row['title']
         entry.game = game
         entry.engine = engine
+        entry.directory_id = row['directory_id']
+        entry.file_size = row['file_size']
         entry.is_singleplayer = row['is_singleplayer']
         entry.is_cooperative = row['is_cooperative']
         entry.is_deathmatch = row['is_deathmatch']

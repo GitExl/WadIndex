@@ -1,7 +1,6 @@
 from pathlib import Path
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Set, Tuple
 
-from PIL.Image import Image
 from mysql.connector import MySQLConnection, connection
 
 from doom.level import Level, LEVEL_FORMAT_TO_INT
@@ -9,6 +8,8 @@ from extractors.musicextractor import MusicInfo
 from idgames.entry import Entry
 from utils.config import Config
 import re
+
+from extractors.extractedinfo import GraphicInfo
 
 
 class DBStorage:
@@ -41,6 +42,9 @@ class DBStorage:
         return Entry.from_row(dict(zip(self.cursor.column_names, row)))
 
     def save_entry(self, entry: Entry) -> int:
+        (directory, _, _) = entry.path.rpartition('/')
+        entry.directory_id = self.get_or_create_directory_id(directory, entry.collection)
+
         row = entry.to_row()
 
         args = list(row.values())
@@ -58,6 +62,29 @@ class DBStorage:
             entry.id = self.cursor.lastrowid
 
         return entry.id
+
+    def get_or_create_directory_id(self, directory_path: str, collection: str) -> int:
+        if directory_path.find('/'):
+            (directory_parent, _, directory_name) = directory_path.rpartition('/')
+        else:
+            directory_parent = None
+            directory_name = directory_path
+
+        self.cursor.execute('SELECT id FROM directories WHERE collection=%s AND path=%s LIMIT 1', (collection, directory_path,))
+        directory_row = self.cursor.fetchone()
+        if directory_row is not None:
+            return directory_row[0]
+
+        if directory_parent:
+            directory_parent_id = self.get_or_create_directory_id(directory_parent, collection)
+        else:
+            directory_parent_id = None
+
+        self.cursor.execute('INSERT INTO directories (parent_id, collection, path, name) VALUES (%s, %s, %s, %s)', (directory_parent_id, collection, directory_path, directory_name,))
+        return self.cursor.lastrowid
+
+    def remove_orphan_directories(self):
+        self.cursor.execute('DELETE FROM directories WHERE id NOT IN (SELECT DISTINCT directory_id FROM entry) AND id NOT IN (SELECT parent_id FROM directories)')
 
     def save_entry_authors(self, entry: Entry, authors: List[str]):
 
@@ -136,10 +163,10 @@ class DBStorage:
         if text_file is not None and len(text_file):
             self.cursor.execute('INSERT INTO entry_textfile VALUES (%s, %s)', (entry.id, text_file))
 
-    def save_entry_images(self, entry: Entry, images: Dict[str, Image]):
+    def save_entry_images(self, entry: Entry, graphics: Dict[str, GraphicInfo]):
         self.cursor.execute('DELETE FROM entry_images WHERE entry_id=%s', (entry.id,))
-        for name, image in images.items():
-            self.cursor.execute('INSERT INTO entry_images VALUES (%s, %s, %s, %s)', (entry.id, name, image.width, image.height))
+        for name, graphic in graphics.items():
+            self.cursor.execute('INSERT INTO entry_images VALUES (%s, %s, %s, %s, %s)', (entry.id, name, graphic.image.width, graphic.image.height, graphic.is_primary))
 
     def save_entry_music(self, entry: Entry, music: Dict[str, MusicInfo]):
         self.cursor.execute('DELETE FROM entry_music WHERE entry_id=%s', (entry.id,))
@@ -147,7 +174,7 @@ class DBStorage:
             self.cursor.execute('INSERT INTO entry_music VALUES (%s, %s, %s)', (entry.id, music.id, name))
 
     def remove_orphan_authors(self):
-        self.cursor.execute('DELETE FROM author WHERE id NOT IN (SELECT author_id FROM entry_authors)')
+        self.cursor.execute('DELETE FROM author WHERE id NOT IN (SELECT DISTINCT author_id FROM entry_authors)')
 
     def remove_orphan_levels(self):
         self.cursor.execute('DELETE FROM entry_levels WHERE entry_id NOT IN (SELECT id FROM entry)')
@@ -212,3 +239,18 @@ class DBStorage:
         url = self.RE_URL_CLEAN.sub('', url)
         url = self.RE_URL_DEDUP.sub('-', url)
         return url[:255].strip()
+
+    def rebuild_directory(self):
+        directories: Set[Tuple[str, str]] = set()
+
+        self.cursor.execute('SELECT path FROM entry')
+        for path in self.cursor.fetchall():
+            (directory, _, _) = path[0].rpartition('/')
+            if directory.find('/'):
+                (parent, _, _) = directory.rpartition('/')
+            else:
+                parent = None
+
+            directories.add((directory, parent))
+
+        print(directories)
