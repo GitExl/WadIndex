@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: idgames
 -- ------------------------------------------------------
--- Server version 10.10.2-MariaDB-1:10.10.2+maria~ubu2204
+-- Server version	10.10.2-MariaDB-1:10.10.2+maria~ubu2204
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `author` (
   `nickname` varchar(127) DEFAULT NULL,
   `path_alias` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3525 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10008 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `directories` (
   PRIMARY KEY (`id`),
   KEY `directories_collection_IDX` (`collection`,`path`) USING BTREE,
   KEY `directories_parent_id_IDX` (`parent_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=289 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -84,8 +84,11 @@ CREATE TABLE IF NOT EXISTS `entry` (
   KEY `entry_is_cooperative_IDX` (`is_cooperative`) USING BTREE,
   KEY `entry_is_deathmatch_IDX` (`is_deathmatch`) USING BTREE,
   KEY `entry_directory_id_IDX` (`directory_id`) USING BTREE,
-  KEY `entry_collection_IDX` (`collection`,`path`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=5088 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `entry_collection_IDX` (`collection`,`path`) USING BTREE,
+  FULLTEXT KEY `entry_path_ft_IDX` (`path`),
+  FULLTEXT KEY `entry_title_ft_IDX` (`title`),
+  FULLTEXT KEY `entry_description_ft_IDX` (`description`)
+) ENGINE=InnoDB AUTO_INCREMENT=19601 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -180,7 +183,8 @@ CREATE TABLE IF NOT EXISTS `entry_tags` (
 CREATE TABLE IF NOT EXISTS `entry_textfile` (
   `entry_id` int(10) unsigned NOT NULL,
   `text` mediumtext NOT NULL,
-  PRIMARY KEY (`entry_id`)
+  PRIMARY KEY (`entry_id`),
+  FULLTEXT KEY `entry_ft_IDX` (`text`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -197,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `music` (
   `duration` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `music_hash_IDX` (`hash`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=3601 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12846 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -223,4 +227,4 @@ CREATE TABLE IF NOT EXISTS `tags` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-07 12:57:30
+-- Dump completed on 2023-01-08 17:19:06
