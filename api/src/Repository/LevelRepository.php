@@ -12,6 +12,15 @@ class LevelRepository {
     'udmf',
   ];
 
+  private const FIELDS_ENTRY_TEASER = '
+    e.collection AS `collection`,
+    e.path AS `path`,
+    el.name AS `name`,
+    el.title AS `title`,
+    el.music AS `music_name`,
+    el.format AS `format`
+  ';
+
   private Connection $connection;
 
   public function __construct(Connection $connection)  {
@@ -21,12 +30,7 @@ class LevelRepository {
   public function getAllTeasersForEntry(int $entry_id): ?array {
     $stmt = $this->connection->prepare('
       SELECT
-        e.path AS `path`,
-        e.collection AS `collection`,
-        el.name AS `name`,
-        el.title AS `title`,
-        el.music AS `music_name`,
-        el.format AS `format`
+        ' . self::FIELDS_ENTRY_TEASER . '
       FROM
         entry_levels el
       LEFT JOIN entry e ON e.id = el.entry_id
@@ -54,12 +58,7 @@ class LevelRepository {
   public function getTeaser(string $collection, string $path, string $name): ?array {
     $stmt = $this->connection->prepare('
       SELECT
-        e.collection AS `collection`,
-        e.path AS `path`,
-        el.name AS `name`,
-        el.title AS `title`,
-        el.music AS `music_name`,
-        el.format AS `format`
+        ' . self::FIELDS_ENTRY_TEASER . '
       FROM entry e
       LEFT JOIN entry_levels el ON el.entry_id = e.id
       WHERE

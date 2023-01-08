@@ -6,12 +6,17 @@ use App\Repository\AuthorRepository;
 use App\Repository\EntryRepository;
 use App\Repository\ImageRepository;
 use App\Repository\LevelRepository;
+use App\Repository\ListParameters;
 use App\Repository\MusicRepository;
+use App\Repository\SearchParameters;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\Cache;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class Entries extends AbstractController {
 
@@ -25,12 +30,15 @@ class Entries extends AbstractController {
 
     private LevelRepository $levels;
 
-    public function __construct(EntryRepository $entries, AuthorRepository $authors, ImageRepository $images, MusicRepository $music, LevelRepository $levels)  {
+    private ValidatorInterface $validator;
+
+    public function __construct(EntryRepository $entries, AuthorRepository $authors, ImageRepository $images, MusicRepository $music, LevelRepository $levels, ValidatorInterface $validator)  {
         $this->entries = $entries;
         $this->authors = $authors;
         $this->images = $images;
         $this->music = $music;
         $this->levels = $levels;
+        $this->validator = $validator;
     }
 
     #[Route('/entries/{collection}/{path}', methods: ['GET'], requirements: ['path' => '.+'])]
@@ -60,12 +68,14 @@ class Entries extends AbstractController {
 
     #[Route('/list/{collection}/{path}', methods: ['GET'], requirements: ['path' => '.+'])]
     #[Cache(public: true, maxage: 3600, mustRevalidate: true)]
-    public function list(string $collection, string $path): Response {
-        if (str_ends_with($path, '/')) {
-            $path = mb_substr($path, 0, -1);
+    public function list(Request $request, string $collection, ?string $path=NULL): Response {
+        $params = ListParameters::fromRequest($request, $collection, $path);
+        $errors = $this->validator->validate($params);
+        if (count($errors) > 0) {
+            throw new BadRequestHttpException((string) $errors);
         }
 
-        $listing = $this->entries->list($collection, $path);
+        $listing = $this->entries->list($params);
         if ($listing == NULL) {
             throw new NotFoundHttpException();
         }
@@ -74,16 +84,19 @@ class Entries extends AbstractController {
         return $this->json($listing);
     }
 
-    #[Route('/list/{collection}', methods: ['GET'])]
+    #[Route('/search', methods: ['GET'])]
     #[Cache(public: true, maxage: 3600, mustRevalidate: true)]
-    public function listRoot(string $collection): Response {
-        $listing = $this->entries->list($collection);
-        if ($listing == NULL) {
-            throw new NotFoundHttpException();
+    public function search(Request $request) {
+        $params = SearchParameters::fromRequest($request);
+        $errors = $this->validator->validate($params);
+        if (count($errors) > 0) {
+            throw new BadRequestHttpException((string) $errors);
         }
 
-        $this->addEntryTeaserData($listing['entries']);
-        return $this->json($listing);
+        $entries = $this->entries->search($params);
+        $this->addEntryTeaserData($entries);
+
+        return $this->json($entries);
     }
 
     private function addEntryTeaserData(array &$entries) {

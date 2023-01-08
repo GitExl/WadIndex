@@ -274,12 +274,22 @@ paths:
     get:
       description: Returns entries matching a search query.
       parameters:
-        - name: key
+        - name: search_key
           in: query
           description: The text to search for.
           schema:
             type: string
           required: true
+        - name: search_fields
+          in: query
+          description: Only search in specific fields.
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [title, description, filename, textfile]
+            default: [title, description, filename]
         - name: collection
           in: query
           description: The collection to search in.
@@ -288,23 +298,17 @@ paths:
         - name: filter_gameplay
           in: query
           description: Filter by the type of gameplay.
+          explode: false
           schema:
             type: string
             enum: [singleplayer, deathmatch, cooperative]
         - name: filter_game
           in: query
           description: Filter by the type of game.
+          explode: false
           schema:
             type: string
             enum: [doom, doom2, tnt, plutonia, heretic, hexen]
-        - name: search_fields
-          in: query
-          description: Only search in specific fields.
-          schema:
-              type: array
-              items:
-                type: string
-                enum: [title, description, authors, filename]
         - name: sort_field
           in: query
           description: Sort results by a property.

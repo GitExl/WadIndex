@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use Doctrine\DBAL\Connection;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use InvalidArgumentException;
 
 class EntryRepository {
 
@@ -41,6 +41,24 @@ class EntryRepository {
     17 => 'zandronum',
   ];
 
+  private const FIELDS_TEASER = '
+    e.id,
+    e.path AS `path`,
+    e.collection AS `collection`,
+    e.title AS `title`,
+    e.file_modified AS `timestamp`,
+    e.game AS `game`,
+    e.description_preview AS `description`,
+    (SELECT COUNT(*) FROM entry_levels WHERE entry_id = e.id) AS `level_count`
+  ';
+
+  private const FIELDS_MINIMAL = '
+    e.entry_id AS `id`,
+    e.collection AS `collection`,
+    e.path AS `path`,
+    e.title AS `title`
+  ';
+
   private Connection $connection;
 
   public function __construct(Connection $connection)  {
@@ -50,14 +68,7 @@ class EntryRepository {
   public function getLatestTeasers(int $count=10): array {
     $stmt = $this->connection->prepare("
       SELECT
-        e.id AS `id`,
-        e.path AS `path`,
-        e.collection AS `collection`,
-        e.title AS `title`,
-        e.file_modified AS `timestamp`,
-        e.game AS `game`,
-        e.description AS `description`,
-        (SELECT COUNT(*) FROM entry_levels WHERE entry_id = e.id) AS `level_count`
+        " . self::FIELDS_TEASER . "
       FROM entry e
       ORDER BY e.file_modified DESC
       LIMIT $count
@@ -110,8 +121,28 @@ class EntryRepository {
     return $entry;
   }
 
-  public function list(string $collection, ?string $path=NULL): ?array {
-    if ($path) {
+  public function list(ListParameters $params): ?array {
+    if ($params->sortField === 'title') {
+      $sort_field = 'e.title';
+    }
+    elseif ($params->sortField === 'date') {
+      $sort_field = 'e.file_modified';
+    }
+    else {
+      throw new InvalidArgumentException();
+    }
+
+    if ($params->sortOrder === 'asc') {
+      $sort_order = 'ASC';
+    }
+    elseif ($params->sortOrder === 'desc') {
+      $sort_order = 'DESC';
+    }
+    else {
+      throw new InvalidArgumentException();
+    }
+
+    if ($params->path) {
       $stmt = $this->connection->prepare('
         SELECT
           d.id AS `id`
@@ -122,8 +153,8 @@ class EntryRepository {
         LIMIT 1
       ');
       $directory_id = $stmt->executeQuery([
-        'collection' => $collection,
-        'path' => $path,
+        'collection' => $params->collection,
+        'path' => $params->path,
       ])->fetchFirstColumn();
       if ($directory_id == NULL) {
         return NULL;
@@ -136,24 +167,17 @@ class EntryRepository {
     }
 
     // Get entries.
-    $stmt = $this->connection->prepare('
+    $stmt = $this->connection->prepare("
       SELECT
-        e.id AS `id`,
-        e.path AS `path`,
-        e.collection AS `collection`,
-        e.title AS `title`,
-        e.file_modified AS `timestamp`,
-        e.game AS `game`,
-        e.description AS `description`,
-        (SELECT COUNT(*) FROM entry_levels WHERE entry_id = e.id) AS `level_count`
+        " . self::FIELDS_TEASER . "
       FROM entry e
       WHERE
         e.collection = :collection AND
         e.directory_id = :directory_id
-      ORDER BY e.path ASC
-    ');
+      ORDER BY $sort_field $sort_order
+    ");
     $entries = $stmt->executeQuery([
-      'collection' => $collection,
+      'collection' => $params->collection,
       'directory_id' => $directory_id,
     ])->fetchAllAssociative();
 
@@ -199,16 +223,13 @@ class EntryRepository {
   public function getForMusic(int $music_id): array {
     $stmt = $this->connection->prepare('
       SELECT
-          em.entry_id AS `id`,
-          em.name AS `name`,
-          e.collection AS `collection`,
-          e.path AS `path`,
-          e.title AS `title`
+        em.name AS `name`,
+        ' . self::FIELDS_MINIMAL . '
       FROM
-          entry_music em
+        entry_music em
       LEFT JOIN entry e ON e.id = em.entry_id
       WHERE
-          em.music_id = :music_id
+        em.music_id = :music_id
       ORDER BY e.file_modified ASC
     ');
     $entries = $stmt->executeQuery([
@@ -221,20 +242,107 @@ class EntryRepository {
   public function getForAuthor(int $author_id): array {
     $stmt = $this->connection->prepare('
       SELECT
-          ea.entry_id AS `id`,
-          e.collection AS `collection`,
-          e.path AS `path`,
-          e.title AS `title`
+        ' . self::FIELDS_MINIMAL . '
       FROM
-          entry_authors ea
+        entry_authors ea
       LEFT JOIN entry e ON e.id = ea.entry_id
       WHERE
-          ea.author_id = :author_id
+        ea.author_id = :author_id
       ORDER BY e.file_modified ASC
     ');
     $entries = $stmt->executeQuery([
       'author_id' => $author_id,
     ])->fetchAllAssociative();
+
+    return $entries;
+  }
+
+  public function search(SearchParameters $params): array {
+
+    // Validate some input.
+    if (empty($params->searchFields)) {
+      $params->searchFields = ['title', 'filename'];
+    }
+
+    if ($params->sortField === 'relevance') {
+      $sort_field = 'score';
+    }
+    elseif ($params->sortField === 'title') {
+      $sort_field = 'title';
+    }
+    elseif ($params->sortField === 'date') {
+      $sort_field = 'date';
+    }
+
+    if ($params->sortOrder === 'asc') {
+      $sort_order = 'ASC';
+    }
+    elseif ($params->sortOrder === 'desc') {
+      $sort_order = 'DESC';
+    }
+
+    // Build fulltext search statements for each column and table.
+    $joins = [];
+    $matches = [];
+    foreach ($params->searchFields as $field) {
+      if ($field == 'title') {
+        $matches[] = 'MATCH(e.`title`) AGAINST(:search_key)';
+      }
+      elseif ($field == 'filename') {
+        $matches[] = 'MATCH(e.`path`) AGAINST(:search_key)';
+      }
+      elseif ($field == 'description') {
+        $matches[] = 'MATCH(e.`description`) AGAINST(:search_key)';
+      }
+      elseif ($field == 'textfile') {
+        $matches[] = 'MATCH(et.`text`) AGAINST(:search_key)';
+        $joins[] = 'LEFT JOIN entry_textfile et ON et.entry_id = e.id';
+      }
+    }
+
+    // Select fields.
+    $query = 'SELECT ' . self::FIELDS_TEASER;
+    if ($params->sortField === 'relevance') {
+      $query .= ', (' . implode(' + ', $matches) . ') AS score';
+    }
+    $query .= ' FROM entry e';
+
+    // Join with other tables.
+    if (!empty($joins)) {
+      $query .= ' ' . implode(' ', $joins);
+    }
+
+    // Search query.
+    $query .= ' WHERE (' . implode(' OR ', $matches) . ')';
+
+    // Filter by collection.
+    $query .= ' AND e.collection = :collection';
+
+    // Filter by game.
+    $game_ids = array_map(function ($game_str) {
+      return array_search($game_str, self::GAME_KEY);
+    }, $params->filterGame);
+    $game_ids = implode(', ', $game_ids);
+    if (!empty($game_ids)) {
+      $query .= " AND e.game IN ($game_ids)";
+    }
+
+    // Filter by gameplay options.
+    if (!empty($params->filterGameplay)) {
+      $gameplays = [];
+      foreach ($params->filterGameplay as $gameplay) {
+        $gameplays[] = 'e.is_' . $gameplay . ' = 1';
+      }
+      $query .= ' AND (' . implode(' OR ', $gameplays) . ')';
+    }
+
+    // Sorting.
+    $query .= " ORDER BY $sort_field $sort_order";
+
+    $stmt = $this->connection->prepare($query);
+    $stmt->bindValue('collection', $params->collection);
+    $stmt->bindValue('search_key', $params->searchKey);
+    $entries = $stmt->executeQuery()->fetchAllAssociative();
 
     return $entries;
   }
