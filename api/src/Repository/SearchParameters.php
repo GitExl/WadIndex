@@ -61,6 +61,13 @@ class SearchParameters {
   #[Assert\Choice(choices: self::SORT_ORDER)]
   public ?string $sortOrder;
 
+  #[Assert\Positive]
+  #[Assert\LessThanOrEqual(200)]
+  public ?int $limit;
+
+  #[Assert\PositiveOrZero]
+  public ?int $offset;
+
   public static function fromRequest(Request $request): SearchParameters {
     $params = new SearchParameters();
     $params->collection = $request->query->get('collection', 'idgames');
@@ -70,6 +77,8 @@ class SearchParameters {
     $params->filterGame = self::parseArrayQueryParam($request->query->get('filter_game', ''));
     $params->sortField = $request->query->get('sort_field', 'relevance');
     $params->sortOrder = $request->query->get('sort_order', 'desc');
+    $params->limit = (int) $request->query->get('limit', '50');
+    $params->offset = (int) $request->query->get('offset', '0');
     return $params;
   }
 

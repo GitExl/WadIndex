@@ -93,10 +93,10 @@ class Entries extends AbstractController {
             throw new BadRequestHttpException((string) $errors);
         }
 
-        $entries = $this->entries->search($params);
-        $this->addEntryTeaserData($entries);
+        $listing = $this->entries->search($params);
+        $this->addEntryTeaserData($listing['entries']);
 
-        return $this->json($entries);
+        return $this->json($listing);
     }
 
     private function addEntryTeaserData(array &$entries) {

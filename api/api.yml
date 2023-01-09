@@ -238,6 +238,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Directory'
+        entries_total:
+          type: integer
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntryTeaser'
+
+    SearchResults:
+      type: object
+      properties:
+        entries_total:
+          type: integer
         entries:
           type: array
           items:
@@ -340,9 +352,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EntryTeaser'
+                $ref: '#/components/schemas/SearchResults'
 
   /entries/{collection}/{entry_path}:
     get:

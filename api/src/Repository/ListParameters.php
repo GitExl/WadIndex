@@ -28,11 +28,20 @@ class ListParameters {
   #[Assert\Choice(choices: self::SORT_ORDER)]
   public ?string $sortOrder;
 
+  #[Assert\Positive]
+  #[Assert\LessThanOrEqual(200)]
+  public ?int $limit;
+
+  #[Assert\PositiveOrZero]
+  public ?int $offset;
+
   public static function fromRequest(Request $request, string $collection, ?string $path=NULL): ListParameters {
     $params = new ListParameters();
 
     $params->sortOrder = $request->query->get('sort_order', 'asc');
     $params->sortField = $request->query->get('sort_field', 'title');
+    $params->limit = (int) $request->query->get('limit', '50');
+    $params->offset = (int) $request->query->get('offset', '0');
 
     $params->collection = $collection;
     if ($path && str_ends_with($path, '/')) {

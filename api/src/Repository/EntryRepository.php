@@ -175,11 +175,26 @@ class EntryRepository {
         e.collection = :collection AND
         e.directory_id = :directory_id
       ORDER BY $sort_field $sort_order
+      LIMIT $params->limit OFFSET $params->offset
     ");
     $entries = $stmt->executeQuery([
       'collection' => $params->collection,
       'directory_id' => $directory_id,
     ])->fetchAllAssociative();
+
+    // Get total entry count.
+    $stmt = $this->connection->prepare('
+      SELECT
+        COUNT(*)
+      FROM entry e
+      WHERE
+        e.collection = :collection AND
+        e.directory_id = :directory_id
+    ');
+    $entries_count = $stmt->executeQuery([
+      'collection' => $params->collection,
+      'directory_id' => $directory_id,
+    ])->fetchFirstColumn()[0];
 
     foreach ($entries as &$entry) {
       $entry['game'] = self::GAME_KEY[$entry['game']];
@@ -216,6 +231,7 @@ class EntryRepository {
 
     return [
       'directories' => $directories,
+      'entries_total' => $entries_count,
       'entries' => $entries,
     ];
   }
@@ -300,51 +316,92 @@ class EntryRepository {
       }
     }
 
-    // Select fields.
-    $query = 'SELECT ' . self::FIELDS_TEASER;
-    if ($params->sortField === 'relevance') {
-      $query .= ', (' . implode(' + ', $matches) . ') AS score';
-    }
-    $query .= ' FROM entry e';
-
-    // Join with other tables.
-    if (!empty($joins)) {
-      $query .= ' ' . implode(' ', $joins);
-    }
-
-    // Search query.
-    $query .= ' WHERE (' . implode(' OR ', $matches) . ')';
-
-    // Filter by collection.
-    $query .= ' AND e.collection = :collection';
-
-    // Filter by game.
-    $game_ids = array_map(function ($game_str) {
-      return array_search($game_str, self::GAME_KEY);
-    }, $params->filterGame);
-    $game_ids = implode(', ', $game_ids);
-    if (!empty($game_ids)) {
-      $query .= " AND e.game IN ($game_ids)";
-    }
-
-    // Filter by gameplay options.
-    if (!empty($params->filterGameplay)) {
-      $gameplays = [];
-      foreach ($params->filterGameplay as $gameplay) {
-        $gameplays[] = 'e.is_' . $gameplay . ' = 1';
-      }
-      $query .= ' AND (' . implode(' OR ', $gameplays) . ')';
-    }
-
-    // Sorting.
-    $query .= " ORDER BY $sort_field $sort_order";
-
+    $query = $this->buildSearchQuery(self::FIELDS_TEASER, $matches, $joins, $params->filterGame, $params->filterGameplay, $sort_field, $sort_order, $params->limit, $params->offset);
     $stmt = $this->connection->prepare($query);
     $stmt->bindValue('collection', $params->collection);
     $stmt->bindValue('search_key', $params->searchKey);
     $entries = $stmt->executeQuery()->fetchAllAssociative();
 
-    return $entries;
+    $count_query = $this->buildSearchQuery('COUNT(*)', $matches, $joins, $params->filterGame, $params->filterGameplay);
+    $stmt = $this->connection->prepare($count_query);
+    $stmt->bindValue('collection', $params->collection);
+    $stmt->bindValue('search_key', $params->searchKey);
+    $entries_total = $stmt->executeQuery()->fetchFirstColumn()[0];
+
+    return [
+      'entries_total' => $entries_total,
+      'entries' => $entries,
+    ];
+  }
+
+  private function buildSearchQuery(
+    string $fields,
+    array $matches,
+    array $joins,
+    array $games,
+    array $gameplay_types,
+    ?string $sort_field=NULL,
+    ?string $sort_order=NULL,
+    ?int $limit=NULL,
+    ?int $offset=NULL
+  ): string {
+
+    $query = [];
+
+    // Select fields.
+    $query[] = 'SELECT ' . $fields;
+
+    if ($sort_field === 'score') {
+      $query[] = ', (' . implode(' + ', $matches) . ') AS score';
+    }
+    $query[] = 'FROM entry e';
+
+    // Join with other tables.
+    if (!empty($joins)) {
+      $query[] = implode(' ', $joins);
+    }
+
+    // Search query.
+    $query[] = 'WHERE (' . implode(' OR ', $matches) . ')';
+
+    // Filter by collection.
+    $query[] = 'AND e.collection = :collection';
+
+    // Filter by game.
+    $game_ids = array_map(function ($game_str) {
+      return array_search($game_str, self::GAME_KEY);
+    }, $games);
+    $game_ids = implode(', ', $game_ids);
+    if (!empty($game_ids)) {
+      $query[] = "AND e.game IN ($game_ids)";
+    }
+
+    // Filter by gameplay options.
+    if (!empty($gameplay_types)) {
+      $gameplay_cases = [];
+      foreach ($gameplay_types as $gameplay_type) {
+        $gameplay_cases[] = 'e.is_' . $gameplay_type . ' = 1';
+      }
+      $query[] = 'AND (' . implode(' OR ', $gameplay_cases) . ')';
+    }
+
+    // Sorting.
+    if ($sort_field) {
+      $query[] = "ORDER BY $sort_field";
+      if ($sort_order) {
+        $query[] = $sort_order;
+      }
+    }
+
+    // Paging.
+    if ($limit) {
+      $query[] = "LIMIT $params->limit";
+    }
+    if ($offset) {
+      $query[] = "OFFSET $params->offset";
+    }
+
+    return implode(' ', $query);
   }
 
 }
