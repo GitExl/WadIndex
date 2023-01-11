@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Repository\AuthorRepository;
 use App\Repository\EntryRepository;
 use App\Repository\ImageRepository;
-use App\Repository\LevelRepository;
+use App\Repository\MapRepository;
 use App\Repository\ListParameters;
 use App\Repository\MusicRepository;
 use App\Repository\SearchParameters;
@@ -28,16 +28,16 @@ class Entries extends AbstractController {
 
     private MusicRepository $music;
 
-    private LevelRepository $levels;
+    private MapRepository $maps;
 
     private ValidatorInterface $validator;
 
-    public function __construct(EntryRepository $entries, AuthorRepository $authors, ImageRepository $images, MusicRepository $music, LevelRepository $levels, ValidatorInterface $validator)  {
+    public function __construct(EntryRepository $entries, AuthorRepository $authors, ImageRepository $images, MusicRepository $music, MapRepository $maps, ValidatorInterface $validator)  {
         $this->entries = $entries;
         $this->authors = $authors;
         $this->images = $images;
         $this->music = $music;
-        $this->levels = $levels;
+        $this->maps = $maps;
         $this->validator = $validator;
     }
 
@@ -52,7 +52,14 @@ class Entries extends AbstractController {
         $entry['authors'] = $this->authors->getForEntry($entry['id']);
         $entry['images'] = $this->images->getAllForEntry($entry['id'], $entry['path']);
         $entry['music'] = $this->music->getAllForEntry($entry['id']);
-        $entry['levels'] = $this->levels->getAllTeasersForEntry($entry['id']);
+
+        $entry['maps'] = $this->maps->getAllTeasersForEntry($entry['id']);
+        foreach ($entry['maps'] as &$map) {
+            $map['authors'] = $this->authors->getForMap($map['id']);
+            unset($map['id']);
+        }
+        unset($map);
+
         unset($entry['id']);
 
         return $this->json($entry);

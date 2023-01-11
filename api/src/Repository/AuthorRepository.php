@@ -20,7 +20,7 @@ class AuthorRepository {
         a.full_name AS `full_name`,
         a.nickname AS `nickname`
       FROM
-        author a
+        authors a
       WHERE
         path_alias = :path_alias
       LIMIT 1
@@ -36,7 +36,7 @@ class AuthorRepository {
     return $author;
   }
 
-  public function getForEntry(int $entry_id): ?array {
+  public function getForEntry(int $entry_id): array {
     $stmt = $this->connection->prepare('
       SELECT
         a.id AS `id`,
@@ -46,7 +46,7 @@ class AuthorRepository {
         a.path_alias AS `path_alias`
       FROM
         entry_authors ea
-      INNER JOIN author a ON a.id = ea.author_id AND
+      INNER JOIN authors a ON a.id = ea.author_id AND
         ea.entry_id = :entry_id
     ');
     $authors = $stmt->executeQuery([
@@ -54,9 +54,34 @@ class AuthorRepository {
     ])->fetchAllAssociative();
 
     if (empty($authors)) {
-      return NULL;
+      return [];
     }
 
     return $authors;
   }
+
+  public function getForMap(int $map_id): array {
+    $stmt = $this->connection->prepare('
+      SELECT
+        a.id AS `id`,
+        a.name AS `name`,
+        a.full_name AS `full_name`,
+        a.nickname AS `nickname`,
+        a.path_alias AS `path_alias`
+      FROM
+        map_authors ma
+      INNER JOIN authors a ON a.id = ma.author_id AND
+        ma.map_id = :map_id
+    ');
+    $authors = $stmt->executeQuery([
+      'map_id' => $map_id,
+    ])->fetchAllAssociative();
+
+    if (empty($authors)) {
+      return [];
+    }
+
+    return $authors;
+  }
+
 }

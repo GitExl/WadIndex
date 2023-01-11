@@ -49,7 +49,7 @@ class EntryRepository {
     e.file_modified AS `timestamp`,
     e.game AS `game`,
     e.description_preview AS `description`,
-    (SELECT COUNT(*) FROM entry_levels WHERE entry_id = e.id) AS `level_count`
+    (SELECT COUNT(*) FROM entry_maps WHERE entry_id = e.id) AS `map_count`
   ';
 
   private const FIELDS_MINIMAL = '
@@ -395,10 +395,10 @@ class EntryRepository {
 
     // Paging.
     if ($limit) {
-      $query[] = "LIMIT $params->limit";
+      $query[] = "LIMIT $limit";
     }
     if ($offset) {
-      $query[] = "OFFSET $params->offset";
+      $query[] = "OFFSET $offset";
     }
 
     return implode(' ', $query);

@@ -7,7 +7,7 @@ info:
 components:
   schemas:
 
-    Level:
+    Map:
       type: object
       properties:
         collection:
@@ -22,13 +22,13 @@ components:
         par_time:
           type: integer
         music:
-          $ref: '#/components/schemas/LevelMusic'
+          $ref: '#/components/schemas/MapMusic'
           nullable: true
         next:
-          $ref: '#/components/schemas/LevelTeaser'
+          $ref: '#/components/schemas/MapTeaser'
           nullable: true
         next_secret:
-          $ref: '#/components/schemas/LevelTeaser'
+          $ref: '#/components/schemas/MapTeaser'
           nullable: true
         cluster:
           type: string
@@ -49,8 +49,12 @@ components:
           type: integer
         side_count:
           type: integer
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
 
-    LevelTeaser:
+    MapTeaser:
       type: object
       properties:
         collection:
@@ -67,6 +71,10 @@ components:
           nullable: true
         format:
           type: string
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
 
     Music:
       type: object
@@ -98,7 +106,7 @@ components:
           type: string
           nullable: true
 
-    LevelMusic:
+    MapMusic:
       type: object
       properties:
         name:
@@ -155,14 +163,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Author'
-        levels:
+        maps:
           type: array
           items:
-            $ref: '#/components/schemas/LevelTeaser'
+            $ref: '#/components/schemas/MapTeaser'
         music:
           type: array
           items:
-            $ref: '#/components/schemas/LevelMusic'
+            $ref: '#/components/schemas/MapMusic'
         images:
           type: array
           items:
@@ -366,7 +374,7 @@ paths:
             type: string
         - name: entry_path
           in: path
-          description: Path of the entry to return a level from.
+          description: Path of the entry to return a map from.
           required: true
           schema:
             type: string
@@ -378,35 +386,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/Entry'
 
-  /levels/{collection}/{entry_path}/{level_name}:
+  /maps/{collection}/{entry_path}/{map_name}:
     get:
-      description: Returns all information of a single level.
+      description: Returns all information of a single map.
       parameters:
         - name: collection
           in: path
-          description: Name of the collection the level is in.
+          description: Name of the collection the map is in.
           required: true
           schema:
             type: string
         - name: entry_path
           in: path
-          description: Path of the entry to return a level from.
+          description: Path of the entry to return a map from.
           required: true
           schema:
             type: string
-        - name: level_name
+        - name: map_name
           in: path
-          description: Lump name of the level to return.
+          description: Lump name of the map to return.
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: Level information.
+          description: Map information.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Level'
+                $ref: '#/components/schemas/Map'
 
   /music/{hash}:
     get:

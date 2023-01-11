@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, List, Dict, Set, Tuple
+from typing import Optional, List, Dict, Set, Iterable
 
 from mysql.connector import MySQLConnection, connection
 
@@ -86,38 +86,44 @@ class DBStorage:
     def remove_orphan_directories(self):
         self.cursor.execute('DELETE FROM directories WHERE id NOT IN (SELECT DISTINCT directory_id FROM entry) AND id NOT IN (SELECT parent_id FROM directories)')
 
-    def save_entry_authors(self, entry: Entry, authors: List[str]):
+    def save_entry_authors(self, entry: Entry, authors: Iterable[str]):
 
         # Update (remove + re-add) authors.
         self.cursor.execute('DELETE FROM entry_authors WHERE entry_id=%s', (entry.id,))
+        author_ids = self.get_author_ids(authors)
+        for author_id in author_ids:
+            self.cursor.execute('INSERT INTO entry_authors VALUES (%s, %s)', (entry.id, author_id))
 
-        known_author_ids = set()
+    def get_author_ids(self, authors: Iterable[str]) -> Set[int]:
+        author_ids = set()
         for author_name in authors:
             path_alias = self.url_clean(author_name)
             if len(path_alias) < 2:
                 continue
 
-            self.cursor.execute('SELECT id FROM author WHERE name=%s LIMIT 1', (author_name,))
+            self.cursor.execute('SELECT id FROM authors WHERE name=%s LIMIT 1', (author_name,))
             author_row = self.cursor.fetchone()
             if author_row is not None:
                 author_id = author_row[0]
 
                 # In some cases the same author can appear multiple times.
-                if author_id in known_author_ids:
+                if author_id in author_ids:
                     continue
 
             else:
-                self.cursor.execute('INSERT INTO author (name, path_alias) VALUES (%s, %s)', (author_name[:255], path_alias))
+                self.cursor.execute('INSERT INTO authors (name, path_alias) VALUES (%s, %s)', (author_name[:255], path_alias))
                 author_id = self.cursor.lastrowid
 
-            self.cursor.execute('INSERT INTO entry_authors VALUES (%s, %s)', (entry.id, author_id))
-            known_author_ids.add(author_id)
+            author_ids.add(author_id)
+
+        return author_ids
 
     def save_entry_maps(self, entry: Entry, entry_maps: List[Map]):
-        self.cursor.execute('DELETE FROM maps WHERE entry_id=%s', (entry.id,))
+        self.cursor.execute('DELETE FROM maps WHERE id IN (SELECT map_id FROM entry_maps WHERE entry_id=%s)', (entry.id,))
+        self.cursor.execute('DELETE FROM entry_maps WHERE entry_id=%s', (entry.id,))
+        self.cursor.execute('DELETE FROM map_authors WHERE entry_id=%s', (entry.id,))
 
         fields = [
-            'entry_id',
             'name',
             'title',
             'format',
@@ -134,13 +140,12 @@ class DBStorage:
             'cluster',
         ]
         fields_concat = ','.join(fields)
-        fields_concat_placeholder = '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s'
+        fields_concat_placeholder = '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s'
 
         for entry_map in entry_maps:
             self.cursor.execute(
                 'INSERT INTO maps ({}) VALUES ({})'.format(fields_concat, fields_concat_placeholder),
                 (
-                    entry.id,
                     entry_map.name[:8],
                     entry_map.title[:1022] if entry_map.title is not None else None,
                     MAP_FORMAT_TO_INT.get(entry_map.format),
@@ -157,6 +162,14 @@ class DBStorage:
                     entry_map.cluster & 0xFFFFFFFF if entry_map.cluster is not None else None
                 )
             )
+            db_id = self.cursor.lastrowid
+
+            self.cursor.execute('INSERT INTO entry_maps VALUES (%s, %s)', (entry.id, db_id,))
+
+            # Add authors.
+            author_ids = self.get_author_ids(entry_map.authors)
+            for author_id in author_ids:
+                self.cursor.execute('INSERT INTO map_authors VALUES (%s, %s)', (entry.id, author_id))
 
     def save_entry_textfile(self, entry: Entry, text_file: Optional[str]):
         self.cursor.execute('DELETE FROM entry_textfile WHERE entry_id=%s', (entry.id,))
@@ -174,10 +187,11 @@ class DBStorage:
             self.cursor.execute('INSERT INTO entry_music VALUES (%s, %s, %s)', (entry.id, music.id, name))
 
     def remove_orphan_authors(self):
-        self.cursor.execute('DELETE FROM author WHERE id NOT IN (SELECT DISTINCT author_id FROM entry_authors)')
+        self.cursor.execute('DELETE FROM authors WHERE id NOT IN (SELECT DISTINCT author_id FROM entry_authors UNION SELECT DISTINCT author_id FROM map_authors)')
 
     def remove_orphan_maps(self):
         self.cursor.execute('DELETE FROM maps WHERE entry_id NOT IN (SELECT id FROM entry)')
+        self.cursor.execute('DELETE FROM map_authors WHERE map_id NOT IN (SELECT id FROM maps)')
 
     def remove_orphan_textfiles(self):
         self.cursor.execute('DELETE FROM entry_textfile WHERE entry_id NOT IN (SELECT id FROM entry)')
@@ -186,7 +200,7 @@ class DBStorage:
         self.cursor.execute('DELETE FROM entry_images WHERE entry_id NOT IN (SELECT id FROM entry)')
 
     def remove_orphan_music(self):
-        self.cursor.execute('DELETE FROM entry_music WHERE entry_id NOT IN (SELECT id FROM entry)')
+        self.cursor.execute('DELETE FROM music WHERE id NOT IN (SELECT entry_id FROM entry_music)')
 
     def remove_dead_entries(self, existing_paths: List[Path]):
         local_paths = set()
@@ -202,6 +216,10 @@ class DBStorage:
                 continue
 
             self.cursor.execute('DELETE FROM entry WHERE id=%s', (db_id,))
+            self.cursor.execute('DELETE FROM entry_maps WHERE entry_id=%s', (db_id,))
+            self.cursor.execute('DELETE FROM entry_authors WHERE entry_id=%s', (db_id,))
+            self.cursor.execute('DELETE FROM entry_images WHERE entry_id=%s', (db_id,))
+            self.cursor.execute('DELETE FROM entry_music WHERE entry_id=%s', (db_id,))
 
     def find_music_by_hash(self, data_hash: bytes) -> Optional[int]:
         self.cursor.execute('SELECT id FROM music WHERE hash=%s', (data_hash,))
@@ -239,18 +257,3 @@ class DBStorage:
         url = self.RE_URL_CLEAN.sub('', url)
         url = self.RE_URL_DEDUP.sub('-', url)
         return url[:255].strip()
-
-    def rebuild_directory(self):
-        directories: Set[Tuple[str, str]] = set()
-
-        self.cursor.execute('SELECT path FROM entry')
-        for path in self.cursor.fetchall():
-            (directory, _, _) = path[0].rpartition('/')
-            if directory.find('/'):
-                (parent, _, _) = directory.rpartition('/')
-            else:
-                parent = None
-
-            directories.add((directory, parent))
-
-        print(directories)

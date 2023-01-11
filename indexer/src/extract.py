@@ -1,7 +1,7 @@
 import cProfile
 import time
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Set
 from optparse import OptionParser
 
 from extractors.archiveextractor import ArchiveExtractor
@@ -178,8 +178,13 @@ def run():
         entry.build_time = info.build_time
         entry.comments = info.comments
 
+        # Combine authors from the main entry and every map.
+        author_set: Set[str] = set(info.authors)
+        for map in info.maps:
+            author_set.update(map.authors)
+
         entry.id = storage.save_entry(entry)
-        storage.save_entry_authors(entry, info.authors)
+        storage.save_entry_authors(entry, author_set)
         storage.save_entry_maps(entry, info.maps)
         storage.save_entry_textfile(entry, info.text_contents)
         storage.save_entry_images(entry, info.graphics)

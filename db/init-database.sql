@@ -16,12 +16,12 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `author`
+-- Table structure for table `authors`
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `author` (
+CREATE TABLE IF NOT EXISTS `authors` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` text NOT NULL,
   `full_name` varchar(255) DEFAULT NULL,
@@ -122,29 +122,16 @@ CREATE TABLE IF NOT EXISTS `entry_images` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `entry_levels`
+-- Table structure for table `entry_maps`
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `entry_levels` (
+CREATE TABLE IF NOT EXISTS `entry_maps` (
   `entry_id` int(10) unsigned NOT NULL,
-  `name` char(8) NOT NULL,
-  `title` varchar(1022) DEFAULT NULL,
-  `format` tinyint(4) NOT NULL,
-  `line_count` int(10) unsigned NOT NULL,
-  `side_count` int(10) unsigned NOT NULL,
-  `thing_count` int(10) unsigned NOT NULL,
-  `sector_count` int(10) unsigned NOT NULL,
-  `allow_jump` tinyint(1) unsigned DEFAULT NULL,
-  `allow_crouch` tinyint(1) unsigned DEFAULT NULL,
-  `par_time` int(10) unsigned DEFAULT NULL,
-  `music` varchar(255) DEFAULT NULL,
-  `next` varchar(255) DEFAULT NULL,
-  `next_secret` varchar(255) DEFAULT NULL,
-  `cluster` int(11) DEFAULT NULL,
-  PRIMARY KEY (`entry_id`,`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `map_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`entry_id`,`map_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -158,19 +145,6 @@ CREATE TABLE IF NOT EXISTS `entry_music` (
   `music_id` int(10) unsigned NOT NULL,
   `name` varchar(27) NOT NULL,
   KEY `entry_music_entry_id_IDX` (`entry_id`,`name`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `entry_tags`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `entry_tags` (
-  `entry_id` int(10) unsigned NOT NULL,
-  `tag_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`entry_id`,`tag_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -189,6 +163,46 @@ CREATE TABLE IF NOT EXISTS `entry_textfile` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `map_authors`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `map_authors` (
+  `map_id` int(10) unsigned NOT NULL,
+  `author_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`map_id`,`author_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `maps`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `maps` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` char(8) NOT NULL,
+  `title` varchar(1022) DEFAULT NULL,
+  `format` tinyint(4) NOT NULL,
+  `line_count` int(10) unsigned NOT NULL,
+  `side_count` int(10) unsigned NOT NULL,
+  `thing_count` int(10) unsigned NOT NULL,
+  `sector_count` int(10) unsigned NOT NULL,
+  `allow_jump` tinyint(1) unsigned DEFAULT NULL,
+  `allow_crouch` tinyint(1) unsigned DEFAULT NULL,
+  `par_time` int(10) unsigned DEFAULT NULL,
+  `music` varchar(255) DEFAULT NULL,
+  `next` varchar(255) DEFAULT NULL,
+  `next_secret` varchar(255) DEFAULT NULL,
+  `cluster` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `maps_name_IDX` (`name`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=15259 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `music`
 --
 
@@ -203,20 +217,6 @@ CREATE TABLE IF NOT EXISTS `music` (
   UNIQUE KEY `music_hash_IDX` (`hash`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=12846 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `tags`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `tags` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `key` varchar(32) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`,`key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -227,4 +227,4 @@ CREATE TABLE IF NOT EXISTS `tags` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-08 17:19:06
+-- Dump completed on 2023-01-11 19:36:09

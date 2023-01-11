@@ -225,3 +225,4 @@ class Map:
         self.next_secret: Optional[str] = None
         self.music: Optional[str] = None
         self.cluster: Optional[int] = None
+        self.authors: List[str] = []
