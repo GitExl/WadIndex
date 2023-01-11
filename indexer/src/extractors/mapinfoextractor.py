@@ -1,9 +1,8 @@
-import re
-from typing import Optional, Pattern
+from typing import Optional
 
 from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
-from doom.level import Level
+from doom.map import Map
 from doom.mapinfoparser import MapInfoParser, MapInfoMap, MapInfoParserError
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
@@ -18,21 +17,21 @@ FILE_ORDER = [
 ]
 
 
-def assign_mapinfo_to_level(level: Level, map_info: MapInfoMap):
-    level.title = map_info.title
-    level.music = map_info.music
-    level.allow_jump = map_info.allow_jump
-    level.allow_crouch = map_info.allow_crouch
-    level.par_time = map_info.par_time
-    level.cluster = map_info.cluster_index
-    level.next = map_info.next
-    level.next_secret = map_info.next_secret
+def assign_mapinfo_to_map(map: Map, map_info: MapInfoMap):
+    map.title = map_info.title
+    map.music = map_info.music
+    map.allow_jump = map_info.allow_jump
+    map.allow_crouch = map_info.allow_crouch
+    map.par_time = map_info.par_time
+    map.cluster = map_info.cluster_index
+    map.next = map_info.next
+    map.next_secret = map_info.next_secret
 
 
 class MapInfoExtractor(ExtractorBase):
 
     def extract(self, info: ExtractedInfo):
-        if not len(info.levels):
+        if not len(info.maps):
             return
 
         archive: ArchiveBase = info.archive
@@ -68,8 +67,8 @@ class MapInfoExtractor(ExtractorBase):
             self.logger.stream('mapinfo_parser_error', info.path_idgames.as_posix())
             self.logger.stream('mapinfo_parser_error', str(e))
 
-        # Match mapinfo data to levels.
-        for level in info.levels:
+        # Match mapinfo data to maps.
+        for map in info.maps:
             for map_key, map_info in parser.maps.items():
-                if map_key.lower() == level.name.lower():
-                    assign_mapinfo_to_level(level, map_info)
+                if map_key.lower() == map.name.lower():
+                    assign_mapinfo_to_map(map, map_info)

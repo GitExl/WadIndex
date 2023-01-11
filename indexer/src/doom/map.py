@@ -3,27 +3,27 @@ from enum import Enum, Flag, auto
 from typing import List, Optional, Dict
 
 
-class LevelFormat(Enum):
+class MapFormat(Enum):
     DOOM = 'doom'
     HEXEN = 'hexen'
     UDMF = 'udmf'
 
 
-INT_TO_LEVEL_FORMAT: Dict[int, LevelFormat] = {
-    0: LevelFormat.DOOM,
-    1: LevelFormat.HEXEN,
-    2: LevelFormat.UDMF,
+INT_TO_MAP_FORMAT: Dict[int, MapFormat] = {
+    0: MapFormat.DOOM,
+    1: MapFormat.HEXEN,
+    2: MapFormat.UDMF,
 }
 
 
-LEVEL_FORMAT_TO_INT: Dict[LevelFormat, int] = {
-    LevelFormat.DOOM: 0,
-    LevelFormat.HEXEN: 1,
-    LevelFormat.UDMF: 2,
+MAP_FORMAT_TO_INT: Dict[MapFormat, int] = {
+    MapFormat.DOOM: 0,
+    MapFormat.HEXEN: 1,
+    MapFormat.UDMF: 2,
 }
 
 
-class LevelNamespace(Enum):
+class MapNamespace(Enum):
     DOOM = 'doom'
     HERETIC = 'heretic'
     STRIFE = 'strife'
@@ -201,15 +201,15 @@ class Thing:
     arg0str: Optional[str]
 
 
-class Level:
+class Map:
 
-    def __init__(self, name: str, namespace: LevelNamespace, format: LevelFormat,
+    def __init__(self, name: str, namespace: MapNamespace, format: MapFormat,
                  vertices: List[Vertex] = None, lines: Optional[List[Line]] = None, sides: Optional[List[Side]] = None,
                  sectors: Optional[List[Sector]] = None, things: Optional[List[Thing]] = None):
 
         self.name: str = name
         self.namespace = namespace
-        self.format: LevelFormat = format
+        self.format: MapFormat = format
 
         self.vertices: List[Vertex] = [] if vertices is None else vertices
         self.lines: List[Line] = [] if lines is None else lines

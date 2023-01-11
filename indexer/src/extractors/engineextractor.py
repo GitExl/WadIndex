@@ -3,7 +3,7 @@ from typing import Dict, Set, List
 
 from archives.archivebase import ArchiveBase
 from archives.archivelist import ArchiveList
-from doom.level import Level
+from doom.map import Map
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from idgames.engine import Engine
@@ -68,11 +68,11 @@ class EngineExtractor(ExtractorBase):
             engine = info.text_keys['engine']
             self.logger.decision('Detected engine "{}" from parsed text file.'.format(engine.name))
 
-        # Detect from level data.
-        if engine == Engine.UNKNOWN and len(info.levels):
-            engine = self.detect_from_levels(info.levels)
+        # Detect from map data.
+        if engine == Engine.UNKNOWN and len(info.maps):
+            engine = self.detect_from_maps(info.maps)
             if engine != Game.UNKNOWN:
-                self.logger.decision('Detected engine "{}" from level data.'.format(engine.name))
+                self.logger.decision('Detected engine "{}" from map data.'.format(engine.name))
 
         # Detect from lump names.
         if engine == Engine.UNKNOWN and info.main_archive is not None:
@@ -111,11 +111,11 @@ class EngineExtractor(ExtractorBase):
 
         return Engine.UNKNOWN
 
-    def detect_from_levels(self, levels: List[Level]) -> Engine:
+    def detect_from_maps(self, maps: List[Map]) -> Engine:
         scores: Dict[str, float] = {}
-        for level in levels:
+        for map in maps:
 
-            for thing in level.things:
+            for thing in map.things:
                 score = self.doomednum_scores.get(thing.id, None)
                 if not score:
                     continue

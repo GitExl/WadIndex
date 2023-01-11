@@ -3,7 +3,7 @@ from typing import Optional, List, Dict, Set, Tuple
 
 from mysql.connector import MySQLConnection, connection
 
-from doom.level import Level, LEVEL_FORMAT_TO_INT
+from doom.map import Map, MAP_FORMAT_TO_INT
 from extractors.musicextractor import MusicInfo
 from idgames.entry import Entry
 from utils.config import Config
@@ -113,8 +113,8 @@ class DBStorage:
             self.cursor.execute('INSERT INTO entry_authors VALUES (%s, %s)', (entry.id, author_id))
             known_author_ids.add(author_id)
 
-    def save_entry_levels(self, entry: Entry, levels: List[Level]):
-        self.cursor.execute('DELETE FROM entry_levels WHERE entry_id=%s', (entry.id,))
+    def save_entry_maps(self, entry: Entry, entry_maps: List[Map]):
+        self.cursor.execute('DELETE FROM maps WHERE entry_id=%s', (entry.id,))
 
         fields = [
             'entry_id',
@@ -136,25 +136,25 @@ class DBStorage:
         fields_concat = ','.join(fields)
         fields_concat_placeholder = '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s'
 
-        for level in levels:
+        for entry_map in entry_maps:
             self.cursor.execute(
-                'INSERT INTO entry_levels ({}) VALUES ({})'.format(fields_concat, fields_concat_placeholder),
+                'INSERT INTO maps ({}) VALUES ({})'.format(fields_concat, fields_concat_placeholder),
                 (
                     entry.id,
-                    level.name[:8],
-                    level.title[:1022] if level.title is not None else None,
-                    LEVEL_FORMAT_TO_INT.get(level.format),
-                    len(level.lines),
-                    len(level.sides),
-                    len(level.things),
-                    len(level.sectors),
-                    level.allow_jump,
-                    level.allow_crouch,
-                    level.par_time & 0xFFFFFFFF if level.par_time is not None else None,
-                    level.music[:255] if level.music is not None else None,
-                    level.next[:255] if level.next is not None else None,
-                    level.next_secret[:255] if level.next_secret is not None else None,
-                    level.cluster & 0xFFFFFFFF if level.cluster is not None else None
+                    entry_map.name[:8],
+                    entry_map.title[:1022] if entry_map.title is not None else None,
+                    MAP_FORMAT_TO_INT.get(entry_map.format),
+                    len(entry_map.lines),
+                    len(entry_map.sides),
+                    len(entry_map.things),
+                    len(entry_map.sectors),
+                    entry_map.allow_jump,
+                    entry_map.allow_crouch,
+                    entry_map.par_time & 0xFFFFFFFF if entry_map.par_time is not None else None,
+                    entry_map.music[:255] if entry_map.music is not None else None,
+                    entry_map.next[:255] if entry_map.next is not None else None,
+                    entry_map.next_secret[:255] if entry_map.next_secret is not None else None,
+                    entry_map.cluster & 0xFFFFFFFF if entry_map.cluster is not None else None
                 )
             )
 
@@ -176,8 +176,8 @@ class DBStorage:
     def remove_orphan_authors(self):
         self.cursor.execute('DELETE FROM author WHERE id NOT IN (SELECT DISTINCT author_id FROM entry_authors)')
 
-    def remove_orphan_levels(self):
-        self.cursor.execute('DELETE FROM entry_levels WHERE entry_id NOT IN (SELECT id FROM entry)')
+    def remove_orphan_maps(self):
+        self.cursor.execute('DELETE FROM maps WHERE entry_id NOT IN (SELECT id FROM entry)')
 
     def remove_orphan_textfiles(self):
         self.cursor.execute('DELETE FROM entry_textfile WHERE entry_id NOT IN (SELECT id FROM entry)')

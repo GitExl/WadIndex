@@ -11,7 +11,7 @@ from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from extractors.filetypeextractor import FileTypeExtractor
 from extractors.gameextractor import GameExtractor
-from extractors.levelextractor import LevelExtractor
+from extractors.mapextractor import MapExtractor
 from extractors.graphicsextractor import GraphicsExtractor
 from extractors.mapinfoextractor import MapInfoExtractor
 from extractors.musicextractor import MusicExtractor
@@ -38,7 +38,7 @@ EXTRACTORS = [
     ArchiveListExtractor,
     FileTypeExtractor,
     MusicExtractor,
-    LevelExtractor,
+    MapExtractor,
     MapInfoExtractor,
     EngineExtractor,
     GraphicsExtractor,
@@ -180,7 +180,7 @@ def run():
 
         entry.id = storage.save_entry(entry)
         storage.save_entry_authors(entry, info.authors)
-        storage.save_entry_levels(entry, info.levels)
+        storage.save_entry_maps(entry, info.maps)
         storage.save_entry_textfile(entry, info.text_contents)
         storage.save_entry_images(entry, info.graphics)
         storage.save_entry_music(entry, info.music)
@@ -195,8 +195,8 @@ def run():
 
         logger.info('Removing orphaned authors...')
         storage.remove_orphan_authors()
-        logger.info('Removing orphaned levels...')
-        storage.remove_orphan_levels()
+        logger.info('Removing orphaned maps...')
+        storage.remove_orphan_maps()
         logger.info('Removing orphaned text files...')
         storage.remove_orphan_textfiles()
         logger.info('Removing orphaned images...')

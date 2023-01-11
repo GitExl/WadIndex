@@ -8,7 +8,7 @@ from PIL.Image import Image
 
 from archives.archivebase import ArchiveBase
 from archives.archivelist import ArchiveList
-from doom.level import Level
+from doom.map import Map
 from idgames.engine import Engine
 from idgames.entry import Entry
 from idgames.game import Game
@@ -75,5 +75,5 @@ class ExtractedInfo:
     comments: Optional[str] = None
     authors: List[str] = field(default_factory=lambda: [])
     graphics: Dict[str, GraphicInfo] = field(default_factory=lambda: {})
-    levels: List[Level] = field(default_factory=lambda: [])
+    maps: List[Map] = field(default_factory=lambda: [])
     music: Dict[str, MusicInfo] = field(default_factory=lambda: {})
