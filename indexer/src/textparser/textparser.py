@@ -3,8 +3,8 @@ import re
 from re import Pattern, RegexFlag
 from typing import TextIO, Tuple, Optional, List
 
-from idgames.engine import Engine
-from idgames.game import Game
+from indexer.engine import Engine
+from indexer.game import Game
 from utils.logger import Logger
 from textparser.textkeys import TEXT_ENGINE, TEXT_KEYS, KeyType, TEXT_GAMES, TEXT_BOOLEAN, TEXT_DIFFICULTY
 

@@ -2,12 +2,11 @@ import json
 from typing import Dict, Set, List
 
 from archives.archivebase import ArchiveBase
-from archives.archivelist import ArchiveList
 from doom.map import Map
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
-from idgames.engine import Engine
-from idgames.game import Game
+from indexer.engine import Engine
+from indexer.game import Game
 from textparser.textkeys import TEXT_ENGINE
 from textparser.textparser import TextParser
 from utils.config import Config

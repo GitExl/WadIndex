@@ -1,7 +1,7 @@
 from enum import Enum
 
-from idgames.engine import Engine
-from idgames.game import Game
+from indexer.engine import Engine
+from indexer.game import Game
 
 
 class KeyType(Enum):

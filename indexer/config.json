@@ -1,6 +1,8 @@
 {
   "paths": {
-    "idgames": "/var/idgames",
+    "collections": {
+      "idgames": "/var/idgames"
+    },
     "iwads": "/var/iwads",
     "logs": "/var/log/indexer"
   },

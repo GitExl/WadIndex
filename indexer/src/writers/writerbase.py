@@ -1,5 +1,5 @@
 from extractors.extractedinfo import ExtractedInfo
-from idgames.dbstorage import DBStorage
+from indexer.dbstorage import DBStorage
 from utils.config import Config
 from utils.logger import Logger
 

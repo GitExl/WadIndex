@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Set
+from typing import Dict, Optional, Set
 
 from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase

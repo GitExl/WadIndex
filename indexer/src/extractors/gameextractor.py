@@ -5,7 +5,7 @@ from typing import Dict
 from archives.archivebase import ArchiveBase
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
-from idgames.game import Game
+from indexer.game import Game
 from textparser.textkeys import TEXT_GAMES
 from textparser.textparser import TextParser
 from utils.config import Config

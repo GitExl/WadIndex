@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 from doom.map import Map, MapNamespace, Line, LineFlags, Sector, Side, Thing, ThingFlags, Vertex
 from doom.mapfinder import MapData, MapFormat
 from doom.mapreaderbase import MapReaderBase
-from idgames.game import Game
+from indexer.game import Game
 
 
 STRUCT_VERTEX: Struct = Struct('<hh')

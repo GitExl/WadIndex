@@ -9,9 +9,9 @@ from PIL.Image import Image
 from archives.archivebase import ArchiveBase
 from archives.archivelist import ArchiveList
 from doom.map import Map
-from idgames.engine import Engine
-from idgames.entry import Entry
-from idgames.game import Game
+from indexer.engine import Engine
+from indexer.entry import Entry
+from indexer.game import Game
 
 
 class MusicType(Enum):

@@ -5,7 +5,7 @@ from mysql.connector import MySQLConnection, connection
 
 from doom.map import Map, MAP_FORMAT_TO_INT
 from extractors.musicextractor import MusicInfo
-from idgames.entry import Entry
+from indexer.entry import Entry
 from utils.config import Config
 import re
 
@@ -120,8 +120,8 @@ class DBStorage:
 
     def save_entry_maps(self, entry: Entry, entry_maps: List[Map]):
         self.cursor.execute('DELETE FROM maps WHERE id IN (SELECT map_id FROM entry_maps WHERE entry_id=%s)', (entry.id,))
-        self.cursor.execute('DELETE FROM entry_maps WHERE entry_id=%s', (entry.id,))
-        self.cursor.execute('DELETE FROM map_authors WHERE entry_id=%s', (entry.id,))
+        self.cursor.execute('DELETE FROM map_authors WHERE map_id NOT IN (SELECT id FROM maps)')
+        self.cursor.execute('DELETE FROM entry_maps WHERE map_id NOT IN (SELECT id FROM maps)')
 
         fields = [
             'name',
@@ -202,24 +202,30 @@ class DBStorage:
     def remove_orphan_music(self):
         self.cursor.execute('DELETE FROM music WHERE id NOT IN (SELECT entry_id FROM entry_music)')
 
-    def remove_dead_entries(self, existing_paths: List[Path]):
-        local_paths = set()
-        for path_local in existing_paths:
-            local_paths.add(path_local.relative_to(self.config.get('paths.idgames')).as_posix())
+    def remove_dead_entries(self, existing_paths: Dict[str, List[Path]]):
 
-        self.cursor.execute('SELECT id, path FROM entry')
-        path_rows = self.cursor.fetchall()
-        db_paths = dict((path, id) for (id, path) in path_rows)
+        for collection, paths_local in existing_paths.items():
+            collection_path = self.config.get('paths.idgames')[collection]
 
-        for db_path, db_id in db_paths.items():
-            if db_path in local_paths:
-                continue
+            # Build a list of local paths relative to each collection.
+            local_paths = set()
+            for path_local in paths_local:
+                local_paths.add(path_local.relative_to(collection_path).as_posix())
 
-            self.cursor.execute('DELETE FROM entry WHERE id=%s', (db_id,))
-            self.cursor.execute('DELETE FROM entry_maps WHERE entry_id=%s', (db_id,))
-            self.cursor.execute('DELETE FROM entry_authors WHERE entry_id=%s', (db_id,))
-            self.cursor.execute('DELETE FROM entry_images WHERE entry_id=%s', (db_id,))
-            self.cursor.execute('DELETE FROM entry_music WHERE entry_id=%s', (db_id,))
+            # Remove entries whose paths do not appear on disk.
+            self.cursor.execute('SELECT id, path FROM entry WHERE collection=%s', (collection,))
+            path_rows = self.cursor.fetchall()
+            db_paths = dict((path, id) for (id, path) in path_rows)
+
+            for db_path, db_id in db_paths.items():
+                if db_path in local_paths:
+                    continue
+
+                self.cursor.execute('DELETE FROM entry WHERE id=%s', (db_id,))
+                self.cursor.execute('DELETE FROM entry_maps WHERE entry_id=%s', (db_id,))
+                self.cursor.execute('DELETE FROM entry_authors WHERE entry_id=%s', (db_id,))
+                self.cursor.execute('DELETE FROM entry_images WHERE entry_id=%s', (db_id,))
+                self.cursor.execute('DELETE FROM entry_music WHERE entry_id=%s', (db_id,))
 
     def find_music_by_hash(self, data_hash: bytes) -> Optional[int]:
         self.cursor.execute('SELECT id FROM music WHERE hash=%s', (data_hash,))

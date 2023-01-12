@@ -1,6 +1,6 @@
 from doom.map import Map
 from doom.mapfinder import MapData
-from idgames.game import Game
+from indexer.game import Game
 from utils.logger import Logger
 
 

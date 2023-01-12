@@ -1,7 +1,7 @@
 from typing import Dict, Optional
 
-from idgames.engine import Engine
-from idgames.game import Game
+from indexer.engine import Engine
+from indexer.game import Game
 
 
 INT_TO_GAME: Dict[int, Game] = {
@@ -77,8 +77,8 @@ ENGINE_TO_INT: Dict[Engine, int] = {
 
 class Entry:
 
-    def __init__(self, path: str, file_modified: int, file_size: int, entry_updated: int):
-        self.collection: str = 'idgames'
+    def __init__(self, collection: str, path: str, file_modified: int, file_size: int, entry_updated: int):
+        self.collection: str = collection
         self.path: str = path
         self.file_modified: int = file_modified
         self.entry_updated: int = entry_updated
@@ -145,12 +145,12 @@ class Entry:
             engine = INT_TO_ENGINE.get(row['engine'])
 
         entry = Entry(
+            row['collection'],
             row['path'],
             row['file_modified'],
             row['file_size'],
             row['entry_updated']
         )
-        entry.collection = row['collection']
         entry.id = row['id']
         entry.title = row['title']
         entry.game = game

@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 from typing import Dict, Optional, Pattern
 
+
 IGNORE: Dict[Pattern, str] = {
     re.compile(r'levels/doom/a-c/bedlam2\.zip'): 'X-rated',
     re.compile(r'levels/doom/g-i/ittu\.zip'): 'X-rated',

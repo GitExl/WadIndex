@@ -15,7 +15,7 @@ class Config:
         for key in keys:
             value = value[key]
 
-        if value[0] == '$':
+        if isinstance(value, str) and value[0] == '$':
             value = os.getenv(value[1:])
 
         return value
