@@ -3,14 +3,9 @@ from typing import Tuple, Optional, List
 
 from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
-from doom.mapinfoparserbase import MapInfoParserBase, MapInfoMap
+from doom.mapinfoparserbase import MapInfoParserBase, MapInfoMap, MapInfoParserError
 from utils import lexer
 from utils.lexer import Lexer, Rule, expand_token_position, Token
-
-
-class UMapInfoParserError(Exception):
-    def __init__(self, message: str, position: Tuple[int, int]):
-        super(Exception, self).__init__('Line {} column {}: {}'.format(position[0], position[1], message))
 
 
 class UMapInfoToken(Enum):
@@ -78,18 +73,18 @@ class UMapInfoParser(MapInfoParserBase):
             token = self.tokens.pop()
 
             if token[0] != UMapInfoToken.IDENTIFIER:
-                raise UMapInfoParserError('Expected an identifier, got "{}".'.format(token[1]), expand_token_position(token))
+                raise MapInfoParserError('Expected an identifier, got "{}".'.format(token[1]), expand_token_position(token))
             identifier = token[1].lower()
 
             if identifier == 'map':
                 map = self.parse_map()
                 self.maps[map.map_lump] = map
             else:
-                raise UMapInfoParserError('Unknown root identifier "{}".'.format(identifier), expand_token_position(token))
+                raise MapInfoParserError('Unknown root identifier "{}".'.format(identifier), expand_token_position(token))
 
     def get_token(self) -> Optional[Token]:
         if not len(self.tokens):
-            raise UMapInfoParserError('Expected a token, got end of file.', (0, 0))
+            raise MapInfoParserError('Expected a token, got end of file.', (0, 0))
         return self.tokens.pop()
 
     def peek_token(self) -> Optional[Token]:
@@ -100,7 +95,7 @@ class UMapInfoParser(MapInfoParserBase):
     def require_token(self, token_type) -> Token:
         token = self.tokens.pop()
         if token[0] != token_type:
-            raise UMapInfoParserError('Expected "{}" token, got "{}".'.format(token_type, token[0]), expand_token_position(token))
+            raise MapInfoParserError('Expected "{}" token, got "{}".'.format(token_type, token[0]), expand_token_position(token))
 
         return token
 
@@ -115,7 +110,7 @@ class UMapInfoParser(MapInfoParserBase):
             if token[0] == UMapInfoToken.BLOCK_END:
                 break
             elif token[0] != UMapInfoToken.IDENTIFIER:
-                raise UMapInfoParserError('Expected an identifier, got "{}".'.format(token[1]), expand_token_position(token))
+                raise MapInfoParserError('Expected an identifier, got "{}".'.format(token[1]), expand_token_position(token))
 
             identifier = token[1].lower()
             self.require_token(UMapInfoToken.ASSIGN)
@@ -175,7 +170,7 @@ class UMapInfoParser(MapInfoParserBase):
                     self.require_token(UMapInfoToken.SEPARATOR)
                     self.get_token()
             else:
-                raise UMapInfoParserError('Unknown UMAPINFO map key "{}".'.format(token[1]), expand_token_position(token))
+                raise MapInfoParserError('Unknown UMAPINFO map key "{}".'.format(token[1]), expand_token_position(token))
 
         return map
 
@@ -193,6 +188,6 @@ class UMapInfoParser(MapInfoParserBase):
             elif token[0] == UMapInfoToken.SEPARATOR:
                 continue
             else:
-                raise UMapInfoParserError('Error parsing UMAPINFO multiline string.'.format(token[1]), expand_token_position(token))
+                raise MapInfoParserError('Error parsing UMAPINFO multiline string.'.format(token[1]), expand_token_position(token))
 
         return str.join('\n', parts)

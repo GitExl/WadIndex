@@ -1,7 +1,12 @@
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Tuple
 
 from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
+
+
+class MapInfoParserError(Exception):
+    def __init__(self, message: str, position: Tuple[int, int]):
+        super(Exception, self).__init__('Line {} column {}: {}'.format(position[0], position[1], message))
 
 
 class MapInfoMap:

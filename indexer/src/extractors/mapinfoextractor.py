@@ -3,7 +3,7 @@ from typing import Optional
 from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
 from doom.map import Map
-from doom.mapinfoparserbase import MapInfoParserBase
+from doom.mapinfoparserbase import MapInfoParserBase, MapInfoParserError
 from doom.zmapinfoparser import ZMapInfoParser, MapInfoMap, ZMapInfoParserError
 from doom.umapinfoparser import UMapInfoParser
 from extractors.extractedinfo import ExtractedInfo
@@ -72,7 +72,7 @@ class MapInfoExtractor(ExtractorBase):
         except LexerError as e:
             self.logger.stream('mapinfo_lexer_error', info.path_idgames.as_posix())
             self.logger.stream('mapinfo_lexer_error', str(e))
-        except ZMapInfoParserError as e:
+        except MapInfoParserError as e:
             self.logger.stream('mapinfo_parser_error', info.path_idgames.as_posix())
             self.logger.stream('mapinfo_parser_error', str(e))
 
