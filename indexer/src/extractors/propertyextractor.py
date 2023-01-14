@@ -1,17 +1,6 @@
-import re
-from re import Pattern
-
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
-
-
-RE_AUTHOR_SPLIT: Pattern = re.compile(r'[;:,&]|(\sand\s)|(\s\|\s)')
-RE_WHITESPACE_COLLAPSE: Pattern = re.compile(r'\s\s+')
-
-AUTHOR_WORDS_EXCLUDE = {
-    'and',
-    'others',
-}
+from utils import author_parser
 
 
 class PropertyExtractor(ExtractorBase):
@@ -33,11 +22,4 @@ class PropertyExtractor(ExtractorBase):
 
         parsed_authors = info.text_keys.get('authors', [])
         parsed_authors = list(set(parsed_authors))
-
-        for author_list in parsed_authors:
-            for author in RE_AUTHOR_SPLIT.split(author_list):
-                if author is None:
-                    continue
-                author = author.strip()
-                if len(author) and author not in AUTHOR_WORDS_EXCLUDE:
-                    info.authors.append(author)
+        info.authors = author_parser.parse(parsed_authors)

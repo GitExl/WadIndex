@@ -8,6 +8,7 @@ from mapinfo.zmapinfoparser import ZMapInfoParser
 from mapinfo.umapinfoparser import UMapInfoParser
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
+from utils import author_parser
 from utils.lexer import LexerError
 from utils.token_list import TokenListError
 
@@ -37,6 +38,8 @@ def assign_mapinfo_to_map(map: Map, map_info: MapInfoMap):
         map.next = map_info.next
     if map_info.next_secret is not None:
         map.next_secret = map_info.next_secret
+    if map_info.authors is not None:
+        map.authors = author_parser.parse(map_info.authors)
 
 
 class MapInfoExtractor(ExtractorBase):

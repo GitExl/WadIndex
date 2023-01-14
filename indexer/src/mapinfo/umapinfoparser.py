@@ -86,7 +86,7 @@ class UMapInfoParser(MapInfoParserBase):
             if identifier == 'levelname':
                 map.title = self.tokens.require(UMapInfoToken.STRING)[1]
             elif identifier == 'author':
-                map.author = self.tokens.require(UMapInfoToken.STRING)[1]
+                map.authors = [self.tokens.require(UMapInfoToken.STRING)[1]]
             elif identifier == 'label':
                 self.tokens.get()
             elif identifier == 'levelpic':
