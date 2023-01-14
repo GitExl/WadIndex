@@ -190,8 +190,7 @@ class DBStorage:
         self.cursor.execute('DELETE FROM authors WHERE id NOT IN (SELECT DISTINCT author_id FROM entry_authors UNION SELECT DISTINCT author_id FROM map_authors)')
 
     def remove_orphan_maps(self):
-        self.cursor.execute('DELETE FROM maps WHERE entry_id NOT IN (SELECT id FROM entry)')
-        self.cursor.execute('DELETE FROM map_authors WHERE map_id NOT IN (SELECT id FROM maps)')
+        self.cursor.execute('DELETE FROM maps WHERE id NOT IN (SELECT map_id FROM entry_maps UNION SELECT map_id FROM map_authors)')
 
     def remove_orphan_textfiles(self):
         self.cursor.execute('DELETE FROM entry_textfile WHERE entry_id NOT IN (SELECT id FROM entry)')
@@ -205,7 +204,7 @@ class DBStorage:
     def remove_dead_entries(self, existing_paths: Dict[str, List[Path]]):
 
         for collection, paths_local in existing_paths.items():
-            collection_path = self.config.get('paths.idgames')[collection]
+            collection_path = self.config.get('paths.collections')[collection]
 
             # Build a list of local paths relative to each collection.
             local_paths = set()

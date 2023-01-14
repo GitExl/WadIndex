@@ -53,7 +53,7 @@ class UMapInfoParser(MapInfoParserBase):
 
         self.tokens: TokenList = TokenList(lexer)
 
-    def parse(self, ):
+    def parse(self):
         while not self.tokens.eol():
             token = self.tokens.get()
 

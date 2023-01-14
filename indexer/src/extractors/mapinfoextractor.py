@@ -9,12 +9,12 @@ from mapinfo.umapinfoparser import UMapInfoParser
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from utils.lexer import LexerError
-
+from utils.token_list import TokenListError
 
 FILE_ORDER = [
     'ZMAPINFO',
-    'EMAPINFO',
-    'RMAPINFO',
+    # 'EMAPINFO',
+    # 'RMAPINFO',
     'UMAPINFO',
     'MAPINFO',
 ]
@@ -79,6 +79,9 @@ class MapInfoExtractor(ExtractorBase):
         except MapInfoParserError as e:
             self.logger.stream('mapinfo_parser_error', info.path_idgames.as_posix())
             self.logger.stream('mapinfo_parser_error', str(e))
+        except TokenListError as e:
+            self.logger.stream('mapinfo_token_list_error', info.path_idgames.as_posix())
+            self.logger.stream('mapinfo_token_list_error', str(e))
 
         # Match mapinfo data to maps.
         for map in info.maps:
