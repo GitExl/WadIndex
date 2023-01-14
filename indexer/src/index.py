@@ -8,7 +8,7 @@ from indexer.dbstorage import DBStorage
 from indexer.entry import Entry
 from indexer.indexer import Indexer
 from utils.config import Config
-
+from indexer.ignorelist import must_ignore
 from utils.logger import Logger
 
 
@@ -41,6 +41,7 @@ def run():
         indexer = Indexer(config, logger, storage)
         time_now = int(time.time())
 
+        # Get a list of files to index, per collection.
         paths_system: Dict[str, List[Path]]
         if options.filename:
             collection = 'idgames'   # TODO: detect from path
@@ -49,19 +50,37 @@ def run():
             }
         else:
             paths_system = {}
-            for collection, collection_path in config.get('paths.collections').items():
-
-                collection_local_root = Path(collection_path)
+            for collection, path_collection in config.get('paths.collections').items():
+                collection_local_root = Path(path_collection)
                 paths_system[collection] = list(collection_local_root.rglob('*.zip'))
                 paths_system[collection].sort()
 
-        for collection, collection_paths in paths_system.items():
-            for path_system in collection_paths:
-                info, entry = indexer.process_file(collection, path_system, options.force)
+        for collection, path_collections in paths_system.items():
+            path_collection = config.get('paths.collections')[collection]
+
+            for path_system in path_collections:
+                path_collection_file = path_system.relative_to(path_collection)
+
+                # Skip entries that do not need updating.
+                if not options.force:
+                    timestamp = storage.get_entry_timestamp_by_path(collection, path_collection_file)
+                    if timestamp is not None and timestamp >= int(path_system.stat().st_mtime):
+                        logger.decision('Skipping {}.'.format(path_system))
+                        continue
+
+                # Ignore some files we'd rather not analyse.
+                ignore_reason = must_ignore(path_collection_file)
+                if ignore_reason is not None:
+                    logger.decision('Ignoring {} because: {}'.format(path_system, ignore_reason))
+                    continue
+
+                logger.info('Processing {}...'.format(path_collection_file))
+                info = indexer.index_file(path_system, path_collection_file)
                 if info is None:
                     continue
 
                 # Transfer indexed information to an entry.
+                entry = storage.get_entry_by_path(collection, path_collection_file)
                 if entry is None:
                     entry = Entry(
                         collection,
@@ -101,7 +120,7 @@ def run():
                 storage.commit()
 
         # Only remove dead entries if all entries were scanned.
-        # Otherwise, unscanned entries will be removed.
+        # Otherwise, any unscanned entries will also be removed.
         if options.clean and not options.filename:
             logger.info('Removing dead entries...')
             storage.remove_dead_entries(paths_system)

@@ -23,8 +23,6 @@ from writers.writerbase import WriterBase
 from writers.graphicswriter import GraphicsWriter
 
 from indexer.dbstorage import DBStorage
-from indexer.entry import Entry
-from indexer.ignorelist import must_ignore
 
 
 EXTRACTORS = [
@@ -63,25 +61,10 @@ class Indexer:
         for writer_class in WRITERS:
             self.writers.append(writer_class(logger, config, storage))
 
-    def process_file(self, collection: str, path_local: Path, force_update: bool) -> Tuple[Optional[ExtractedInfo], Optional[Entry]]:
+    def index_file(self, path_local: Path, path_collection: Path) -> Optional[ExtractedInfo]:
         path_local_base = path_local.parents[0] / path_local.stem
-        path_collection = path_local.relative_to(self.config.get('paths.collections')[collection])
         path_collection_base = path_collection.parents[0] / path_collection.stem
         filename_base = path_local.stem
-
-        self.logger.info('Processing {}...'.format(path_collection))
-        entry = self.storage.get_entry_by_path(path_collection)
-
-        # Bail if the file has not been updated since the last scan.
-        if not force_update and entry is not None and entry.file_modified >= int(path_local.stat().st_mtime):
-            self.logger.decision('Skipping {} because it is not updated.'.format(path_collection))
-            return None, None
-
-        # Ignore some files we'd rather not analyse.
-        ignore_reason = must_ignore(path_collection)
-        if ignore_reason is not None:
-            self.logger.decision('Ignoring {} because: {}'.format(path_collection, ignore_reason))
-            return None, None
 
         stat = path_local.stat()
         info = ExtractedInfo(
@@ -104,9 +87,10 @@ class Indexer:
         for extractor in reversed(self.extractors):
             extractor.cleanup(info)
 
-        return info, entry
+        return info
 
     def close(self):
+
         # Close extractor and writer classes.
         for writer in reversed(self.writers):
             writer.close()

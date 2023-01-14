@@ -32,14 +32,22 @@ class DBStorage:
         self.cursor.close()
         self.db.close()
 
-    def get_entry_by_path(self, path: Path) -> Optional[Entry]:
-        self.cursor.execute('SELECT * FROM entry WHERE path=%s LIMIT 1', (path.as_posix(),))
+    def get_entry_by_path(self, collection: str, path: Path) -> Optional[Entry]:
+        self.cursor.execute('SELECT * FROM entry WHERE COLLECTION=%s AND path=%s LIMIT 1', (collection, path.as_posix(),))
 
         row = self.cursor.fetchone()
         if row is None:
             return None
 
         return Entry.from_row(dict(zip(self.cursor.column_names, row)))
+
+    def get_entry_timestamp_by_path(self, collection: str, path: Path) -> Optional[int]:
+        self.cursor.execute('SELECT file_modified FROM entry WHERE COLLECTION=%s AND path=%s LIMIT 1', (collection, path.as_posix(),))
+
+        row = self.cursor.fetchone()
+        if row is None:
+            return None
+        return row[0]
 
     def save_entry(self, entry: Entry) -> int:
         (directory, _, _) = entry.path.rpartition('/')
