@@ -59,19 +59,23 @@ class MapInfoExtractor(ExtractorBase):
         if file is None:
             return
 
-        parser: MapInfoParserBase
-        if file.name == 'MAPINFO' or file.name == 'ZMAPINFO':
-            parser = ZMapInfoParser(file)
-        elif file.name == 'UMAPINFO':
-            parser = UMapInfoParser(file)
-        else:
+        parser: Optional[MapInfoParserBase] = None
+        try:
+            if file.name == 'MAPINFO' or file.name == 'ZMAPINFO':
+                parser = ZMapInfoParser(file)
+            elif file.name == 'UMAPINFO':
+                parser = UMapInfoParser(file)
+            else:
+                return
+        except LexerError as e:
+            self.logger.stream('mapinfo_lexer_error', info.path_idgames.as_posix())
+            self.logger.stream('mapinfo_lexer_error', str(e))
+
+        if parser is None:
             return
 
         try:
             parser.parse()
-        except LexerError as e:
-            self.logger.stream('mapinfo_lexer_error', info.path_idgames.as_posix())
-            self.logger.stream('mapinfo_lexer_error', str(e))
         except MapInfoParserError as e:
             self.logger.stream('mapinfo_parser_error', info.path_idgames.as_posix())
             self.logger.stream('mapinfo_parser_error', str(e))
