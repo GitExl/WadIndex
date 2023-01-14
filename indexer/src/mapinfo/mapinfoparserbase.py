@@ -28,11 +28,12 @@ class MapInfoEpisode:
 
 class MapInfoParserBase:
 
-    def __init__(self, archive: ArchiveBase):
-        self.archive = archive
+    def __init__(self, file: ArchiveFileBase):
+        self.archive: ArchiveBase = file.owner
+        self.file: ArchiveFileBase = file
 
         self.maps: Dict[str, MapInfoMap] = {}
         self.episodes: List[MapInfoEpisode] = []
 
-    def parse(self, file: ArchiveFileBase):
+    def parse(self):
         pass

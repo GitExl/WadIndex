@@ -2,34 +2,31 @@ import re
 from copy import copy
 from enum import Enum
 from re import Pattern
-from typing import Tuple, Optional, List
-
-from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
-from doom.mapinfoparserbase import MapInfoMap, MapInfoParserBase, MapInfoEpisode, MapInfoParserError
-from utils import lexer
-from utils.lexer import Lexer, Rule, Token, expand_token_position
+from mapinfo.mapinfoparserbase import MapInfoMap, MapInfoParserBase, MapInfoEpisode, MapInfoParserError
+from utils.lexer import Lexer, Rule, expand_token_position, TokenTypeBase, process_string
+from utils.token_list import TokenList
 
 
 RE_CLEAN: Pattern = re.compile('[\x00\xff\x1a]')
 
 
-class ZMapInfoToken(Enum):
-    EOL: str = 'eol'
-    WHITESPACE: str = 'white'
-    COMMENT: str = 'comment'
-    IDENTIFIER: str = 'ident'
-    ASSIGN: str = 'assign'
-    BLOCK_START: str = 'blstart'
-    BLOCK_END: str = 'blend'
-    STRING: str = 'str'
-    SEPARATOR: str = 'sep'
+class ZMapInfoToken(TokenTypeBase):
+    EOL = 0
+    WHITESPACE = 1
+    COMMENT = 2
+    IDENTIFIER = 3
+    ASSIGN = 4
+    BLOCK_START = 5
+    BLOCK_END = 6
+    STRING = 7
+    SEPARATOR = 8
 
 
 class ZParseMode(Enum):
-    NONE: int = 0
-    MAP: int = 1
-    EPISODE: int = 2
+    NONE = 0
+    MAP = 1
+    EPISODE = 2
 
 
 def get_lexer() -> Lexer:
@@ -45,49 +42,39 @@ def get_lexer() -> Lexer:
             Rule(ZMapInfoToken.BLOCK_END, '}'),
             Rule(ZMapInfoToken.SEPARATOR, ','),
             Rule(ZMapInfoToken.IDENTIFIER, r'[\\?!\\$\\:`@A-Za-z0-9_\-\+\\-\\.]+'),
-            Rule(ZMapInfoToken.STRING, r'"(?:\\.|[^"])*(?:"|$)', process=lexer.process_string),
+            Rule(ZMapInfoToken.STRING, r'"(?:\\.|[^"])*(?:"|$)', process=process_string),
         ]
     )
 
 
-def get_file_tokens(file: ArchiveFileBase):
+def get_file_tokens(file: ArchiveFileBase) -> TokenList:
     text = file.get_data().decode('latin1')
     text = RE_CLEAN.sub('', text)
 
-    file_lexer = get_lexer()
-    file_lexer.input(text)
+    lexer = get_lexer()
+    lexer.input(text)
 
-    tokens = []
-    while True:
-        token = file_lexer.get_token()
-        if not token:
-            break
-        tokens.append(token)
-    tokens.reverse()
-
-    return tokens
+    return TokenList(lexer)
 
 
 class ZMapInfoParser(MapInfoParserBase):
 
-    def __init__(self, archive: ArchiveBase):
-        super().__init__(archive)
+    def __init__(self, file: ArchiveFileBase):
+        super().__init__(file)
 
         self.new_format = False
-        self.tokens: List[Token] = []
 
-    def parse(self, file: ArchiveFileBase):
         self.tokens = get_file_tokens(file)
 
+    def parse(self):
         default_map: MapInfoMap = MapInfoMap()
         current_map: MapInfoMap = MapInfoMap()
         current_episode: MapInfoEpisode = MapInfoEpisode()
         parse_mode = ZParseMode.NONE
         self.new_format = False
 
-        # Manually consume tokens so that we can peek ahead.
-        while len(self.tokens):
-            key_token = self.tokens.pop()
+        while not self.tokens.eol():
+            key_token = self.tokens.get()
 
             if key_token[0] == ZMapInfoToken.EOL:
                 continue
@@ -101,11 +88,11 @@ class ZMapInfoParser(MapInfoParserBase):
 
             key = key_token[1].lower()
             if key == 'include':
-                include_filename = str(self.get_token()[1])
+                include_filename = str(self.tokens.get()[1])
                 include_file = self.archive.file_find_regexp(include_filename)
                 if include_file:
                     include_tokens = get_file_tokens(include_file)
-                    self.tokens.extend(include_tokens)
+                    self.tokens.insert(include_tokens)
                 else:
                     raise MapInfoParserError('Cannot find include file "{}".'.format(include_filename), expand_token_position(key_token))
                 continue
@@ -168,7 +155,7 @@ class ZMapInfoParser(MapInfoParserBase):
                 elif key == 'jumpallowed':
                     current_map.allow_jump = True
                 else:
-                    self.skip_until(ZMapInfoToken.EOL)
+                    self.tokens.skip_until(ZMapInfoToken.EOL)
 
             elif parse_mode == ZParseMode.EPISODE:
                 if key == 'title':
@@ -178,66 +165,41 @@ class ZMapInfoParser(MapInfoParserBase):
                     self.parse_assignment()
                     current_episode.title = '${}'.format(self.parse_string())
                 else:
-                    self.skip_until(ZMapInfoToken.EOL)
+                    self.tokens.skip_until(ZMapInfoToken.EOL)
 
             else:
-                self.skip_until(ZMapInfoToken.EOL)
-
-    def get_token(self) -> Optional[Token]:
-        if not len(self.tokens):
-            raise MapInfoParserError('Expected a token, got end of file.', (0, 0))
-        return self.tokens.pop()
-
-    def peek_token(self) -> Optional[Token]:
-        if not len(self.tokens):
-            return None
-        return self.tokens[-1]
-
-    def require_token(self, token_type) -> Token:
-        token = self.tokens.pop()
-        if token[0] != token_type:
-            raise MapInfoParserError('Expected "{}" token, got "{}".'.format(token_type, token[0]), expand_token_position(token))
-
-        return token
-
-    def skip_until(self, token_type):
-        while len(self.tokens):
-            token = self.get_token()
-            if token is None:
-                break
-            elif token[0] == token_type:
-                break
+                self.tokens.skip_until(ZMapInfoToken.EOL)
 
     def parse_assignment(self):
         if self.new_format:
-            self.require_token(ZMapInfoToken.ASSIGN)
+            self.tokens.require(ZMapInfoToken.ASSIGN)
 
     def parse_map_header(self, mapinfo_map: MapInfoMap):
-        lump_token = self.get_token()
+        lump_token = self.tokens.get()
         mapinfo_map.map_lump = str(lump_token[1])
 
-        title_token = self.get_token()
+        title_token = self.tokens.get()
         if str(title_token[1]).lower() == 'lookup':
-            lookup_token = self.get_token()
+            lookup_token = self.tokens.get()
             mapinfo_map.title = '${}'.format(str(lookup_token[1]))
         else:
             mapinfo_map.title = str(title_token[1])
 
     def parse_episode_header(self, mapinfo_episode: MapInfoEpisode):
-        lump_token = self.get_token()
+        lump_token = self.tokens.get()
         mapinfo_episode.map_lump = str(lump_token[1])
 
-        title_token = self.get_token()
+        title_token = self.tokens.get()
         mapinfo_episode.title = str(title_token[1])
 
         # episode MAP01 teaser DEMO01
-        next_token = self.peek_token()
+        next_token = self.tokens.peek()
         if next_token is not None and next_token[0] == ZMapInfoToken.IDENTIFIER and next_token[1].lower() == 'teaser':
-            self.get_token()
-            self.get_token()
+            self.tokens.get()
+            self.tokens.get()
 
     def parse_next_map(self) -> str:
-        token = self.get_token()
+        token = self.tokens.get()
         if token[1].isdigit():
             next_map = 'MAP{:02}'.format(int(token[1]))
         elif token[0] == ZMapInfoToken.STRING or ZMapInfoToken.IDENTIFIER:
@@ -248,43 +210,43 @@ class ZMapInfoParser(MapInfoParserBase):
                 expand_token_position(token))
 
         if next_map.lower() == 'endpic':
-            next_token = self.peek_token()
+            next_token = self.tokens.peek()
             if next_token[0] == ZMapInfoToken.SEPARATOR:
-                self.get_token()
-            pic = self.get_token()
+                self.tokens.get()
+            pic = self.tokens.get()
             next_map = 'endpic:{}'.format(str(pic[1]))
         elif next_map.lower() == 'endgame':
-            self.skip_until(ZMapInfoToken.BLOCK_END)
+            self.tokens.skip_until(ZMapInfoToken.BLOCK_END)
             next_map = 'endgame'
         elif next_map.lower() == 'endsequence':
-            next_token = self.peek_token()
+            next_token = self.tokens.peek()
             if next_token[0] == ZMapInfoToken.SEPARATOR:
-                self.get_token()
-            sequence = self.get_token()
+                self.tokens.get()
+            sequence = self.tokens.get()
             next_map = 'endsequence:{}'.format(str(sequence[1]))
 
         return next_map
 
     def parse_music(self) -> str:
-        token = self.get_token()
+        token = self.tokens.get()
         if token[0] == ZMapInfoToken.STRING or token[0] == ZMapInfoToken.IDENTIFIER:
             music = token[1]
         else:
             raise MapInfoParserError('Invalid value "{}" for music name, expected string or identifier.'.format(token[1]),
                                       expand_token_position(token))
 
-        next_token = self.peek_token()
+        next_token = self.tokens.peek()
         if next_token is not None and next_token[1] == ':':
-            self.get_token()
-            index_token = self.get_token()
+            self.tokens.get()
+            index_token = self.tokens.get()
             return '{}:{}'.format(music, index_token[1])
 
         return music
 
     def parse_title(self) -> str:
-        next_token = self.get_token()
+        next_token = self.tokens.get()
         if next_token[0] == ZMapInfoToken.IDENTIFIER and next_token[1] == 'lookup':
-            lookup_key = self.get_token()
+            lookup_key = self.tokens.get()
             title = '${}'.format(str(lookup_key[1]))
         else:
             title = str(next_token[1])
@@ -292,14 +254,14 @@ class ZMapInfoParser(MapInfoParserBase):
         return title
 
     def parse_integer(self) -> int:
-        value = self.get_token()
+        value = self.tokens.get()
         try:
             return int(value[1])
         except ValueError:
             return 0
 
     def parse_string(self) -> str:
-        value = self.get_token()
+        value = self.tokens.get()
         if value[0] != ZMapInfoToken.STRING and value[0] != ZMapInfoToken.IDENTIFIER:
             raise MapInfoParserError('Invalid value "{}", expected string or identifier.'.format(value[1]),
                                       expand_token_position(value))

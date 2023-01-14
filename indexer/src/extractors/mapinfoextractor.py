@@ -3,9 +3,9 @@ from typing import Optional
 from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
 from doom.map import Map
-from doom.mapinfoparserbase import MapInfoParserBase, MapInfoParserError
-from doom.zmapinfoparser import ZMapInfoParser, MapInfoMap, ZMapInfoParserError
-from doom.umapinfoparser import UMapInfoParser
+from mapinfo.mapinfoparserbase import MapInfoParserBase, MapInfoParserError, MapInfoMap
+from mapinfo.zmapinfoparser import ZMapInfoParser
+from mapinfo.umapinfoparser import UMapInfoParser
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from utils.lexer import LexerError
@@ -61,14 +61,14 @@ class MapInfoExtractor(ExtractorBase):
 
         parser: MapInfoParserBase
         if file.name == 'MAPINFO' or file.name == 'ZMAPINFO':
-            parser = ZMapInfoParser(info.archive)
+            parser = ZMapInfoParser(file)
         elif file.name == 'UMAPINFO':
-            parser = UMapInfoParser(info.archive)
+            parser = UMapInfoParser(file)
         else:
             return
 
         try:
-            parser.parse(file)
+            parser.parse()
         except LexerError as e:
             self.logger.stream('mapinfo_lexer_error', info.path_idgames.as_posix())
             self.logger.stream('mapinfo_lexer_error', str(e))

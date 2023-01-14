@@ -5,12 +5,19 @@ Eli Bendersky (eliben@gmail.com).
 
 import re
 from dataclasses import dataclass
+from enum import Enum
 from typing import List, Optional, Pattern, Tuple
+
+
+class TokenTypeBase(Enum):
+    """ Base class for token type values.
+    """
+    pass
 
 
 # A token as returned from get_token().
 # type, contents, position, lexer object
-Token = Tuple[str, any, int, any]
+Token = Tuple[TokenTypeBase, any, int, any]
 
 
 def process_float(f):
@@ -49,7 +56,7 @@ def expand_token_position(token: Token) -> (int, int):
 class Rule:
     """ A single rule that can be matched.
     """
-    name: str
+    type: TokenTypeBase
     regex: str
     process: Optional[any] = None
     skip: bool = False
@@ -106,7 +113,7 @@ class Lexer:
         self.text_len = len(text)
         self.pos = 0
 
-    def require_token(self, token_type: str) -> any:
+    def require_token(self, token_type: TokenTypeBase) -> any:
         """ Returns the value if the next token is of a specific type.
         """
 
@@ -118,7 +125,7 @@ class Lexer:
 
         return token[1]
 
-    def get_all_tokens_until(self, token_type: str) -> List[Token]:
+    def get_all_tokens_until(self, token_type: TokenTypeBase) -> List[Token]:
         """ Returns a list of tokens up to and including a specific token type.
         """
 
@@ -134,7 +141,7 @@ class Lexer:
 
         return tokens
 
-    def skip_tokens_until(self, token_type: str):
+    def skip_tokens_until(self, token_type: TokenTypeBase):
         """ Skips tokens up to and including a specific token type.
         """
 
@@ -171,7 +178,7 @@ class Lexer:
             if rule.process is not None:
                 value = rule.process(value)
 
-            return rule.name, value, m.pos, self
+            return rule.type, value, m.pos, self
 
         # If we're here, no rule matched.
         raise LexerError('Invalid token', self.expand_position(self.pos))

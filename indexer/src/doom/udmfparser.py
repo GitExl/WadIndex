@@ -1,9 +1,8 @@
-from enum import Enum
 from typing import Dict, List, Optional, Tuple
 
 from doom.map import Line, LineFlags, Sector, Side, Thing, ThingFlags, Vertex
 from utils import lexer
-from utils.lexer import Lexer, Rule, expand_token_position
+from utils.lexer import Lexer, Rule, expand_token_position, TokenTypeBase
 
 
 class UDMFParserError(Exception):
@@ -11,18 +10,18 @@ class UDMFParserError(Exception):
         super(Exception, self).__init__('Line {} column {}: {}'.format(position[0], position[1], message))
 
 
-class UDMFToken(Enum):
-    WHITESPACE: str = 'white'
-    COMMENT: str = 'comment'
-    IDENTIFIER: str = 'ident'
-    BLOCK_START: str = 'bstart'
-    BLOCK_END: str = 'bend'
-    ASSIGN: str = 'assign'
-    END: str = 'end'
-    INTEGER: str = 'int'
-    FLOAT: str = 'float'
-    KEYWORD: str = 'keyword'
-    STRING: str = 'str'
+class UDMFToken(TokenTypeBase):
+    WHITESPACE = 1
+    COMMENT = 2
+    IDENTIFIER = 3
+    BLOCK_START = 4
+    BLOCK_END = 5
+    ASSIGN = 6
+    END = 7
+    INTEGER = 8
+    FLOAT = 9
+    KEYWORD = 10
+    STRING = 11
 
 
 LINE_FLAG_MAP: Dict[str, LineFlags] = {
