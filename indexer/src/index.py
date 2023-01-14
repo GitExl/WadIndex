@@ -60,6 +60,7 @@ def run():
             # Transfer indexed information to an entry.
             if entry is None:
                 entry = Entry(
+                    collection,
                     info.path_idgames.as_posix(),
                     info.file_modified,
                     info.file_size,

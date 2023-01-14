@@ -3,7 +3,7 @@ import json
 from typing import Dict, Set
 
 from archives.wadarchive import WADArchive
-from idgames.game import Game
+from indexer.game import Game
 from utils.config import Config
 from utils.logger import Logger
 

@@ -1,7 +1,7 @@
 import json
 
 from typing import Dict, Set
-from idgames.engine import Engine
+from indexer.engine import Engine
 from utils.config import Config
 
 engine_factors = {
