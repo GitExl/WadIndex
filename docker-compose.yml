@@ -57,7 +57,7 @@ services:
       - internal
     volumes:
       - ./indexer:/usr/src/app
-      - "$INDEXER_PATH_IDGAMES:/var/idgames"
+      - "$INDEXER_PATH_COLLECTIONS:/var/collections"
       - "$INDEXER_PATH_IWADS:/var/iwads:ro"
       - ./storage/logs:/var/log/indexer
       - ./storage/graphics:/var/indexer/storage/graphics
