@@ -46,9 +46,14 @@ Then run
 
 ```python src/index.py --index```
 
-This will run for a while, possibly many hours if the environment is low on IO or CPU resources. Indexing performance is
-largely dictated by ZIP decompression speed, with a fast CPU being only secondary. As of january 2023 a modern system
-with a fast SSD should be able to complete this in about an hour for just the /idgames collection.
+This will run for a while, possibly many hours if the environment is low on resources. Indexing performance is
+largely dictated by CPU speed, with IO performance being secondary. As of january 2023 a modern system
+with a fast SSD should be able to complete this in about 25 minutes for just the /idgames collection, using 12
+processes.
+
+Use the `--processes` argument to indicate how many processes to use. The default is 60% of available CPUs, minus 1.
+
+Other indexing options are available using `--help`.
 
 ## Limitations
 * In some cases the indexer detects the wrong game type. As a result images with the wrong palette will be output.

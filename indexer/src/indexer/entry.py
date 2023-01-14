@@ -1,5 +1,7 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
+from doom.map import Map
+from extractors.extractedinfo import MusicInfo, GraphicInfo
 from indexer.engine import Engine
 from indexer.game import Game
 
@@ -99,6 +101,12 @@ class Entry:
         self.credits: Optional[str] = None
         self.build_time: Optional[str] = None
         self.comments: Optional[str] = None
+
+        self.maps: List[Map] = []
+        self.authors: List[str] = []
+        self.text_contents: Optional[str] = None
+        self.graphics: Dict[str, GraphicInfo] = {}
+        self.music: Dict[str, MusicInfo] = {}
 
     def __repr__(self):
         return '{}, {}: {}'.format(self.id, self.path, self.title)

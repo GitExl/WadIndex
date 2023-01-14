@@ -44,16 +44,16 @@ class MusicExtractor(ExtractorBase):
                 info.music[name] = MusicInfo(name, music_type, data, data_hash, duration)
 
     def get_music_duration(self, info: ExtractedInfo, file: ArchiveFileBase) -> Optional[int]:
-        # try:
-        #     if file.type == 'midi':
-        #         mid = MidiFile(file=io.BytesIO(file.get_data()))
-        #         if mid.type < 2:
-        #             return mid.length
-        #         else:
-        #             self.logger.debug(
-        #                 'Cannot determine length of type 2 MIDI track {} in {}.'.format(file.name, info.path_idgames))
-        #
-        # except Exception as e:
-        #     self.logger.error('Cannot determine length of music {} in {}: {}'.format(file.name, info.path_idgames, e))
+        try:
+            if file.type == 'midi':
+                mid = MidiFile(file=io.BytesIO(file.get_data()))
+                if mid.type < 2:
+                    return mid.length
+                else:
+                    self.logger.debug(
+                        'Cannot determine length of type 2 MIDI track {} in {}.'.format(file.name, info.path_idgames))
+
+        except Exception as e:
+            self.logger.error('Cannot determine length of music {} in {}: {}'.format(file.name, info.path_idgames, e))
 
         return None

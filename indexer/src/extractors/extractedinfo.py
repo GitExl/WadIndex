@@ -10,7 +10,6 @@ from archives.archivebase import ArchiveBase
 from archives.archivelist import ArchiveList
 from doom.map import Map
 from indexer.engine import Engine
-from indexer.entry import Entry
 from indexer.game import Game
 
 
@@ -52,7 +51,6 @@ class ExtractedInfo:
     filename_base: str
     file_size: int
     file_modified: int
-    entry: Optional[Entry] = None
 
     main_archive: Optional[ZipFile] = None
     archive: Optional[ArchiveBase] = None

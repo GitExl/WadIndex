@@ -61,7 +61,7 @@ class Indexer:
         for writer_class in WRITERS:
             self.writers.append(writer_class(logger, config, storage))
 
-    def index_file(self, path_local: Path, path_collection: Path) -> Optional[ExtractedInfo]:
+    def index_file(self, path_local: Path, path_collection: Path) -> ExtractedInfo:
         path_local_base = path_local.parents[0] / path_local.stem
         path_collection_base = path_collection.parents[0] / path_collection.stem
         filename_base = path_local.stem
