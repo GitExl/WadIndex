@@ -127,8 +127,8 @@ class DBStorage:
         return author_ids
 
     def save_entry_maps(self, entry: Entry, entry_maps: List[Map]):
-        self.cursor.execute('DELETE FROM maps WHERE entry_id IN (SELECT map_id FROM entry_maps WHERE entry_id=%s)', (entry.id,))
-        self.cursor.execute('DELETE FROM map_authors WHERE map_id NOT IN (SELECT id FROM maps)')
+        self.cursor.execute('DELETE FROM map_authors WHERE map_id IN (SELECT id FROM maps WHERE entry_id=%s)', (entry.id,))
+        self.cursor.execute('DELETE FROM maps WHERE entry_id=%s', (entry.id,))
 
         fields = [
             'entry_id',
@@ -176,7 +176,7 @@ class DBStorage:
             # Add authors.
             author_ids = self.get_author_ids(entry_map.authors)
             for author_id in author_ids:
-                self.cursor.execute('INSERT INTO map_authors VALUES (%s, %s)', (entry.id, author_id))
+                self.cursor.execute('INSERT INTO map_authors VALUES (%s, %s)', (db_id, author_id))
 
     def save_entry_textfile(self, entry: Entry, text_file: Optional[str]):
         self.cursor.execute('DELETE FROM entry_textfile WHERE entry_id=%s', (entry.id,))
