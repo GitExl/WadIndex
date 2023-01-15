@@ -20,9 +20,9 @@ Step 2: Ensure that the following IWADs are present in a directory of choice:
 * `STRIFE0.WAD`: Strife (Shareware)
 * `TNT.WAD`: TNT: Evilution
 
-Step 2: Copy `.env.example` to `.env` and set the paths in it to point to your IWADs and source collection files.
+Step 3: Copy `.env.example` to `.env` and set the paths in it to point to your IWADs and source collection files.
 
-Step 3: Start the production Docker environment with:
+Step 4: Start the production Docker environment with:
 
 ```
 docker compose build
@@ -38,13 +38,13 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
 ### Indexing
-To generate the initial index, start a shell into the indexer Docker container with
+To generate the initial index, start a shell into the indexer Docker container with:
 
 ```docker exec -it wadindex-indexer-1 /bin/bash```
 
-Then run
+Then run:
 
-```python src/index.py --index```
+```python src/index.py index```
 
 This will run for a while, possibly many hours if the environment is low on resources. Indexing performance is
 largely dictated by CPU speed, with IO performance being secondary. As of january 2023 a modern system
