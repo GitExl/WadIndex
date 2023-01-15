@@ -86,7 +86,6 @@ class EngineExtractor(ExtractorBase):
                 self.logger.decision('Detected engine "{}" from complete text file contents.'.format(engine.name))
 
         if engine == Engine.UNKNOWN:
-            self.logger.warn('Cannot determine engine.')
             self.logger.stream('engine_unknown', info.path_idgames.as_posix())
             return
 
