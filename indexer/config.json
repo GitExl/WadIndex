@@ -22,6 +22,9 @@
     },
     "music": {
       "output_path": "/var/indexer/storage/music"
+    },
+    "map_previews": {
+      "output_path": "/var/indexer/storage/map_previews"
     }
   },
   "ignore": [

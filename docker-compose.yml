@@ -62,6 +62,7 @@ services:
       - ./storage/logs:/var/log/indexer
       - ./storage/graphics:/var/indexer/storage/graphics
       - ./storage/music:/var/indexer/storage/music
+      - ./storage/map_previews:/var/indexer/storage/map_previews
     depends_on:
       - db
 

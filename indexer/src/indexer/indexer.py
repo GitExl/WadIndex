@@ -17,6 +17,7 @@ from extractors.textextractor import TextExtractor
 
 from utils.config import Config
 from utils.logger import Logger
+from writers.mappreviewwriter import MapPreviewWriter
 
 from writers.musicwriter import MusicWriter
 from writers.writerbase import WriterBase
@@ -42,6 +43,7 @@ EXTRACTORS = [
 WRITERS = [
     GraphicsWriter,
     MusicWriter,
+    MapPreviewWriter,
 ]
 
 
