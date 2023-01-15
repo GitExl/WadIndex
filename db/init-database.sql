@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: idgames
 -- ------------------------------------------------------
--- Server version	10.10.2-MariaDB-1:10.10.2+maria~ubu2204
+-- Server version 10.10.2-MariaDB-1:10.10.2+maria~ubu2204
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `authors` (
   `nickname` varchar(127) DEFAULT NULL,
   `path_alias` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10008 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `directories` (
   PRIMARY KEY (`id`),
   KEY `directories_collection_IDX` (`collection`,`path`) USING BTREE,
   KEY `directories_parent_id_IDX` (`parent_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=289 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `entry` (
   FULLTEXT KEY `entry_path_ft_IDX` (`path`),
   FULLTEXT KEY `entry_title_ft_IDX` (`title`),
   FULLTEXT KEY `entry_description_ft_IDX` (`description`)
-) ENGINE=InnoDB AUTO_INCREMENT=19601 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -119,19 +119,6 @@ CREATE TABLE IF NOT EXISTS `entry_images` (
   PRIMARY KEY (`entry_id`,`name`),
   KEY `entry_images_is_primary_IDX` (`is_primary`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `entry_maps`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE IF NOT EXISTS `entry_maps` (
-  `entry_id` int(10) unsigned NOT NULL,
-  `map_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`entry_id`,`map_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -183,6 +170,7 @@ CREATE TABLE IF NOT EXISTS `map_authors` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE IF NOT EXISTS `maps` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `entry_id` int(10) unsigned NOT NULL,
   `name` char(8) NOT NULL,
   `title` varchar(1022) DEFAULT NULL,
   `format` tinyint(4) NOT NULL,
@@ -198,8 +186,8 @@ CREATE TABLE IF NOT EXISTS `maps` (
   `next_secret` varchar(255) DEFAULT NULL,
   `cluster` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `maps_name_IDX` (`name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=15259 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `maps_entry_id_IDX` (`entry_id`,`name`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -215,7 +203,7 @@ CREATE TABLE IF NOT EXISTS `music` (
   `duration` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `music_hash_IDX` (`hash`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12846 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -227,4 +215,4 @@ CREATE TABLE IF NOT EXISTS `music` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-11 19:36:09
+-- Dump completed on 2023-01-15 10:10:27

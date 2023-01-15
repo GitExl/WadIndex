@@ -33,8 +33,7 @@ class MapRepository {
       SELECT
         ' . self::FIELDS_ENTRY_TEASER . '
       FROM entry e
-      LEFT JOIN entry_maps em ON em.entry_id = e.id
-      LEFT JOIN maps m ON em.map_id = m.id
+      LEFT JOIN maps m ON m.entry_id = e.id
       WHERE
         e.id=:entry_id
       ORDER BY name ASC
@@ -61,8 +60,7 @@ class MapRepository {
       SELECT
         ' . self::FIELDS_ENTRY_TEASER . '
       FROM entry e
-      LEFT JOIN entry_maps em ON em.entry_id = e.id
-      LEFT JOIN maps m ON em.map_id = m.id
+      LEFT JOIN maps m ON m.entry_id = e.id
       WHERE
         e.collection=:collection AND
         e.path=:entry_path AND
@@ -107,8 +105,7 @@ class MapRepository {
         m.sector_count AS `sector_count`,
         m.thing_count AS `thing_count`
       FROM entry e
-      LEFT JOIN entry_maps em ON em.entry_id = e.id
-      LEFT JOIN maps m ON em.map_id = m.id
+      LEFT JOIN maps m ON e.id = m.entry_id
       WHERE
         e.collection=:collection AND
         e.path=:entry_path AND

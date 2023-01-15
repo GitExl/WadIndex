@@ -127,11 +127,11 @@ class DBStorage:
         return author_ids
 
     def save_entry_maps(self, entry: Entry, entry_maps: List[Map]):
-        self.cursor.execute('DELETE FROM maps WHERE id IN (SELECT map_id FROM entry_maps WHERE entry_id=%s)', (entry.id,))
+        self.cursor.execute('DELETE FROM maps WHERE entry_id IN (SELECT map_id FROM entry_maps WHERE entry_id=%s)', (entry.id,))
         self.cursor.execute('DELETE FROM map_authors WHERE map_id NOT IN (SELECT id FROM maps)')
-        self.cursor.execute('DELETE FROM entry_maps WHERE map_id NOT IN (SELECT id FROM maps)')
 
         fields = [
+            'entry_id',
             'name',
             'title',
             'format',
@@ -148,12 +148,13 @@ class DBStorage:
             'cluster',
         ]
         fields_concat = ','.join(fields)
-        fields_concat_placeholder = '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s'
+        fields_concat_placeholder = '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s'
 
         for entry_map in entry_maps:
             self.cursor.execute(
                 'INSERT INTO maps ({}) VALUES ({})'.format(fields_concat, fields_concat_placeholder),
                 (
+                    entry.id,
                     entry_map.name[:8],
                     entry_map.title[:1022] if entry_map.title is not None else None,
                     MAP_FORMAT_TO_INT.get(entry_map.format),
@@ -171,8 +172,6 @@ class DBStorage:
                 )
             )
             db_id = self.cursor.lastrowid
-
-            self.cursor.execute('INSERT INTO entry_maps VALUES (%s, %s)', (entry.id, db_id,))
 
             # Add authors.
             author_ids = self.get_author_ids(entry_map.authors)
@@ -198,7 +197,7 @@ class DBStorage:
         self.cursor.execute('DELETE FROM authors WHERE id NOT IN (SELECT DISTINCT author_id FROM entry_authors UNION SELECT DISTINCT author_id FROM map_authors)')
 
     def remove_orphan_maps(self):
-        self.cursor.execute('DELETE FROM maps WHERE id NOT IN (SELECT map_id FROM entry_maps UNION SELECT map_id FROM map_authors)')
+        self.cursor.execute('DELETE FROM maps WHERE entry_id NOT IN (SELECT id FROM entry)')
 
     def remove_orphan_textfiles(self):
         self.cursor.execute('DELETE FROM entry_textfile WHERE entry_id NOT IN (SELECT id FROM entry)')
@@ -229,7 +228,6 @@ class DBStorage:
                     continue
 
                 self.cursor.execute('DELETE FROM entry WHERE id=%s', (db_id,))
-                self.cursor.execute('DELETE FROM entry_maps WHERE entry_id=%s', (db_id,))
                 self.cursor.execute('DELETE FROM entry_authors WHERE entry_id=%s', (db_id,))
                 self.cursor.execute('DELETE FROM entry_images WHERE entry_id=%s', (db_id,))
                 self.cursor.execute('DELETE FROM entry_music WHERE entry_id=%s', (db_id,))
