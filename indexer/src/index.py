@@ -16,7 +16,7 @@ from utils.logger import Logger
 
 class IndexProcess(Process):
 
-    def __init__(self, verbosity: int, task_queue: Queue, db_lock: Lock):
+    def __init__(self, name: str, verbosity: int, task_queue: Queue, db_lock: Lock):
         Process.__init__(self)
 
         self.config: Config = Config()
@@ -24,6 +24,7 @@ class IndexProcess(Process):
         self.storage: DBStorage = DBStorage(self.config)
         self.db_lock: Lock = db_lock
 
+        self.name = name
         self.task_queue: Queue = task_queue
 
     def run(self) -> None:
@@ -125,7 +126,6 @@ def index(options):
         proc_count = options.processes
     else:
         proc_count = max(ceil(multiprocessing.cpu_count() * 0.6) - 1, 1)
-    proc_count = min(proc_count, len(paths_system))
     logger.info('Using {} processes.'.format(proc_count))
 
     # Start worker processes.
@@ -133,7 +133,7 @@ def index(options):
     db_lock = Lock()
     workers = []
     for i in range(proc_count):
-        worker = IndexProcess(options.verbosity, task_queue, db_lock)
+        worker = IndexProcess('index-{:02}'.format(i + 1), options.verbosity, task_queue, db_lock)
         workers.append(worker)
         worker.start()
 

@@ -1,5 +1,6 @@
 import codecs
 import sys
+from multiprocessing import current_process
 from time import localtime, strftime
 
 import colorama
@@ -25,35 +26,35 @@ class Logger:
             return
 
         dt = strftime('%Y-%m-%d %H:%M:%S', localtime())
-        sys.stdout.write('{} \033[1;36m[debug]    {}\n'.format(dt, text))
+        sys.stdout.write('{} {:<11} \033[1;36m[debug]    {}\n'.format(dt, current_process().name, text))
 
     def decision(self, text: str):
         if self.verbosity < Logger.VERBOSITY_DECISION:
             return
 
         dt = strftime('%Y-%m-%d %H:%M:%S', localtime())
-        sys.stdout.write('{} \033[1;32m[decision] {}\n'.format(dt, text))
+        sys.stdout.write('{} {:<11} \033[1;32m[decision] {}\n'.format(dt, current_process().name, text))
 
     def error(self, text: str):
         if self.verbosity < Logger.VERBOSITY_ERROR:
             return
 
         dt = strftime('%Y-%m-%d %H:%M:%S', localtime())
-        sys.stderr.write('{} \033[1;31m[error]    {}\n'.format(dt, text))
+        sys.stderr.write('{} {:<11} \033[1;31m[error]    {}\n'.format(dt, current_process().name, text))
 
     def info(self, text: str):
         if self.verbosity < Logger.VERBOSITY_INFO:
             return
 
         dt = strftime('%Y-%m-%d %H:%M:%S', localtime())
-        sys.stdout.write('{}            {}\n'.format(dt, text))
+        sys.stdout.write('{} {:<11}            {}\n'.format(dt, current_process().name, text))
 
     def warn(self, text: str):
         if self.verbosity < Logger.VERBOSITY_WARNING:
             return
 
         dt = strftime('%Y-%m-%d %H:%M:%S', localtime())
-        sys.stdout.write('{} \033[1;33m[warning]  {}\n'.format(dt, text))
+        sys.stdout.write('{} {:<11} \033[1;33m[warning]  {}\n'.format(dt, current_process().name, text))
 
     def stream(self, stream: str, text: str):
         if stream not in self.streams:
