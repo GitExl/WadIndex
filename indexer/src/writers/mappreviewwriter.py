@@ -46,7 +46,7 @@ class MapPreviewWriter(WriterBase):
                 elif 0 <= line.side_front < side_count and 0 <= line.side_back < side_count:
                     side_front = map.sides[line.side_front]
                     side_back = map.sides[line.side_back]
-                    if side_front.sector >= sector_count or side_back.sector >= sector_count:
+                    if side_front.sector < 0 or side_front.sector >= sector_count or side_back.sector < 0 or side_back.sector >= sector_count:
                         continue
 
                     sector_front = map.sectors[side_front.sector]
