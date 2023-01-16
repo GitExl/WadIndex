@@ -98,6 +98,10 @@ class Entries extends AbstractController {
         }
 
         $this->addEntryTeaserData($listing['entries']);
+
+        $listing['offset'] = $params->offset;
+        $listing['limit'] = $params->limit;
+
         return $this->json($listing);
     }
 
@@ -112,6 +116,9 @@ class Entries extends AbstractController {
 
         $listing = $this->entries->search($params);
         $this->addEntryTeaserData($listing['entries']);
+
+        $listing['offset'] = $params->offset;
+        $listing['limit'] = $params->limit;
 
         return $this->json($listing);
     }

@@ -49,7 +49,7 @@ class EntryRepository {
     e.file_modified AS `timestamp`,
     e.game AS `game`,
     e.description_preview AS `description`,
-    (SELECT COUNT(*) FROM entry_maps WHERE entry_id = e.id) AS `map_count`
+    (SELECT COUNT(*) FROM maps WHERE entry_id = e.id) AS `map_count`
   ';
 
   private const FIELDS_MINIMAL = '
