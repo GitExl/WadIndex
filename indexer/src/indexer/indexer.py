@@ -8,6 +8,7 @@ from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from extractors.filetypeextractor import FileTypeExtractor
 from extractors.gameextractor import GameExtractor
+from extractors.languageextractor import LanguageExtractor
 from extractors.mapextractor import MapExtractor
 from extractors.graphicsextractor import GraphicsExtractor
 from extractors.mapinfoextractor import MapInfoExtractor
@@ -34,6 +35,7 @@ EXTRACTORS = [
     ArchiveListExtractor,
     FileTypeExtractor,
     MusicExtractor,
+    LanguageExtractor,
     MapExtractor,
     MapInfoExtractor,
     EngineExtractor,

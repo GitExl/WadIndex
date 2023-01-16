@@ -42,6 +42,9 @@ class TokenList:
 
         return self.tokens[self.token_index]
 
+    def skip(self, count=1):
+        self.token_index += count
+
     def require(self, token_type: TokenTypeBase) -> Token:
         if self.token_index >= self.token_count:
             raise TokenListError('Expected a token, got end of file.', (0, 0))

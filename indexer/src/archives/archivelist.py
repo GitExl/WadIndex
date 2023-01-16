@@ -34,6 +34,19 @@ class ArchiveList:
 
         return None
 
+    def file_find_all_regexp(self, regexp: str, include_main: bool = True) -> List[ArchiveFileBase]:
+        files = []
+
+        for archive in reversed(self.archives):
+            if not include_main and archive.is_main:
+                continue
+
+            archive_files = archive.file_find_all_regexp(regexp)
+            if archive_files is not None:
+                files.extend(archive_files)
+
+        return files
+
     def close(self, iwads: bool = True):
         for archive in self.archives:
             if (archive.is_main and iwads) or not archive.is_main:

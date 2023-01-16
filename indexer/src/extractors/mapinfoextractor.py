@@ -6,11 +6,12 @@ from doom.map import Map
 from mapinfo.mapinfoparserbase import MapInfoParserBase, MapInfoParserError, MapInfoMap
 from mapinfo.zmapinfoparser import ZMapInfoParser
 from mapinfo.umapinfoparser import UMapInfoParser
-from extractors.extractedinfo import ExtractedInfo
+from extractors.extractedinfo import ExtractedInfo, LocaleStrings
 from extractors.extractorbase import ExtractorBase
 from utils import author_parser
 from utils.lexer import LexerError
 from utils.token_list import TokenListError
+
 
 FILE_ORDER = [
     'ZMAPINFO',
@@ -21,11 +22,11 @@ FILE_ORDER = [
 ]
 
 
-def assign_mapinfo_to_map(map: Map, map_info: MapInfoMap):
+def assign_mapinfo_to_map(map: Map, map_info: MapInfoMap, strings: Optional[LocaleStrings]):
     if map_info.title is not None:
-        map.title = map_info.title
+        map.title = replace_language_lookup(map_info.title, strings)
     if map_info.music is not None:
-        map.music = map_info.music
+        map.music = replace_language_lookup(map_info.music, strings)
     if map_info.allow_jump is not None:
         map.allow_jump = map_info.allow_jump
     if map_info.allow_crouch is not None:
@@ -40,6 +41,21 @@ def assign_mapinfo_to_map(map: Map, map_info: MapInfoMap):
         map.next_secret = map_info.next_secret
     if map_info.authors is not None:
         map.authors = author_parser.parse(map_info.authors)
+
+
+def replace_language_lookup(key: str, strings: Optional[LocaleStrings]) -> str:
+    if not key.startswith('$'):
+        return key
+
+    key = key[1:]
+    if strings is None:
+        return key
+
+    replacement = strings.get_default(key)
+    if replacement is None:
+        return key
+
+    return replacement
 
 
 class MapInfoExtractor(ExtractorBase):
@@ -90,4 +106,4 @@ class MapInfoExtractor(ExtractorBase):
         for map in info.maps:
             for map_key, map_info in parser.maps.items():
                 if map_key.lower() == map.name.lower():
-                    assign_mapinfo_to_map(map, map_info)
+                    assign_mapinfo_to_map(map, map_info, info.locale_strings)

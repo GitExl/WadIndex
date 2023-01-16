@@ -8,6 +8,7 @@ from PIL.Image import Image
 
 from archives.archivebase import ArchiveBase
 from archives.archivelist import ArchiveList
+from doom.language_parser import LocaleStrings
 from doom.map import Map
 from indexer.engine import Engine
 from indexer.game import Game
@@ -75,3 +76,4 @@ class ExtractedInfo:
     graphics: Dict[str, GraphicInfo] = field(default_factory=lambda: {})
     maps: List[Map] = field(default_factory=lambda: [])
     music: Dict[str, MusicInfo] = field(default_factory=lambda: {})
+    locale_strings: Optional[LocaleStrings] = None
