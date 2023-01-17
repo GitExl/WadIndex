@@ -168,6 +168,10 @@ class Lexer:
             if not m:
                 break
 
+            # A token was detected, but it did not advance in the text stream.
+            if m.end() == self.pos:
+                break
+
             self.pos = m.end()
             group_index = m.lastindex
             rule = self.group_rules[group_index - 1]

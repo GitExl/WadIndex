@@ -18,9 +18,6 @@ class LanguageExtractor(ExtractorBase):
         if not len(language_files):
             return
 
-        # levels/doom2/Ports/d-f/delta2020.zip
-        # levels/heretic/Ports/lostcmtr.zip
-
         info.locale_strings = LocaleStrings()
         for language_file in language_files:
             text = language_file.get_data().decode('latin1')
