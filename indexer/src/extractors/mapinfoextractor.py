@@ -1,12 +1,13 @@
-from typing import Optional
+from typing import Optional, List
 
 from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
+from doom.strings_builtin import BUILTIN_STRINGS
 from doom.map import Map
 from mapinfo.mapinfoparserbase import MapInfoParserBase, MapInfoParserError, MapInfoMap
 from mapinfo.zmapinfoparser import ZMapInfoParser
 from mapinfo.umapinfoparser import UMapInfoParser
-from extractors.extractedinfo import ExtractedInfo, LocaleStrings
+from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from utils import author_parser
 from utils.lexer import LexerError
@@ -16,46 +17,10 @@ from utils.token_list import TokenListError
 FILE_ORDER = [
     'ZMAPINFO',
     # 'EMAPINFO',
-    # 'RMAPINFO',
+    'RMAPINFO',
     'UMAPINFO',
     'MAPINFO',
 ]
-
-
-def assign_mapinfo_to_map(map: Map, map_info: MapInfoMap, strings: Optional[LocaleStrings]):
-    if map_info.title is not None:
-        map.title = replace_language_lookup(map_info.title, strings)
-    if map_info.music is not None:
-        map.music = replace_language_lookup(map_info.music, strings)
-    if map_info.allow_jump is not None:
-        map.allow_jump = map_info.allow_jump
-    if map_info.allow_crouch is not None:
-        map.allow_crouch = map_info.allow_crouch
-    if map_info.par_time is not None:
-        map.par_time = map_info.par_time
-    if map_info.cluster_index is not None:
-        map.cluster = map_info.cluster_index
-    if map_info.next is not None:
-        map.next = map_info.next
-    if map_info.next_secret is not None:
-        map.next_secret = map_info.next_secret
-    if map_info.authors is not None:
-        map.authors = author_parser.parse(map_info.authors)
-
-
-def replace_language_lookup(key: str, strings: Optional[LocaleStrings]) -> str:
-    if not key.startswith('$'):
-        return key
-
-    key = key[1:]
-    if strings is None:
-        return key
-
-    replacement = strings.get_default(key)
-    if replacement is None:
-        return key
-
-    return replacement
 
 
 class MapInfoExtractor(ExtractorBase):
@@ -69,41 +34,82 @@ class MapInfoExtractor(ExtractorBase):
             self.logger.warn('Cannot extract map info without an archive.')
             return
 
-        file: Optional[ArchiveFileBase] = None
+        mapinfo_files: List[ArchiveFileBase] = []
         for filename in FILE_ORDER:
             file = archive.file_find_basename(filename)
             if file is not None:
-                break
+                mapinfo_files.append(file)
 
-        if file is None:
-            return
+        for file in mapinfo_files:
+            parser: Optional[MapInfoParserBase] = None
+            try:
+                if file.name == 'MAPINFO' or file.name == 'ZMAPINFO' or file.name == 'RMAPINFO':
+                    parser = ZMapInfoParser(file)
+                elif file.name == 'UMAPINFO':
+                    parser = UMapInfoParser(file)
+                else:
+                    return
+            except LexerError as e:
+                self.logger.stream('mapinfo_lexer_error', '{}: {}'.format(info.path_idgames.as_posix(), str(e)))
 
-        parser: Optional[MapInfoParserBase] = None
-        try:
-            if file.name == 'MAPINFO' or file.name == 'ZMAPINFO':
-                parser = ZMapInfoParser(file)
-            elif file.name == 'UMAPINFO':
-                parser = UMapInfoParser(file)
-            else:
+            if parser is None:
                 return
-        except LexerError as e:
-            self.logger.stream('mapinfo_lexer_error', info.path_idgames.as_posix())
-            self.logger.stream('mapinfo_lexer_error', str(e))
 
-        if parser is None:
-            return
+            try:
+                parser.parse()
+            except MapInfoParserError as e:
+                self.logger.stream('mapinfo_parser_error', '{}: {}'.format(info.path_idgames.as_posix(), str(e)))
+            except TokenListError as e:
+                self.logger.stream('mapinfo_token_list_error', '{}: {}'.format(info.path_idgames.as_posix(), str(e)))
 
-        try:
-            parser.parse()
-        except MapInfoParserError as e:
-            self.logger.stream('mapinfo_parser_error', info.path_idgames.as_posix())
-            self.logger.stream('mapinfo_parser_error', str(e))
-        except TokenListError as e:
-            self.logger.stream('mapinfo_token_list_error', info.path_idgames.as_posix())
-            self.logger.stream('mapinfo_token_list_error', str(e))
+            # Match mapinfo data to maps.
+            for map in info.maps:
+                for map_key, map_info in parser.maps.items():
+                    if map_key.lower() == map.name.lower():
+                        self.assign_mapinfo_to_map(map, map_info, info)
 
-        # Match mapinfo data to maps.
-        for map in info.maps:
-            for map_key, map_info in parser.maps.items():
-                if map_key.lower() == map.name.lower():
-                    assign_mapinfo_to_map(map, map_info, info.locale_strings)
+    def assign_mapinfo_to_map(self, map: Map, map_info: MapInfoMap, info: ExtractedInfo):
+        if map_info.title is not None:
+            title = self.replace_language_lookup(map_info.title, info)
+            if title is not None and title != '':
+                map.title = title
+
+        if map_info.music is not None:
+            music = self.replace_language_lookup(map_info.music, info)
+            if music is not None and music != '':
+                map.music = music
+
+        if map_info.authors is not None:
+            map.authors = author_parser.parse(map_info.authors)
+
+        if map_info.allow_jump is not None:
+            map.allow_jump = map_info.allow_jump
+        if map_info.allow_crouch is not None:
+            map.allow_crouch = map_info.allow_crouch
+        if map_info.par_time is not None:
+            map.par_time = map_info.par_time
+        if map_info.cluster_index is not None:
+            map.cluster = map_info.cluster_index
+        if map_info.next is not None:
+            map.next = map_info.next
+        if map_info.next_secret is not None:
+            map.next_secret = map_info.next_secret
+
+    @staticmethod
+    def replace_language_lookup(key: Optional[str], info: ExtractedInfo) -> Optional[str]:
+        if key is None:
+            return None
+        if not key.startswith('$'):
+            return key
+
+        key = key[1:]
+        if key in BUILTIN_STRINGS:
+            return None
+        if info.locale_strings is None:
+            return key
+
+        replacement = info.locale_strings.get_default(key)
+        if replacement is None:
+            return key
+
+        return replacement

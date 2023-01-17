@@ -19,7 +19,7 @@ class MapInfoMap:
     music: Optional[str] = None
     allow_jump: Optional[bool] = None
     allow_crouch: Optional[bool] = None
-    authors: Optional[List[str]] = None
+    authors: List[str] = []
 
 
 class MapInfoEpisode:

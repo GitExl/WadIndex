@@ -154,6 +154,19 @@ class ZMapInfoParser(MapInfoParserBase):
                     current_map.allow_jump = False
                 elif key == 'jumpallowed':
                     current_map.allow_jump = True
+
+                # From RMAPINFO
+                elif key == 'author':
+                    self.parse_assignment()
+                    author = self.parse_string()
+                    if author is not None:
+                        current_map.authors.append(author[1])
+                # What a terrible place to put these two...
+                elif key == 'musicartist':
+                    pass
+                elif key == 'musictitle':
+                    pass
+
                 else:
                     self.tokens.skip_until(ZMapInfoToken.EOL)
 
