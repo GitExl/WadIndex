@@ -85,6 +85,7 @@ class IndexProcess(Process):
             self.db_lock.release()
 
         indexer.close()
+        self.logger.stream_flush_all()
 
 
 def index(options):

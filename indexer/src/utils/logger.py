@@ -2,6 +2,7 @@ import codecs
 import sys
 from multiprocessing import current_process
 from time import localtime, strftime
+from typing import Dict
 
 import colorama
 
@@ -17,7 +18,7 @@ class Logger:
     def __init__(self, path: str, verbosity: int = VERBOSITY_INFO):
         colorama.init(autoreset=True)
 
-        self.streams: dict = {}
+        self.streams: Dict[str, codecs.StreamReaderWriter] = {}
         self.path: str = path
         self.verbosity: int = verbosity
 
@@ -65,3 +66,7 @@ class Logger:
 
         stream_file.write(text)
         stream_file.write('\n')
+
+    def stream_flush_all(self):
+        for stream in self.streams.values():
+            stream.flush()
