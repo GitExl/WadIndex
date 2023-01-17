@@ -69,7 +69,7 @@ class TextParser:
 
         # Convert pairs into useful data.
         for key, value in self.pairs:
-            if not self.parse_pair(key, value):
+            if not self.parse_pair(key, value) and self.logger.verbosity == Logger.VERBOSITY_DEBUG:
                 self.logger.stream('pairs', '{} :: {}'.format(key, value))
                 self.logger.stream('keys', key)
 
@@ -232,7 +232,9 @@ class TextParser:
         elif parser_key == 'false':
             return False
 
-        self.logger.stream('text_parser_value_bool', '{}'.format(value))
+        if self.logger.verbosity == Logger.VERBOSITY_DEBUG:
+            self.logger.stream('text_parser_value_bool', '{}'.format(value))
+
         return False
 
     def parse_game(self, value: str) -> Game:
@@ -242,7 +244,9 @@ class TextParser:
         if parser_key:
             return Game(parser_key)
 
-        self.logger.stream('text_parser_value_game', '{}'.format(value))
+        if self.logger.verbosity == Logger.VERBOSITY_DEBUG:
+            self.logger.stream('text_parser_value_game', '{}'.format(value))
+
         return Game.UNKNOWN
 
     def parse_engine(self, value: str) -> Engine:
@@ -253,7 +257,9 @@ class TextParser:
         if parser_key:
             return Engine(parser_key)
 
-        self.logger.stream('text_parser_value_engine', '{}'.format(value))
+        if self.logger.verbosity == Logger.VERBOSITY_DEBUG:
+            self.logger.stream('text_parser_value_engine', '{}'.format(value))
+
         return Engine.UNKNOWN
 
     def parse_difficulty(self, value: str) -> Optional[bool]:
@@ -263,5 +269,7 @@ class TextParser:
         if parser_key is not None:
             return parser_key == 'true'
 
-        self.logger.stream('text_parser_value_difficulty', '{}'.format(value))
+        if self.logger.verbosity == Logger.VERBOSITY_DEBUG:
+            self.logger.stream('text_parser_value_difficulty', '{}'.format(value))
+
         return None

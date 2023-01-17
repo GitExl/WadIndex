@@ -26,12 +26,10 @@ class LanguageExtractor(ExtractorBase):
                 parser = LanguageParser(text)
                 locale_strings = parser.parse_locale_strings(info.game)
             except LexerError as e:
-                self.logger.stream('language_parser_lexer_error', info.path_idgames.as_posix())
-                self.logger.stream('language_parser_lexer_error', str(e))
+                self.logger.stream('language_parser_lexer_error', '{}: {}'.format(info.path_idgames.as_posix(), str(e)))
                 continue
             except LanguageParserError as e:
-                self.logger.stream('language_parser_error', info.path_idgames.as_posix())
-                self.logger.stream('language_parser_error', str(e))
+                self.logger.stream('language_parser_error', '{}: {}'.format(info.path_idgames.as_posix(), str(e)))
                 continue
 
             info.locale_strings.add_from(locale_strings)
