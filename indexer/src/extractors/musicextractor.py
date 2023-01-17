@@ -15,7 +15,7 @@ class MusicExtractor(ExtractorBase):
 
     def extract(self, info: ExtractedInfo):
         if info.archive_list is None:
-            self.logger.warn('Cannot extract music without an archive list.')
+            self.logger.debug('Cannot extract music without an archive list.')
             return
 
         archive_list = info.archive_list

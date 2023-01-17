@@ -7,7 +7,7 @@ class FileTypeExtractor(ExtractorBase):
 
     def extract(self, info: ExtractedInfo):
         if info.archive_list is None:
-            self.logger.warn('Cannot extract file types without an archive list.')
+            self.logger.debug('Cannot extract file types without an archive list.')
             return
 
         archive_list = info.archive_list

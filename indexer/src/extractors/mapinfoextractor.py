@@ -31,7 +31,7 @@ class MapInfoExtractor(ExtractorBase):
 
         archive: ArchiveBase = info.archive
         if archive is None:
-            self.logger.warn('Cannot extract map info without an archive.')
+            self.logger.debug('Cannot extract map info without an archive.')
             return
 
         mapinfo_files: List[ArchiveFileBase] = []

@@ -16,11 +16,11 @@ class MapExtractor(ExtractorBase):
     def extract(self, info: ExtractedInfo):
         archive: ArchiveBase = info.archive
         if archive is None:
-            self.logger.warn('Cannot extract maps without an archive.')
+            self.logger.debug('Cannot extract maps without an archive.')
             return
 
         if info.game == Game.UNKNOWN:
-            self.logger.warn('Cannot extract maps without a known game.')
+            self.logger.debug('Cannot extract maps without a known game.')
             return
 
         map_data_finder = MapDataFinder()
