@@ -43,11 +43,13 @@ class MapInfoExtractor(ExtractorBase):
                 mapinfo_files.append(file)
 
         for file in mapinfo_files:
+            filename = file.name.lower()
+
             parser: Optional[MapInfoParserBase] = None
             try:
-                if file.name == 'MAPINFO' or file.name == 'ZMAPINFO' or file.name == 'RMAPINFO':
+                if filename == 'mapinfo' or filename == 'zmapinfo' or filename == 'rmapinfo':
                     parser = ZMapInfoParser(file)
-                elif file.name == 'UMAPINFO':
+                elif filename == 'umapinfo':
                     parser = UMapInfoParser(file)
                 else:
                     continue
@@ -76,6 +78,9 @@ class MapInfoExtractor(ExtractorBase):
 
     @staticmethod
     def assign_game_music_defaults(info: ExtractedInfo):
+        if info.archive_list is None:
+            return
+
         if info.game == Game.DOOM or info.game == Game.CHEX:
             name_source = MUSIC_NAMES_DOOM
         elif info.game == Game.DOOM2 or info.game == Game.TNT or info.game == Game.PLUTONIA or info.game == Game.HACX:

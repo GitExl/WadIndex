@@ -25,7 +25,7 @@ def get_lexer() -> Lexer:
     return Lexer(
         [
             Rule(UMapInfoToken.WHITESPACE, r'[\s\n\r]+', skip=True),
-            Rule(UMapInfoToken.COMMENT, r'//.*?\r?\n', skip=True),
+            Rule(UMapInfoToken.COMMENT, r'//.*?(?=[\n\r])', skip=True),
             Rule(UMapInfoToken.COMMENT, r'/\*[^*]*\*+(?:[^/*][^*]*\*+)*/', skip=True),
             Rule(UMapInfoToken.ASSIGN, '='),
             Rule(UMapInfoToken.SEPARATOR, ','),

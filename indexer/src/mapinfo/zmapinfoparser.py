@@ -33,9 +33,9 @@ def get_lexer() -> Lexer:
     return Lexer(
         [
             Rule(ZMapInfoToken.EOL, r'[\n\r]+'),
-            Rule(ZMapInfoToken.WHITESPACE, r'[\s]+', skip=True),
+            Rule(ZMapInfoToken.WHITESPACE, r'[ \t]+', skip=True),
             Rule(ZMapInfoToken.COMMENT, r'(?:;).*?\r?\n', skip=True),
-            Rule(ZMapInfoToken.COMMENT, r'//.*?\r?\n', skip=True),
+            Rule(ZMapInfoToken.COMMENT, r'//.*?(?=[\n\r])', skip=True),
             Rule(ZMapInfoToken.COMMENT, r'/\*[^*]*\*+(?:[^/*][^*]*\*+)*/', skip=True),
             Rule(ZMapInfoToken.ASSIGN, '='),
             Rule(ZMapInfoToken.BLOCK_START, '{'),
@@ -163,9 +163,9 @@ class ZMapInfoParser(MapInfoParserBase):
                         current_map.authors.append(author[1])
                 # What a terrible place to put these two...
                 elif key == 'musicartist':
-                    pass
+                    self.parse_string()
                 elif key == 'musictitle':
-                    pass
+                    self.parse_string()
 
                 else:
                     self.tokens.skip_until(ZMapInfoToken.EOL)
