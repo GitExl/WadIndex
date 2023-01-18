@@ -1,3 +1,4 @@
+import os
 from typing import Optional, List
 
 from archives.archivebase import ArchiveBase
@@ -43,7 +44,7 @@ class MapInfoExtractor(ExtractorBase):
                 mapinfo_files.append(file)
 
         for file in mapinfo_files:
-            filename = file.name.lower()
+            filename = os.path.splitext(file.name.lower())[0]
 
             parser: Optional[MapInfoParserBase] = None
             try:
