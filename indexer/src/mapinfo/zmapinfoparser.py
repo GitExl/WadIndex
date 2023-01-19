@@ -27,6 +27,7 @@ class ZParseMode(Enum):
     NONE = 0
     MAP = 1
     EPISODE = 2
+    CLUSTER = 3
 
 
 def get_lexer() -> Lexer:
@@ -125,6 +126,11 @@ class ZMapInfoParser(MapInfoParserBase):
                 self.parse_episode_header(current_episode)
                 self.episodes.append(current_episode)
                 parse_mode = ZParseMode.EPISODE
+                continue
+
+            elif key == 'cluster' and parse_mode == ZParseMode.NONE:
+                self.tokens.require(ZMapInfoToken.IDENTIFIER)
+                parse_mode = ZParseMode.CLUSTER
                 continue
 
             elif parse_mode == ZParseMode.MAP:
@@ -250,7 +256,7 @@ class ZMapInfoParser(MapInfoParserBase):
 
         next_token = self.tokens.peek()
         if next_token is not None and next_token[1] == ':':
-            self.tokens.get()
+            self.tokens.skip()
             index_token = self.tokens.get()
             return '{}:{}'.format(music, index_token[1])
 

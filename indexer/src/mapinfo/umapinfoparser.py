@@ -93,9 +93,9 @@ class UMapInfoParser(MapInfoParserBase):
                 self.tokens.get()
             elif identifier == 'next':
                 map.next = self.tokens.require(UMapInfoToken.STRING)[1]
-            elif identifier == 'nextsecret':
+            elif identifier == 'nextsecret' or identifier == 'secretnext':
                 map.next_secret = self.tokens.require(UMapInfoToken.STRING)[1]
-            elif identifier == 'skytexture':
+            elif identifier == 'skytexture' or identifier == 'sky':
                 self.tokens.get()
             elif identifier == 'music':
                 map.music = self.tokens.require(UMapInfoToken.STRING)[1]
@@ -103,7 +103,7 @@ class UMapInfoParser(MapInfoParserBase):
                 self.tokens.get()
             elif identifier == 'enterpic':
                 self.tokens.get()
-            elif identifier == 'partime':
+            elif identifier == 'partime' or identifier == 'par':
                 map.par_time = self.tokens.require(UMapInfoToken.INTEGER)[1]
             elif identifier == 'endgame':
                 self.tokens.get()
