@@ -8,18 +8,18 @@ from utils.config import Config
 from utils.logger import Logger
 
 iwads = {
-    Game.DOOM2: 'doom2.wad',
-    Game.DOOM: 'doom.wad',
-    Game.HERETIC: 'heretic.wad',
-    Game.HEXEN: 'hexen.wad',
-    Game.TNT: 'tnt.wad',
-    Game.PLUTONIA: 'plutonia.wad',
-    Game.STRIFE: 'strife0.wad',
-    Game.HACX: 'hacx.wad'
+    Game.DOOM2: 'DOOM2.WAD',
+    Game.DOOM: 'DOOM.WAD',
+    Game.HERETIC: 'HERETIC.WAD',
+    Game.HEXEN: 'HEXEN.WAD',
+    Game.TNT: 'TNT.WAD',
+    Game.PLUTONIA: 'PLUTONIA.WAD',
+    Game.STRIFE: 'STRIFE0.WAD',
+    Game.HACX: 'HACX.WAD',
 }
 
 iwad_factors = {
-    Game.DOOM2: 1.0,
+    Game.DOOM2: 1.05,
     Game.DOOM: 1.0,
     Game.HERETIC: 1.0,
     Game.HEXEN: 1.0,
@@ -34,7 +34,10 @@ ignore = {
     'SS_START', 'S_START', 'SS_END', 'S_END',
     'FF_START', 'F_START', 'FF_END', 'F_END',
     'PP_START', 'P_START', 'PP_END', 'P_END',
-    'PLAYPAL', 'COLORMAP'
+    'PLAYPAL', 'COLORMAP',
+
+    # These are Hexen, but also ZDoom so not indicative
+    'MAPINFO', 'SNDINFO', 'BEHAVIOR',
 }
 
 config = Config()

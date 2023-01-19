@@ -1,8 +1,9 @@
 import json
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Set, List
 
 from archives.archivebase import ArchiveBase
+from doom.map import Map
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from indexer.game import Game
@@ -10,6 +11,7 @@ from textparser.textkeys import TEXT_GAMES
 from textparser.textparser import TextParser
 from utils.config import Config
 from utils.logger import Logger
+
 
 LumpScores = Dict[str, Dict[Game, float]]
 
@@ -53,15 +55,13 @@ class GameExtractor(ExtractorBase):
         if game == Game.UNKNOWN and info.archive is not None:
             game = self.detect_from_archive(info.archive)
             if game != Game.UNKNOWN:
-                self.logger.decision('Detected game "{}" from archive filenames.'.format(game.name))
+                self.logger.decision('Detected game "{}" from lump names.'.format(game.name))
 
         # Last ditch effort, just use the entire text file.
         if game == Game.UNKNOWN and info.text_contents:
             game = self.detect_from_text(info.text_contents)
             if game != Game.UNKNOWN:
                 self.logger.decision('Detected game "{}" from complete text file contents.'.format(game.name))
-
-        # TODO: from thing types and texture names
 
         if game == Game.UNKNOWN:
             self.logger.warn('Cannot determine game.')
@@ -127,7 +127,6 @@ class GameExtractor(ExtractorBase):
 
         if len(scores):
             game = max(scores.keys(), key=(lambda k: scores[k]))
-            if scores[game] >= 5:
-                return game
+            return game
 
         return Game.UNKNOWN
