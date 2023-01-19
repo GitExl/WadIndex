@@ -12,15 +12,16 @@ from indexer.indexer import Indexer
 from utils.config import Config
 from indexer.ignorelist import must_ignore
 from utils.logger import Logger
+from utils.logger_stream import LoggerStream
 
 
 class IndexProcess(Process):
 
-    def __init__(self, name: str, verbosity: int, task_queue: Queue, db_lock: Lock):
+    def __init__(self, name: str, verbosity: int, stream_queue: Queue, task_queue: Queue, db_lock: Lock):
         Process.__init__(self)
 
         self.config: Config = Config()
-        self.logger: Logger = Logger(self.config.get('paths.logs'), verbosity)
+        self.logger: Logger = Logger(self.config.get('paths.logs'), stream_queue, verbosity)
         self.storage: DBStorage = DBStorage(self.config)
         self.db_lock: Lock = db_lock
 
@@ -85,12 +86,15 @@ class IndexProcess(Process):
             self.db_lock.release()
 
         indexer.close()
-        self.logger.stream_flush_all()
 
 
 def index(options):
     config = Config()
-    logger = Logger(config.get('paths.logs'), options.verbosity)
+
+    logger_stream = LoggerStream(config.get('paths.logs'))
+    logger = Logger(config.get('paths.logs'), logger_stream.queue, options.verbosity)
+    logger_stream.start()
+
     storage = DBStorage(config)
 
     time_now = int(time.time())
@@ -134,7 +138,7 @@ def index(options):
     db_lock = Lock()
     workers = []
     for i in range(proc_count):
-        worker = IndexProcess('index-{:02}'.format(i + 1), options.verbosity, task_queue, db_lock)
+        worker = IndexProcess('index-{:02}'.format(i + 1), options.verbosity, logger_stream.queue, task_queue, db_lock)
         workers.append(worker)
         worker.start()
 
@@ -167,6 +171,10 @@ def index(options):
     # Wait for processes to complete.
     for worker in workers:
         worker.join()
+
+    # Stop logger stream.
+    logger_stream.stop()
+    logger_stream.join()
 
     storage.commit()
     storage.close()

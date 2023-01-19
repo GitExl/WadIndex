@@ -1,8 +1,7 @@
-import codecs
 import sys
-from multiprocessing import current_process
+from multiprocessing import current_process, Queue
 from time import localtime, strftime
-from typing import Dict
+from typing import Optional
 
 import colorama
 
@@ -15,11 +14,11 @@ class Logger:
     VERBOSITY_DECISION: int = 3
     VERBOSITY_DEBUG: int = 4
 
-    def __init__(self, path: str, verbosity: int = VERBOSITY_INFO):
+    def __init__(self, path: str, stream_queue: Optional[Queue]=None, verbosity: int = VERBOSITY_INFO):
         colorama.init(autoreset=True)
 
-        self.streams: Dict[str, codecs.StreamReaderWriter] = {}
         self.path: str = path
+        self.stream_queue: Optional[Queue] = stream_queue
         self.verbosity: int = verbosity
 
     def debug(self, text: str):
@@ -58,15 +57,6 @@ class Logger:
         sys.stdout.write('{} {:<11} \033[1;33m[warning]  {}\n'.format(dt, current_process().name, text))
 
     def stream(self, stream: str, text: str):
-        if stream not in self.streams:
-            stream_file = codecs.open('{}/{}.txt'.format(self.path, stream), 'w', encoding='utf8')
-            self.streams[stream] = stream_file
-        else:
-            stream_file = self.streams[stream]
-
-        stream_file.write(text)
-        stream_file.write('\n')
-
-    def stream_flush_all(self):
-        for stream in self.streams.values():
-            stream.flush()
+        if self.stream_queue is None:
+            return
+        self.stream_queue.put((stream, text + '\n'))
