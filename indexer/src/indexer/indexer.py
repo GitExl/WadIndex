@@ -3,6 +3,7 @@ from typing import List, Optional, Tuple
 
 from extractors.archiveextractor import ArchiveExtractor
 from extractors.archivelistextractor import ArchiveListExtractor
+from extractors.dehackedextractor import DehackedExtractor
 from extractors.engineextractor import EngineExtractor
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
@@ -37,6 +38,7 @@ EXTRACTORS = [
     MusicExtractor,
     LanguageExtractor,
     MapExtractor,
+    DehackedExtractor,
     MapInfoExtractor,
     EngineExtractor,
     GraphicsExtractor,
