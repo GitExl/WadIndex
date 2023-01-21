@@ -3,9 +3,10 @@ from pathlib import Path
 
 from archives.archivebase import ArchiveBase
 from archives.wadarchive import WADArchive
-from doom.binarymapreader import BinaryMapReader
-from doom.mapfinder import MapDataFinder, MapFormat
-from doom.udmfmapreader import UDMFMapReader
+from doom.map.binary_map_reader import BinaryMapReader
+from doom.map.map import MapFormat
+from doom.map.map_data_finder import MapDataFinder
+from doom.map.udmf_map_reader import UDMFMapReader
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from indexer.game import Game

@@ -3,7 +3,7 @@ from typing import Optional, List, Dict, Set, Iterable
 
 from mysql.connector import MySQLConnection, connection
 
-from doom.map import Map, MAP_FORMAT_TO_INT
+from doom.map.map import Map, MAP_FORMAT_TO_INT
 from extractors.musicextractor import MusicInfo
 from indexer.entry import Entry
 from utils.config import Config

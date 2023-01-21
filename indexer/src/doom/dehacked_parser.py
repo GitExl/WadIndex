@@ -63,7 +63,7 @@ class DehackedAmmo:
 class DehackedPar:
     episode: int
     map: int
-    par: int
+    time: int
 
 
 class DehackedParser:

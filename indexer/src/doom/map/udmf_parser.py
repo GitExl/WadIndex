@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, Tuple
 
-from doom.map import Line, LineFlags, Sector, Side, Thing, ThingFlags, Vertex
+from doom.map.map import Line, LineFlags, Sector, Side, Thing, ThingFlags, Vertex
 from utils import lexer
 from utils.lexer import Lexer, Rule, expand_token_position, TokenTypeBase
 

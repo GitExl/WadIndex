@@ -3,7 +3,7 @@ import io
 import struct
 from pathlib import Path
 
-from doom.map import LineFlags
+from doom.map.map import LineFlags
 from extractors.extractedinfo import ExtractedInfo
 from writers.writerbase import WriterBase
 

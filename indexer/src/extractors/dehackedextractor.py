@@ -3,7 +3,7 @@ from typing import Dict
 
 from archives.archivebase import ArchiveBase
 from doom.dehacked_parser import DehackedParser, DehackedParserError
-from doom.strings_builtin import MAP_TITLE_STRINGS
+from doom.strings_map_titles import STRINGS_MAP_TITLES
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 
@@ -42,13 +42,13 @@ class DehackedExtractor(ExtractorBase):
 
     @staticmethod
     def assign_map_titles(info: ExtractedInfo, parser: DehackedParser):
-        if info.game not in MAP_TITLE_STRINGS:
+        if info.game not in STRINGS_MAP_TITLES:
             return
 
         # Find map titles from original strings/keys.
         map_names: Dict[str, str] = {}
         for key, replacement in parser.strings.items():
-            map_lump = MAP_TITLE_STRINGS[info.game].get(key)
+            map_lump = STRINGS_MAP_TITLES[info.game].get(key)
             if map_lump is None:
                 continue
             map_names[map_lump] = replacement
@@ -72,4 +72,4 @@ class DehackedExtractor(ExtractorBase):
             par = parser.pars.get(map.name.upper())
             if par is None:
                 continue
-            map.par_time = par
+            map.par_time = par.time

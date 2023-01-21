@@ -1,6 +1,6 @@
 from typing import Dict, Optional, List
 
-from doom.map import Map
+from doom.map.map import Map
 from extractors.extractedinfo import MusicInfo, GraphicInfo
 from indexer.engine import Engine
 from indexer.game import Game

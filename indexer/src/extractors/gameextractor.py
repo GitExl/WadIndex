@@ -1,9 +1,8 @@
 import json
 from pathlib import Path
-from typing import Dict, Set, List
+from typing import Dict
 
 from archives.archivebase import ArchiveBase
-from doom.map import Map
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from indexer.game import Game

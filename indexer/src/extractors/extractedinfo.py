@@ -9,7 +9,7 @@ from PIL.Image import Image
 from archives.archivebase import ArchiveBase
 from archives.archivelist import ArchiveList
 from doom.language_parser import LocaleStrings
-from doom.map import Map
+from doom.map.map import Map
 from indexer.engine import Engine
 from indexer.game import Game
 

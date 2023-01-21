@@ -1,9 +1,9 @@
 from struct import Struct
 from typing import Optional, Tuple
 
-from doom.map import Map, MapNamespace, Line, LineFlags, Sector, Side, Thing, ThingFlags, Vertex
-from doom.mapfinder import MapData, MapFormat
-from doom.mapreaderbase import MapReaderBase
+from doom.map.map import Map, MapNamespace, Line, LineFlags, Sector, Side, Thing, ThingFlags, Vertex, MapFormat
+from doom.map.map_data_finder import MapData
+from doom.map.map_reader_base import MapReaderBase
 from indexer.game import Game
 
 
@@ -197,12 +197,6 @@ class BinaryMapReader(MapReaderBase):
         elif self.game == Game.HEXEN:
             namespace = MapNamespace.HEXEN
         # TODO: ZDoom, Eternity?
-
-        # vertices = []
-        # lines = []
-        # sides = []
-        # sectors = []
-        # things = []
 
         vertices = BinaryMapReader._read_binary_data(map_data, 'VERTEXES', unpack_vertex, STRUCT_VERTEX)
         sides = BinaryMapReader._read_binary_data(map_data, 'SIDEDEFS', unpack_side, STRUCT_SIDE)

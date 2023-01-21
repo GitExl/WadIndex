@@ -1,4 +1,4 @@
-from doom.doomimage import DoomImage
+from doom.doom_image import DoomImage
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 

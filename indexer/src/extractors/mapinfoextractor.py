@@ -3,13 +3,14 @@ from typing import Optional, List
 
 from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
-from doom.strings_builtin import BUILTIN_STRINGS, MUSIC_NAMES_DOOM, MUSIC_NAMES_DOOM2, MUSIC_NAMES_HERETIC, \
-    MUSIC_NAMES_HEXEN, MUSIC_NAMES_STRIFE
-from doom.map import Map
+from doom.strings_builtin import STRINGS_BUILTIN
+from doom.map.map import Map
+from doom.strings_music import MUSIC_NAMES_DOOM, MUSIC_NAMES_DOOM2, MUSIC_NAMES_HERETIC, MUSIC_NAMES_HEXEN, \
+    MUSIC_NAMES_STRIFE
 from indexer.game import Game
-from mapinfo.mapinfoparserbase import MapInfoParserBase, MapInfoParserError, MapInfoMap
-from mapinfo.zmapinfoparser import ZMapInfoParser
-from mapinfo.umapinfoparser import UMapInfoParser
+from doom.mapinfo.mapinfo_parser_base import MapInfoParserBase, MapInfoParserError, MapInfoMap
+from doom.mapinfo.zmapinfo_parser import ZMapInfoParser
+from doom.mapinfo.umapinfo_parser import UMapInfoParser
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from utils import author_parser
@@ -141,8 +142,8 @@ class MapInfoExtractor(ExtractorBase):
             return key
 
         key = key[1:]
-        if key in BUILTIN_STRINGS:
-            return BUILTIN_STRINGS[key]
+        if key in STRINGS_BUILTIN:
+            return STRINGS_BUILTIN[key]
         if info.locale_strings is None:
             return key
 

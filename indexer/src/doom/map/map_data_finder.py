@@ -2,7 +2,7 @@ from typing import Dict, Optional, Set
 
 from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
-from doom.map import MapFormat, MapNamespace
+from doom.map.map import MapFormat, MapNamespace
 
 
 MAP_LUMP_NAMES: Set[str] = {

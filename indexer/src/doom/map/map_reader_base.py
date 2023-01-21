@@ -1,5 +1,5 @@
-from doom.map import Map
-from doom.mapfinder import MapData
+from doom.map.map import Map
+from doom.map.map_data_finder import MapData
 from indexer.game import Game
 from utils.logger import Logger
 

@@ -2,7 +2,7 @@ import json
 from typing import Dict, Set, List
 
 from archives.archivebase import ArchiveBase
-from doom.map import Map
+from doom.map.map import Map
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from indexer.engine import Engine

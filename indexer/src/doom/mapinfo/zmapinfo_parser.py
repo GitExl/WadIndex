@@ -3,7 +3,7 @@ from copy import copy
 from enum import Enum
 from re import Pattern
 from archives.archivefilebase import ArchiveFileBase
-from mapinfo.mapinfoparserbase import MapInfoMap, MapInfoParserBase, MapInfoEpisode, MapInfoParserError
+from doom.mapinfo.mapinfo_parser_base import MapInfoMap, MapInfoParserBase, MapInfoEpisode, MapInfoParserError
 from utils.lexer import Lexer, Rule, expand_token_position, TokenTypeBase, process_string
 from utils.token_list import TokenList
 

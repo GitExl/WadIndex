@@ -1,9 +1,9 @@
 from typing import Dict, Optional
 
-from doom.mapfinder import MapData
-from doom.mapreaderbase import MapReaderBase
-from doom.map import Map, MapNamespace, MapFormat
-from doom.udmfparser import UDMFParser, UDMFParserError
+from doom.map.map import Map, MapNamespace, MapFormat
+from doom.map.map_data_finder import MapData
+from doom.map.map_reader_base import MapReaderBase
+from doom.map.udmf_parser import UDMFParser, UDMFParserError
 from utils.lexer import LexerError
 
 

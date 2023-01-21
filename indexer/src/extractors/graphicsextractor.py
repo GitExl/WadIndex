@@ -7,7 +7,7 @@ from PIL import Image
 from archives.archivefilebase import ArchiveFileBase
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
-from doom.doomimage import DoomImage
+from doom.doom_image import DoomImage
 from doom.palette import Palette
 from extractors.extractedinfo import GraphicInfo
 

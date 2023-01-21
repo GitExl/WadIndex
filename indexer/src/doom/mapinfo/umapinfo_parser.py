@@ -1,8 +1,8 @@
 from typing import Optional, List
 
 from archives.archivefilebase import ArchiveFileBase
-from mapinfo.mapinfoparserbase import MapInfoParserBase, MapInfoMap, MapInfoParserError
-from utils.lexer import Lexer, Rule, expand_token_position, Token, TokenTypeBase, process_float, process_int, \
+from doom.mapinfo.mapinfo_parser_base import MapInfoParserBase, MapInfoMap, MapInfoParserError
+from utils.lexer import Lexer, Rule, expand_token_position, TokenTypeBase, process_float, process_int, \
     process_int_base8, process_int_base16, process_string
 from utils.token_list import TokenList
 
