@@ -15,8 +15,13 @@ from indexer.game import Game
 
 
 class MusicType(Enum):
-    MIDI = 'mid'
+    UNKNOWN = 'unk'
+    MIDI = 'midi'
     MUS = 'mus'
+    MOD = 'mod'
+    MP3 = 'mp3'
+    OGG = 'ogg'
+    OPUS = 'opus'
 
 
 @dataclass

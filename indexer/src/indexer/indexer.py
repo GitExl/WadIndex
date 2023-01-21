@@ -35,11 +35,11 @@ EXTRACTORS = [
     PropertyExtractor,
     ArchiveListExtractor,
     FileTypeExtractor,
-    MusicExtractor,
     LanguageExtractor,
     MapExtractor,
     DehackedExtractor,
     MapInfoExtractor,
+    MusicExtractor,
     EngineExtractor,
     GraphicsExtractor,
 ]

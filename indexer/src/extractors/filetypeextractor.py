@@ -21,12 +21,35 @@ class FileTypeExtractor(ExtractorBase):
                     continue
 
                 data = file.get_data()
+
+                # MIDI formats
                 if data[:4] == b'MThd':
                     filetype = 'midi'
                 elif data[:4] == b'MUS\0x1A':
                     filetype = 'mus'
+
+                # Digital music formats
+                # elif self.detect_mp3(data):
+                #     filetype = 'mp3'
+                # elif self.detect_ogg(data):
+                #     filetype = 'ogg'
+                # elif self.detect_opus(data):
+                #     filetype = 'opus'
+
+                # Tracker formats
+                elif data[:17] == 'Extended module: ':
+                    filetype = 'xm'
+                elif data[1080:1084] in {'4FLT', '8FLT', 'M.K.', '4CHN', '6CHN', '8CHN'}:
+                    filetype = 'mod'
+                # elif data[:] == '':
+                #     filetype = 'it'
+                # elif data[:] == '':
+                #     filetype = 's3m'
+
+                # Graphics
                 # elif DoomImage.is_valid(data):
                 #     filetype = 'doom_image'
+
                 else:
                     continue
 

@@ -5,9 +5,6 @@ from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
 from doom.strings_builtin import STRINGS_BUILTIN
 from doom.map.map import Map
-from doom.strings_music import MUSIC_NAMES_DOOM, MUSIC_NAMES_DOOM2, MUSIC_NAMES_HERETIC, MUSIC_NAMES_HEXEN, \
-    MUSIC_NAMES_STRIFE
-from indexer.game import Game
 from doom.mapinfo.mapinfo_parser_base import MapInfoParserBase, MapInfoParserError, MapInfoMap
 from doom.mapinfo.zmapinfo_parser import ZMapInfoParser
 from doom.mapinfo.umapinfo_parser import UMapInfoParser
@@ -73,39 +70,6 @@ class MapInfoExtractor(ExtractorBase):
                 for map_key, map_info in parser.maps.items():
                     if map_key.lower() == map.name.lower():
                         self.assign_mapinfo_to_map(map, map_info, info)
-
-        # Set default music for maps depending on the game.
-        if info.game != Game.UNKNOWN:
-            self.assign_game_music_defaults(info)
-
-    @staticmethod
-    def assign_game_music_defaults(info: ExtractedInfo):
-        if info.archive_list is None:
-            return
-
-        if info.game == Game.DOOM or info.game == Game.CHEX:
-            name_source = MUSIC_NAMES_DOOM
-        elif info.game == Game.DOOM2 or info.game == Game.TNT or info.game == Game.PLUTONIA or info.game == Game.HACX:
-            name_source = MUSIC_NAMES_DOOM2
-        elif info.game == Game.HERETIC:
-            name_source = MUSIC_NAMES_HERETIC
-        elif info.game == Game.HEXEN:
-            name_source = MUSIC_NAMES_HEXEN
-        elif info.game == Game.STRIFE:
-            name_source = MUSIC_NAMES_STRIFE
-        else:
-            return
-
-        for map in info.maps:
-            if map.music is not None:
-                continue
-
-            # If the archive contains the default music, assign it.
-            default_music = name_source.get(map.name, None)
-            if default_music is None:
-                continue
-            if info.archive_list.file_find_basename(default_music, False) is not None:
-                map.music = default_music
 
     def assign_mapinfo_to_map(self, map: Map, map_info: MapInfoMap, info: ExtractedInfo):
         if map_info.title is not None:
