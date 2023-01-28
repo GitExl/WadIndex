@@ -223,8 +223,8 @@ class BinaryMapReader(MapReaderBase):
             aligned = data_struct.size * int(len(data) / data_struct.size)
             data = data[0:aligned]
 
-        items = []
-        for unpacked in data_struct.iter_unpack(data):
-            items.append(unpack_func(unpacked, map_data.namespace))
+        items = [None] * (len(data) // data_struct.size)
+        for index, unpacked in enumerate(data_struct.iter_unpack(data)):
+            items[index] = unpack_func(unpacked, map_data.namespace)
 
         return items
