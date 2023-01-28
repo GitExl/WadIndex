@@ -1,26 +1,14 @@
 from dataclasses import dataclass
 from enum import Enum, Flag, auto
-from typing import List, Optional, Dict
+from typing import List, Optional
+
+from doom.map.nodes import NodeTypes, NodeTypesGL
 
 
 class MapFormat(Enum):
-    DOOM = 'doom'
-    HEXEN = 'hexen'
-    UDMF = 'udmf'
-
-
-INT_TO_MAP_FORMAT: Dict[int, MapFormat] = {
-    0: MapFormat.DOOM,
-    1: MapFormat.HEXEN,
-    2: MapFormat.UDMF,
-}
-
-
-MAP_FORMAT_TO_INT: Dict[MapFormat, int] = {
-    MapFormat.DOOM: 0,
-    MapFormat.HEXEN: 1,
-    MapFormat.UDMF: 2,
-}
+    DOOM = 0
+    HEXEN = 1
+    UDMF = 2
 
 
 class MapNamespace(Enum):
@@ -226,3 +214,6 @@ class Map:
         self.music: Optional[str] = None
         self.cluster: Optional[int] = None
         self.authors: List[str] = []
+        self.complexity: int = 0
+        self.nodes_type: NodeTypes = NodeTypes.NONE
+        self.nodes_gl_type: NodeTypesGL = NodeTypesGL.NONE

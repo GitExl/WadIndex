@@ -3,7 +3,7 @@ from typing import Optional, List, Dict, Set, Iterable
 
 from mysql.connector import MySQLConnection, connection
 
-from doom.map.map import Map, MAP_FORMAT_TO_INT
+from doom.map.map import Map
 from extractors.musicextractor import MusicInfo
 from indexer.entry import Entry
 from utils.config import Config
@@ -146,9 +146,12 @@ class DBStorage:
             'next',
             'next_secret',
             'cluster',
+            'complexity',
+            'nodes',
+            'nodes_gl',
         ]
         fields_concat = ','.join(fields)
-        fields_concat_placeholder = '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s'
+        fields_concat_placeholder = '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s'
 
         for entry_map in entry_maps:
             self.cursor.execute(
@@ -157,7 +160,7 @@ class DBStorage:
                     entry.id,
                     entry_map.name[:8],
                     entry_map.title[:1022] if entry_map.title is not None else None,
-                    MAP_FORMAT_TO_INT.get(entry_map.format),
+                    entry_map.format.value,
                     len(entry_map.lines),
                     len(entry_map.sides),
                     len(entry_map.things),
@@ -168,7 +171,10 @@ class DBStorage:
                     entry_map.music[:255] if entry_map.music is not None else None,
                     entry_map.next[:255] if entry_map.next is not None else None,
                     entry_map.next_secret[:255] if entry_map.next_secret is not None else None,
-                    entry_map.cluster & 0xFFFFFFFF if entry_map.cluster is not None else None
+                    entry_map.cluster & 0xFFFFFFFF if entry_map.cluster is not None else None,
+                    entry_map.complexity,
+                    entry_map.nodes_type.value,
+                    entry_map.nodes_gl_type.value,
                 )
             )
             db_id = self.cursor.lastrowid

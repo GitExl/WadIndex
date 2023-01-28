@@ -1,11 +1,14 @@
 from io import BytesIO
 from pathlib import Path
+from statistics import median, fmean
 
 from archives.archivebase import ArchiveBase
 from archives.wadarchive import WADArchive
 from doom.map.binary_map_reader import BinaryMapReader
+from doom.map.blockmap_generator import BlockmapGenerator
 from doom.map.map import MapFormat
 from doom.map.map_data_finder import MapDataFinder
+from doom.map.nodes_reader import NodesReader
 from doom.map.udmf_map_reader import UDMFMapReader
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
@@ -51,12 +54,29 @@ class MapExtractor(ExtractorBase):
                     reader = BinaryMapReader(info.game, self.logger)
 
                 map = reader.read(map_data)
-                if map:
+                if map is not None:
                     info.maps.append(map)
                     self.logger.debug('Found {} ({}): {} vertices, {} lines, {} sides, {} sectors, {} things.'.format(
                         map.name, map_data.format.name,
                         len(map.vertices), len(map.lines), len(map.sides), len(map.sectors), len(map.things))
                     )
+
+                    # Load nodes, if any.
+                    nodes = NodesReader(map_data, self.logger, info.path_idgames.as_posix())
+                    nodes.detect()
+                    map.nodes_type = nodes.nodes_type
+                    map.nodes_gl_type = nodes.nodes_gl_type
+
+                    # Calculate complexity.
+                    blockmap_generator = BlockmapGenerator(map, 128)
+                    blockmap = blockmap_generator.blockmap
+                    line_lengths = []
+                    for block in blockmap:
+                        if block is None:
+                            continue
+                        line_lengths.append(block.total_length)
+                    if len(line_lengths):
+                        map.complexity = len(map.sectors) / fmean(line_lengths)
 
         for archive in wad_archives:
             archive.close()
