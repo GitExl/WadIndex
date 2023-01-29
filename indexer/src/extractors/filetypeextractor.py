@@ -1,4 +1,3 @@
-from doom.doom_image import DoomImage
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 
@@ -20,37 +19,32 @@ class FileTypeExtractor(ExtractorBase):
                 if file.type is not None:
                     continue
 
-                data = file.get_data()
+                data = memoryview(file.get_data())
 
                 # MIDI formats
                 if data[:4] == b'MThd':
-                    filetype = 'midi'
+                    file.type = 'midi'
                 elif data[:4] == b'MUS\0x1A':
-                    filetype = 'mus'
+                    file.type = 'mus'
 
                 # Digital music formats
                 # elif self.detect_mp3(data):
-                #     filetype = 'mp3'
+                #     file.type = 'mp3'
                 # elif self.detect_ogg(data):
-                #     filetype = 'ogg'
+                #     file.type = 'ogg'
                 # elif self.detect_opus(data):
-                #     filetype = 'opus'
+                #     file.type = 'opus'
 
                 # Tracker formats
                 elif data[:17] == 'Extended module: ':
-                    filetype = 'xm'
+                    file.type = 'xm'
                 elif data[1080:1084] in {'4FLT', '8FLT', 'M.K.', '4CHN', '6CHN', '8CHN'}:
-                    filetype = 'mod'
+                    file.type = 'mod'
                 # elif data[:] == '':
-                #     filetype = 'it'
+                #     file.type = 'it'
                 # elif data[:] == '':
-                #     filetype = 's3m'
+                #     file.type = 's3m'
 
                 # Graphics
                 # elif DoomImage.is_valid(data):
-                #     filetype = 'doom_image'
-
-                else:
-                    continue
-
-                file.type = filetype
+                #     file.type = 'doom_image'
