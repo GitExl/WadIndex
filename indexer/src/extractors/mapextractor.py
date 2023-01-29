@@ -1,6 +1,6 @@
 from io import BytesIO
 from pathlib import Path
-from statistics import median, fmean
+from statistics import fmean
 
 from archives.archivebase import ArchiveBase
 from archives.wadarchive import WADArchive
@@ -8,8 +8,8 @@ from doom.map.binary_map_reader import BinaryMapReader
 from doom.map.blockmap_generator import BlockmapGenerator
 from doom.map.map import MapFormat
 from doom.map.map_data_finder import MapDataFinder
-from doom.map.nodes_reader import NodesReader
 from doom.map.udmf_map_reader import UDMFMapReader
+from doom.nodes.nodes_finder import NodesFinder
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from indexer.game import Game
@@ -61,11 +61,15 @@ class MapExtractor(ExtractorBase):
                         len(map.vertices), len(map.lines), len(map.sides), len(map.sectors), len(map.things))
                     )
 
-                    # Load nodes, if any.
-                    nodes = NodesReader(map_data, self.logger, info.path_idgames.as_posix())
-                    nodes.detect()
-                    map.nodes_type = nodes.nodes_type
-                    map.nodes_gl_type = nodes.nodes_gl_type
+                    # Detect node data.
+                    nodes_finder = NodesFinder(map, map_data, self.logger, info.path_idgames.as_posix())
+                    map.nodes_type = nodes_finder.nodes_type
+                    map.nodes_gl_type = nodes_finder.nodes_gl_type
+
+                    # Load node data.
+                    nodes_reader = nodes_finder.get_reader()
+                    if nodes_reader is not None:
+                        nodes = nodes_reader.read()
 
                     # Calculate complexity.
                     blockmap_generator = BlockmapGenerator(map, 128)

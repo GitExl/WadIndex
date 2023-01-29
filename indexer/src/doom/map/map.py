@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum, Flag, auto
 from typing import List, Optional
 
-from doom.map.nodes import NodeTypes, NodeTypesGL
+from doom.nodes.node_types import NodeTypes, NodeTypesGL
 
 
 class MapFormat(Enum):
