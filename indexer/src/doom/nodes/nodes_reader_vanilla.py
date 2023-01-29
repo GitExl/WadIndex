@@ -4,7 +4,7 @@ from typing import Tuple, List
 from doom.map.map import Map
 from doom.map.map_data_finder import MapData
 
-from doom.nodes.nodes import Segment, Node, Nodes, SubSector
+from doom.nodes.nodes import Segment, Node, Nodes, SubSector, CHILD_IS_SUBSECTOR
 from doom.nodes.nodes_reader_base import NodesReaderBase
 
 
@@ -27,11 +27,20 @@ def unpack_subsector_raw(values: Tuple):
 
 
 def unpack_node(values: Tuple):
+
+    # Remap subsector flag.
+    child_left = values[12]
+    child_right = values[13]
+    if child_left & 0x8000:
+        child_left = (values[12] & 0x7FFF) | CHILD_IS_SUBSECTOR
+    if child_right & 0x8000:
+        child_right = (values[13] & 0x7FFF) | CHILD_IS_SUBSECTOR
+
     return Node(
         values[0], values[1], values[2], values[3],
         values[4], values[5], values[6], values[7],
         values[8], values[9], values[10], values[11],
-        values[12], values[13]
+        child_left, child_right
     )
 
 

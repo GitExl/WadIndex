@@ -56,6 +56,9 @@ class Node:
     child_left: int
 
 
+CHILD_IS_SUBSECTOR = 0x7FFFFFFF
+
+
 class Nodes:
 
     def __init__(self, vertices: List[Vertex], segments: List[Segment], sub_sectors: List[SubSector], nodes: List[Node]):

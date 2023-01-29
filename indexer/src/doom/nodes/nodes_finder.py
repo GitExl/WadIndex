@@ -6,6 +6,7 @@ from doom.map.map_data_finder import MapData
 from doom.nodes.node_types import NodeTypes, NodeTypesGL
 from doom.nodes.nodes_reader_base import NodesReaderBase
 from doom.nodes.nodes_reader_extended import NodesReaderExtended
+from doom.nodes.nodes_reader_glbsp import NodesReaderGLBSP
 from doom.nodes.nodes_reader_vanilla import NodesReaderVanilla
 from doom.nodes.nodes_reader_zdoomgl import NodesReaderZDoomGL
 from utils.logger import Logger
@@ -45,16 +46,16 @@ class NodesFinder:
             return NodesReaderZDoomGL(self.map, self.map_data, zlib.decompress(self.nodes_gl_data[4:]), 3)
 
         # # Use GLBSP nodes if available.
-        # elif self.nodes_gl_type == NodeTypesGL.GLBSP1:
-        #     return self._load_nodes_glbsp(1, self.map_data)
-        # elif self.nodes_gl_type == NodeTypesGL.GLBSP2:
-        #     return self._load_nodes_glbsp(2, self.map_data)
-        # elif self.nodes_gl_type == NodeTypesGL.GLBSP3:
-        #     return self._load_nodes_glbsp(3, self.map_data)
-        # elif self.nodes_gl_type == NodeTypesGL.GLBSP4:
-        #     return self._load_nodes_glbsp(4, self.map_data)
-        # elif self.nodes_gl_type == NodeTypesGL.GLBSP5:
-        #     return self._load_nodes_glbsp(5, self.map_data)
+        elif self.nodes_gl_type == NodeTypesGL.GLBSP1:
+            return NodesReaderGLBSP(self.map, self.map_data, 1)
+        elif self.nodes_gl_type == NodeTypesGL.GLBSP2:
+            return NodesReaderGLBSP(self.map, self.map_data, 2)
+        elif self.nodes_gl_type == NodeTypesGL.GLBSP3:
+            return NodesReaderGLBSP(self.map, self.map_data, 3)
+        elif self.nodes_gl_type == NodeTypesGL.GLBSP4:
+            return NodesReaderGLBSP(self.map, self.map_data, 4)
+        elif self.nodes_gl_type == NodeTypesGL.GLBSP5:
+            return NodesReaderGLBSP(self.map, self.map_data, 5)
 
         # Fallback to extended nodes.
         elif self.nodes_type == NodeTypes.EXTENDED:
@@ -126,12 +127,13 @@ class NodesFinder:
             glnodes_nodes_file = self.map_data.files.get('GL_NODES')
             if glnodes_vert_file is not None and glnodes_segs_file is not None or glnodes_ssect_file is not None and glnodes_nodes_file is not None:
                 gl_vert_data = glnodes_vert_file.get_data()
+                gl_segs_data = glnodes_segs_file.get_data()
                 if len(gl_vert_data):
                     self.nodes_gl_type = NodeTypesGL.GLBSP1
-                    if gl_vert_data[:4] == b'gNd2':
-                        self.nodes_gl_type = NodeTypesGL.GLBSP2
-                    elif gl_vert_data[:4] == b'gNd3':
+                    if gl_vert_data[:4] == b'gNd2' and gl_segs_data[:4] == b'gNd3':
                         self.nodes_gl_type = NodeTypesGL.GLBSP3
+                    elif gl_vert_data[:4] == b'gNd2':
+                        self.nodes_gl_type = NodeTypesGL.GLBSP2
                     elif gl_vert_data[:4] == b'gNd4':
                         self.nodes_gl_type = NodeTypesGL.GLBSP4
                     elif gl_vert_data[:4] == b'gNd5':
