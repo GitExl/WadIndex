@@ -7,6 +7,7 @@ from doom.nodes.node_types import NodeTypes, NodeTypesGL
 from doom.nodes.nodes_reader_base import NodesReaderBase
 from doom.nodes.nodes_reader_extended import NodesReaderExtended
 from doom.nodes.nodes_reader_vanilla import NodesReaderVanilla
+from doom.nodes.nodes_reader_zdoomgl import NodesReaderZDoomGL
 from utils.logger import Logger
 
 
@@ -28,21 +29,21 @@ class NodesFinder:
 
     def get_reader(self) -> Optional[NodesReaderBase]:
 
-        # # Prefer ZDoom GL nodes.
-        # if self.nodes_gl_type == NodeTypesGL.ZDOOM_GL1:
-        #     return self._load_nodes_zdoom_gl(1, self.nodes_gl_data[4:])
-        # elif self.nodes_gl_type == NodeTypesGL.ZDOOM_GL2:
-        #     return self._load_nodes_zdoom_gl(2, self.nodes_gl_data[4:])
-        # elif self.nodes_gl_type == NodeTypesGL.ZDOOM_GL3:
-        #     return self._load_nodes_zdoom_gl(3, self.nodes_gl_data[4:])
-        #
-        # elif self.nodes_gl_type == NodeTypesGL.ZDOOM_GL1_COMPRESSED:
-        #     return self._load_nodes_zdoom_gl(1, zlib.decompress(self.nodes_gl_data[4:]))
-        # elif self.nodes_gl_type == NodeTypesGL.ZDOOM_GL2_COMPRESSED:
-        #     return self._load_nodes_zdoom_gl(2, zlib.decompress(self.nodes_gl_data[4:]))
-        # elif self.nodes_gl_type == NodeTypesGL.ZDOOM_GL3_COMPRESSED:
-        #     return self._load_nodes_zdoom_gl(3, zlib.decompress(self.nodes_gl_data[4:]))
-        #
+        # Prefer ZDoom GL nodes.
+        if self.nodes_gl_type == NodeTypesGL.ZDOOM_GL1:
+            return NodesReaderZDoomGL(self.map, self.map_data, self.nodes_gl_data[4:], 1)
+        elif self.nodes_gl_type == NodeTypesGL.ZDOOM_GL2:
+            return NodesReaderZDoomGL(self.map, self.map_data, self.nodes_gl_data[4:], 2)
+        elif self.nodes_gl_type == NodeTypesGL.ZDOOM_GL3:
+            return NodesReaderZDoomGL(self.map, self.map_data, self.nodes_gl_data[4:], 3)
+
+        elif self.nodes_gl_type == NodeTypesGL.ZDOOM_GL1_COMPRESSED:
+            return NodesReaderZDoomGL(self.map, self.map_data, zlib.decompress(self.nodes_gl_data[4:]), 1)
+        elif self.nodes_gl_type == NodeTypesGL.ZDOOM_GL2_COMPRESSED:
+            return NodesReaderZDoomGL(self.map, self.map_data, zlib.decompress(self.nodes_gl_data[4:]), 2)
+        elif self.nodes_gl_type == NodeTypesGL.ZDOOM_GL3_COMPRESSED:
+            return NodesReaderZDoomGL(self.map, self.map_data, zlib.decompress(self.nodes_gl_data[4:]), 3)
+
         # # Use GLBSP nodes if available.
         # elif self.nodes_gl_type == NodeTypesGL.GLBSP1:
         #     return self._load_nodes_glbsp(1, self.map_data)
@@ -56,7 +57,7 @@ class NodesFinder:
         #     return self._load_nodes_glbsp(5, self.map_data)
 
         # Fallback to extended nodes.
-        if self.nodes_type == NodeTypes.EXTENDED:
+        elif self.nodes_type == NodeTypes.EXTENDED:
             return NodesReaderExtended(self.map, self.map_data, self.nodes_data[4:])
         elif self.nodes_type == NodeTypes.EXTENDED_COMPRESSED:
             return NodesReaderExtended(self.map, self.map_data, zlib.decompress(self.nodes_data[4:]))

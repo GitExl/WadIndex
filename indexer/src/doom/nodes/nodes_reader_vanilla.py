@@ -1,5 +1,5 @@
 from struct import Struct
-from typing import Tuple
+from typing import Tuple, List
 
 from doom.map.map import Map
 from doom.map.map_data_finder import MapData
@@ -52,15 +52,15 @@ class NodesReaderVanilla(NodesReaderBase):
             struct_node = STRUCT_NODE
             struct_sub_sector = STRUCT_SUB_SECTOR_RAW
 
-        segments = self.read_binary_data_lump('SEGS', unpack_segment, struct_seg)
-        nodes = self.read_binary_data_lump('NODES', unpack_node, struct_node)
+        segments: List[Segment] = self.read_binary_data_lump('SEGS', unpack_segment, struct_seg)
+        nodes: List[Node] = self.read_binary_data_lump('NODES', unpack_node, struct_node)
 
         # Build segment lists from index offset data.
-        sub_sectors = []
+        sub_sectors: List[SubSector] = []
         raw_sub_sectors = self.read_binary_data_lump('SSECTORS', unpack_subsector_raw, struct_sub_sector)
         for raw_sub_sector in raw_sub_sectors:
             seg_count, seg_first = raw_sub_sector[0], raw_sub_sector[1]
-            sub_sector = SubSector(segments[seg_first:seg_first + seg_count])
+            sub_sector = SubSector(list(range(seg_first, seg_first + seg_count)))
             sub_sectors.append(sub_sector)
 
         return Nodes(self.map.vertices, segments, sub_sectors, nodes)
