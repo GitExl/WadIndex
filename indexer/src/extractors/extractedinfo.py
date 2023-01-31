@@ -20,7 +20,8 @@ class MusicType(Enum):
     MUS = 'mus'
     MOD = 'mod'
     MP3 = 'mp3'
-    OGG = 'ogg'
+    WAV = 'wav'
+    VORBIS = 'vorbis'
     OPUS = 'opus'
 
 

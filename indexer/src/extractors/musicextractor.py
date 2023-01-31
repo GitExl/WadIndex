@@ -1,5 +1,4 @@
 import io
-import re
 from hashlib import sha1
 from pathlib import Path
 from typing import Optional, Dict
@@ -58,10 +57,12 @@ class MusicExtractor(ExtractorBase):
                 music_type = MusicType.MUS
             elif file.type == 'mp3':
                 music_type = MusicType.MP3
-            elif file.type == 'ogg':
-                music_type = MusicType.OGG
+            elif file.type == 'vorbis':
+                music_type = MusicType.VORBIS
             elif file.type == 'opus':
                 music_type = MusicType.OPUS
+            elif file.type == 'wav':
+                music_type = MusicType.WAV
             elif file.type == 's3m' or file.type == 'xm' or file.type == 'it' or file.type == 'mod':
                 music_type = MusicType.MOD
             else:
