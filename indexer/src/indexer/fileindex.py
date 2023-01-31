@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import gzip
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
@@ -68,22 +69,24 @@ class FileIndex:
                     continue
                 elif line.endswith(':'):
                     current_dir = Path(line[:-1])
-                elif dir is not None:
+                    continue
+
+                elif current_dir is not None:
                     file_type = line[0]
                     if file_type == 'd':
                         continue
                     elif file_type == 'l':
                         continue
 
-                    parts = line[30:].strip().replace('  ', ' ').split(' ')
-                    if parts[4][0] == '.':
+                    parts = re.sub(' +', ' ', line).strip().replace('  ', ' ').split(' ')
+                    if parts[8][0] == '.':
                         continue
 
-                    path_str = str(current_dir / parts[4])
+                    path_str = str(current_dir / parts[8])
                     if FileIndex.must_ignore_path(path_str, ignore_paths):
                         continue
 
-                    month, day, year = parts[1:4]
+                    month, day, year = parts[5:8]
                     recent = False
                     if year.find(':') >= 0:
                         recent = True
@@ -96,7 +99,7 @@ class FileIndex:
                     if recent and date.month > path_mtime.month:
                         date = date.replace(year=date.year - 1)
 
-                    size = int(parts[0])
+                    size = int(parts[4])
                     files[path_str] = FileIndexEntry(path_str, size, date)
 
         return FileIndex(files)
