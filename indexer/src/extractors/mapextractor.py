@@ -67,9 +67,9 @@ class MapExtractor(ExtractorBase):
                     map.nodes_gl_type = nodes_finder.nodes_gl_type
 
                     # Load node data.
-                    nodes_reader = nodes_finder.get_reader()
-                    if nodes_reader is not None:
-                        nodes = nodes_reader.read()
+                    # nodes_reader = nodes_finder.get_reader()
+                    # if nodes_reader is not None:
+                    #     nodes = nodes_reader.read()
 
                     # Calculate complexity.
                     blockmap_generator = BlockmapGenerator(map, 128)
