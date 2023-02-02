@@ -18,11 +18,12 @@ class MusicType(Enum):
     UNKNOWN = 'unk'
     MIDI = 'midi'
     MUS = 'mus'
-    MOD = 'mod'
+    TRACKER = 'tracker'
     MP3 = 'mp3'
     WAV = 'wav'
     VORBIS = 'vorbis'
     OPUS = 'opus'
+    WMA = 'wma'
 
 
 @dataclass

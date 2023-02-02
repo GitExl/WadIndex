@@ -1,5 +1,6 @@
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
+from utils.mp3_detect import mp3_detect
 
 
 class FileTypeExtractor(ExtractorBase):
@@ -24,11 +25,11 @@ class FileTypeExtractor(ExtractorBase):
                 # MIDI music formats
                 if data[:4] == b'MThd':
                     file.type = 'midi'
-                elif data[:4] == b'MUS\0x1A':
+                elif data[:4] == b'MUS\x1A':
                     file.type = 'mus'
 
                 # Digital audio formats
-                elif self.detect_mp3(data):
+                elif mp3_detect(data):
                     file.type = 'mp3'
                 elif self.detect_wav(data):
                     file.type = 'wav'
@@ -37,49 +38,23 @@ class FileTypeExtractor(ExtractorBase):
                 elif self.detect_opus(data):
                     file.type = 'opus'
 
+                # Assume an ASF file header GUID always indicates WMA audio.
+                elif data[:16] == b'\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C':
+                    file.type = 'wma'
+
                 # Tracker music formats
-                elif data[:17] == 'Extended module: ':
+                elif data[:17] == b'Extended Module: ':
                     file.type = 'xm'
-                elif data[1080:1084] in {'4FLT', '8FLT', 'M.K.', '4CHN', '6CHN', '8CHN'}:
+                elif data[1080:1084] in {b'4FLT', b'8FLT', b'M.K.', b'4CHN', b'6CHN', b'8CHN'}:
                     file.type = 'mod'
-                # elif data[:] == '':
-                #     file.type = 'it'
-                # elif data[:] == '':
-                #     file.type = 's3m'
+                elif data[:4] == b'IMPM':
+                    file.type = 'it'
+                elif data[28:32] == b'\x1A\x10\x00\x00' and data[44:48] == b'SCRM':
+                    file.type = 's3m'
 
                 # Graphics
                 # elif DoomImage.is_valid(data):
                 #     file.type = 'doom_image'
-
-    def detect_mp3(self, data: memoryview) -> bool:
-        if len(data) < 5:
-            return False
-
-        if data[:3] == b'ID3':
-            return True
-
-        scan_len = min(768, len(data) - 4)
-        for i in range(0, scan_len):
-
-            # Frame sync
-            if not (data[i] == 255 and (data[i + 1] & 224) == 224):
-                continue
-            # bits 20 - 19 (mpeg version)
-            if (data[i + 1] & 24) >> 3 == 1:
-                continue
-            # bits 18 - 17 (mpeg layer)
-            if (data[i + 1] & 6) >> 1 == 0:
-                continue
-            # bits 15 - 12 (bitrate)
-            if data[i + 2] >> 4 == 15:
-                continue
-            # bits 11 - 10 (sampling rate)
-            if (data[i + 2] & 12) >> 2 == 3:
-                continue
-
-            return True
-
-        return False
 
     def detect_wav(self, data: memoryview) -> bool:
         if len(data) < 16:

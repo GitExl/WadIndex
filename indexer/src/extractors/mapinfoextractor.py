@@ -37,9 +37,9 @@ class MapInfoExtractor(ExtractorBase):
 
         mapinfo_files: List[ArchiveFileBase] = []
         for filename in FILE_ORDER:
-            file = archive.file_find_basename(filename)
-            if file is not None:
-                mapinfo_files.append(file)
+            files = archive.file_find_all_basename(filename)
+            mapinfo_files.extend(files)
+        mapinfo_files.reverse()
 
         for file in mapinfo_files:
             filename = os.path.splitext(file.name.lower())[0]

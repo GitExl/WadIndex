@@ -15,77 +15,71 @@ from utils.logger import Logger
 from utils.logger_stream import LoggerStream
 
 
-class IndexProcess(Process):
+def index_process(verbosity: int, stream_queue: Queue, task_queue: Queue, db_lock: Lock) -> None:
+    config: Config = Config()
+    logger: Logger = Logger(config.get('paths.logs'), stream_queue, verbosity)
+    storage: DBStorage = DBStorage(config)
 
-    def __init__(self, name: str, verbosity: int, stream_queue: Queue, task_queue: Queue, db_lock: Lock):
-        Process.__init__(self)
+    indexer = Indexer(config, logger)
 
-        self.config: Config = Config()
-        self.logger: Logger = Logger(self.config.get('paths.logs'), stream_queue, verbosity)
-        self.storage: DBStorage = DBStorage(self.config)
-        self.db_lock: Lock = db_lock
+    for (collection, path_system, path_collection_file, start_time) in iter(task_queue.get, None):
+        logger.info('Processing {}...'.format(path_collection_file))
 
-        self.name = name
-        self.task_queue: Queue = task_queue
+        info = indexer.index_file(path_system, path_collection_file)
+        if info is None:
+            return None
 
-    def run(self) -> None:
-        indexer = Indexer(self.config, self.logger, self.storage)
+        # Transfer indexed information to an entry.
+        entry = storage.get_entry_by_path(collection, path_collection_file)
+        if entry is None:
+            entry = Entry(
+                collection,
+                info.path_idgames.as_posix(),
+                info.file_modified,
+                info.file_size,
+                start_time
+            )
+        else:
+            entry.entry_updated = start_time
 
-        for (collection, path_system, path_collection_file, start_time) in iter(self.task_queue.get, None):
-            self.logger.info('Processing {}...'.format(path_collection_file))
+        entry.title = info.title
+        entry.game = info.game
+        entry.engine = info.engine
+        entry.is_singleplayer = info.is_singleplayer
+        entry.is_cooperative = info.is_cooperative
+        entry.is_deathmatch = info.is_deathmatch
+        entry.description = info.description
+        entry.tools_used = info.tools_used
+        entry.known_bugs = info.known_bugs
+        entry.credits = info.credits
+        entry.build_time = info.build_time
+        entry.comments = info.comments
+        entry.maps = info.maps
+        entry.text_contents = info.text_contents
+        entry.graphics = info.graphics
+        entry.music = info.music
 
-            info = indexer.index_file(path_system, path_collection_file)
-            if info is None:
-                return None
+        # Combine authors from the main entry and every map.
+        author_set: Set[str] = set(info.authors)
+        for map in entry.maps:
+            author_set.update(map.authors)
+        entry.authors = author_set
 
-            # Transfer indexed information to an entry.
-            entry = self.storage.get_entry_by_path(collection, path_collection_file)
-            if entry is None:
-                entry = Entry(
-                    collection,
-                    info.path_idgames.as_posix(),
-                    info.file_modified,
-                    info.file_size,
-                    start_time
-                )
-            else:
-                entry.entry_updated = start_time
+        # Store or update entry.
+        with db_lock:
+            storage.commit()
+            storage.start_transaction()
+            entry.id = storage.save_entry(entry)
+            storage.save_entry_authors(entry, entry.authors)
+            storage.save_entry_maps(entry, entry.maps)
+            storage.save_entry_textfile(entry, entry.text_contents)
+            storage.save_entry_images(entry, entry.graphics)
+            for music in entry.music.values():
+                storage.save_music(music)
+            storage.save_entry_music(entry, entry.music)
+            storage.commit()
 
-            entry.title = info.title
-            entry.game = info.game
-            entry.engine = info.engine
-            entry.is_singleplayer = info.is_singleplayer
-            entry.is_cooperative = info.is_cooperative
-            entry.is_deathmatch = info.is_deathmatch
-            entry.description = info.description
-            entry.tools_used = info.tools_used
-            entry.known_bugs = info.known_bugs
-            entry.credits = info.credits
-            entry.build_time = info.build_time
-            entry.comments = info.comments
-            entry.maps = info.maps
-            entry.text_contents = info.text_contents
-            entry.graphics = info.graphics
-            entry.music = info.music
-
-            # Combine authors from the main entry and every map.
-            author_set: Set[str] = set(info.authors)
-            for map in entry.maps:
-                author_set.update(map.authors)
-            entry.authors = author_set
-
-            # Store or update entry.
-            self.db_lock.acquire()
-            entry.id = self.storage.save_entry(entry)
-            self.storage.save_entry_authors(entry, entry.authors)
-            self.storage.save_entry_maps(entry, entry.maps)
-            self.storage.save_entry_textfile(entry, entry.text_contents)
-            self.storage.save_entry_images(entry, entry.graphics)
-            self.storage.save_entry_music(entry, entry.music)
-            self.storage.commit()
-            self.db_lock.release()
-
-        indexer.close()
+    indexer.close()
 
 
 def index(options):
@@ -138,7 +132,7 @@ def index(options):
     db_lock = Lock()
     workers = []
     for i in range(proc_count):
-        worker = IndexProcess('index-{:02}'.format(i + 1), options.verbosity, logger_stream.queue, task_queue, db_lock)
+        worker = Process(target=index_process, args=(options.verbosity, logger_stream.queue, task_queue, db_lock), name='index-{:02}'.format(i + 1))
         workers.append(worker)
         worker.start()
 

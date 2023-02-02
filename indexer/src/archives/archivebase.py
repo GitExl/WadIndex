@@ -42,6 +42,17 @@ class ArchiveBase:
 
         return None
 
+    def file_find_all_basename(self, file_basename: str) -> List[ArchiveFileBase]:
+        files: List[ArchiveFileBase] = []
+
+        file_basename = file_basename.lower()
+        for file in reversed(self.files):
+            filename = basename(splitext(file.name)[0]).lower()
+            if file_basename == filename:
+                files.append(file)
+
+        return files
+
     def file_find_regexp(self, regexp: str) -> Optional[ArchiveFileBase]:
         for file in reversed(self.files):
             if re.match(regexp, file.name, RegexFlag.IGNORECASE):

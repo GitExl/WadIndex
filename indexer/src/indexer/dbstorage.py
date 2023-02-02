@@ -27,6 +27,7 @@ class DBStorage:
             database=config.get('db.database'),
         )
         self.cursor = self.db.cursor()
+        self.db.autocommit = False
 
     def close(self):
         self.cursor.close()
@@ -238,33 +239,29 @@ class DBStorage:
                 self.cursor.execute('DELETE FROM entry_images WHERE entry_id=%s', (db_id,))
                 self.cursor.execute('DELETE FROM entry_music WHERE entry_id=%s', (db_id,))
 
-    def find_music_by_hash(self, data_hash: bytes) -> Optional[int]:
-        self.cursor.execute('SELECT id FROM music WHERE hash=%s', (data_hash,))
-        music_row = self.cursor.fetchone()
-        if music_row is not None:
-            return music_row[0]
-
-        return None
-
-    def save_music(self, music: MusicInfo) -> int:
+    def save_music(self, music: MusicInfo):
         row = music.to_row()
         args = list(row.values())
 
-        if music.id:
-            args.append(music.id)
+        self.cursor.execute('SELECT id FROM music WHERE hash=%s LIMIT 1', (music.hash,))
+        existing_row = self.cursor.fetchone()
+
+        if existing_row is not None:
             set_stmt = ['{}=%s'.format(key) for key in row.keys()]
-            query = 'UPDATE music SET {} WHERE id=%s'.format(','.join(set_stmt))
+            existing_id = existing_row[0]
+            query = 'UPDATE music SET {} WHERE id={}'.format(','.join(set_stmt), existing_id)
+            self.cursor.execute(query, args)
+            music.id = existing_id
 
         else:
             col_names = row.keys()
             value_subs = ['%s'] * len(row)
             query = 'INSERT INTO music ({}) VALUES ({})'.format(','.join(col_names), ','.join(value_subs))
-        self.cursor.execute(query, args)
-
-        if music.id is None:
+            self.cursor.execute(query, args)
             music.id = self.cursor.lastrowid
 
-        return music.id
+    def start_transaction(self):
+        self.db.start_transaction()
 
     def commit(self):
         self.db.commit()

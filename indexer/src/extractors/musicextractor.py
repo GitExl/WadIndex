@@ -36,17 +36,19 @@ class MusicExtractor(ExtractorBase):
             # Set default music tracks for maps.
             self.assign_game_music_defaults(info, MUSIC_STRINGS[source]['maps'])
 
-            # Get music files assigned to maps.
-            for map in info.maps:
-                file = info.archive_list.file_find_basename(map.music, False)
-                if file is not None:
-                    music_files[file.name] = file
-
             # Add extra known music tracks.
             for music_name in MUSIC_STRINGS[source]['extra']:
                 file = info.archive_list.file_find_basename(music_name, False)
                 if file is None:
                     continue
+                music_files[file.name] = file
+
+        # Get music files assigned to maps.
+        for map in info.maps:
+            if map.music is None:
+                continue
+            file = info.archive_list.file_find_basename(map.music, False)
+            if file is not None:
                 music_files[file.name] = file
 
         # Process all found music files.
@@ -64,7 +66,9 @@ class MusicExtractor(ExtractorBase):
             elif file.type == 'wav':
                 music_type = MusicType.WAV
             elif file.type == 's3m' or file.type == 'xm' or file.type == 'it' or file.type == 'mod':
-                music_type = MusicType.MOD
+                music_type = MusicType.TRACKER
+            elif file.type == 'wma':
+                music_type = MusicType.WMA
             else:
                 music_type = MusicType.UNKNOWN
 

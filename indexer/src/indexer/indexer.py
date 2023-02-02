@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List
 
 from extractors.archiveextractor import ArchiveExtractor
 from extractors.archivelistextractor import ArchiveListExtractor
@@ -24,8 +24,6 @@ from writers.mappreviewwriter import MapPreviewWriter
 from writers.musicwriter import MusicWriter
 from writers.writerbase import WriterBase
 from writers.graphicswriter import GraphicsWriter
-
-from indexer.dbstorage import DBStorage
 
 
 EXTRACTORS = [
@@ -53,10 +51,9 @@ WRITERS = [
 
 class Indexer:
 
-    def __init__(self, config: Config, logger: Logger, storage: DBStorage):
+    def __init__(self, config: Config, logger: Logger):
         self.config: Config = config
         self.logger: Logger = logger
-        self.storage: DBStorage = storage
 
         # Initialize processor instances.
         self.extractors: List[ExtractorBase] = []
@@ -65,7 +62,7 @@ class Indexer:
 
         self.writers: List[WriterBase] = []
         for writer_class in WRITERS:
-            self.writers.append(writer_class(logger, config, storage))
+            self.writers.append(writer_class(logger, config))
 
     def index_file(self, path_local: Path, path_collection: Path) -> ExtractedInfo:
         path_local_base = path_local.parents[0] / path_local.stem
