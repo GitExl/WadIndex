@@ -1,3 +1,5 @@
+import gzip
+
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from utils.mp3_detect import mp3_detect
@@ -19,8 +21,16 @@ class FileTypeExtractor(ExtractorBase):
             for file in archive.files:
                 if file.type is not None:
                     continue
+                if file.size < 4:
+                    continue
 
-                data = memoryview(file.get_data())
+                data = file.get_data()
+
+                # Decompress GZipped data
+                if data[:3] == b'\x1F\x8B\x08' and data[4] & 0xE0 == 0:
+                    data = gzip.decompress(data)
+
+                data = memoryview(data)
 
                 # MIDI music formats
                 if data[:4] == b'MThd':
@@ -33,24 +43,33 @@ class FileTypeExtractor(ExtractorBase):
                     file.type = 'mp3'
                 elif self.detect_wav(data):
                     file.type = 'wav'
-                elif self.detect_vorbis(data):
-                    file.type = 'vorbis'
-                elif self.detect_opus(data):
-                    file.type = 'opus'
+                elif data[:4] == b'fLaC':
+                    file.type = 'flac'
+                elif len(data) > 5 and data[:5] == b'OggS\x00':
+                    if self.detect_vorbis(data):
+                        file.type = 'vorbis'
+                    elif self.detect_opus(data):
+                        file.type = 'opus'
 
                 # Assume an ASF file header GUID always indicates WMA audio.
-                elif data[:16] == b'\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C':
+                elif len(data) > 16 and data[:16] == b'\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C':
                     file.type = 'wma'
 
                 # Tracker music formats
-                elif data[:17] == b'Extended Module: ':
+                elif len(data) > 17 and data[:17] == b'Extended Module: ':
                     file.type = 'xm'
-                elif data[1080:1084] in {b'4FLT', b'8FLT', b'M.K.', b'4CHN', b'6CHN', b'8CHN'}:
+                elif len(data) > 1100 and data[1080:1084] in {b'4FLT', b'8FLT', b'M.K.', b'4CHN', b'6CHN', b'8CHN'}:
                     file.type = 'mod'
                 elif data[:4] == b'IMPM':
                     file.type = 'it'
-                elif data[28:32] == b'\x1A\x10\x00\x00' and data[44:48] == b'SCRM':
+                elif len(data) > 32 and data[28:32] == b'\x1A\x10\x00\x00' and data[44:48] == b'SCRM':
                     file.type = 's3m'
+
+                # Video game music
+                elif data[:4] == b'Vgm\x20':
+                    file.type = 'vgm'
+                elif len(data) > 33 and data[:33] == b'SNES-SPC700 Sound File Data v0.30':
+                    file.type = 'spc'
 
                 # Graphics
                 # elif DoomImage.is_valid(data):
@@ -61,7 +80,7 @@ class FileTypeExtractor(ExtractorBase):
             return False
         if data[:4] != b'RIFF':
             return False
-        if data[9:15] != b'WAVEfmt':
+        if data[8:15] != b'WAVEfmt':
             return False
 
         return True
@@ -69,10 +88,8 @@ class FileTypeExtractor(ExtractorBase):
     def detect_vorbis(self, data: memoryview) -> bool:
         if len(data) < 13:
             return False
-        if data[:5] != b'OggS\x00':
-            return False
 
-        scan_len = min(768, len(data) - 4)
+        scan_len = min(1024, len(data) - 4)
         for i in range(0, scan_len):
             # Vorbis identification header packet
             if data[i:i + 7] == b'\0x1vorbis':
@@ -83,10 +100,8 @@ class FileTypeExtractor(ExtractorBase):
     def detect_opus(self, data: memoryview) -> bool:
         if len(data) < 15:
             return False
-        if data[:5] != b'OggS\x00':
-            return False
 
-        scan_len = min(768, len(data) - 4)
+        scan_len = min(1024, len(data) - 4)
         for i in range(0, scan_len):
             # Opus header packet
             if data[i:i + 9] == b'OpusHead\x01':

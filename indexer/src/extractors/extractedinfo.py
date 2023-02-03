@@ -24,6 +24,9 @@ class MusicType(Enum):
     VORBIS = 'vorbis'
     OPUS = 'opus'
     WMA = 'wma'
+    VGM = 'vgm'
+    SPC = 'spc'
+    FLAC = 'flac'
 
 
 @dataclass

@@ -69,6 +69,12 @@ class MusicExtractor(ExtractorBase):
                 music_type = MusicType.TRACKER
             elif file.type == 'wma':
                 music_type = MusicType.WMA
+            elif file.type == 'vgm':
+                music_type = MusicType.VGM
+            elif file.type == 'spc':
+                music_type = MusicType.SPC
+            elif file.type == 'flac':
+                music_type = MusicType.FLAC
             else:
                 music_type = MusicType.UNKNOWN
 

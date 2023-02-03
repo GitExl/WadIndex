@@ -99,7 +99,7 @@ def mp3_detect(input_data: memoryview) -> bool:
         i += frame_size - 1
 
         consecutive_frames += 1
-        if consecutive_frames > 2:
+        if consecutive_frames > 1:
             return True
 
     return False
