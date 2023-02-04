@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Set, Dict, List
 from optparse import OptionParser, OptionGroup
 
-from indexer.dbstorage import DBStorage
 from indexer.entry import Entry
 from indexer.indexer import Indexer
+from indexer.storage import Storage
 from utils.config import Config
 from indexer.ignorelist import must_ignore
 from utils.logger import Logger
@@ -18,7 +18,7 @@ from utils.logger_stream import LoggerStream
 def index_process(verbosity: int, stream_queue: Queue, task_queue: Queue, db_lock: Lock) -> None:
     config: Config = Config()
     logger: Logger = Logger(config.get('paths.logs'), stream_queue, verbosity)
-    storage: DBStorage = DBStorage(config)
+    storage: Storage = Storage(config)
 
     indexer = Indexer(config, logger)
 
@@ -30,7 +30,7 @@ def index_process(verbosity: int, stream_queue: Queue, task_queue: Queue, db_loc
             return None
 
         # Transfer indexed information to an entry.
-        entry = storage.get_entry_by_path(collection, path_collection_file)
+        entry = storage.entries.get_by_path(collection, path_collection_file)
         if entry is None:
             entry = Entry(
                 collection,
@@ -67,17 +67,12 @@ def index_process(verbosity: int, stream_queue: Queue, task_queue: Queue, db_loc
 
         # Store or update entry.
         with db_lock:
-            storage.commit()
-            storage.start_transaction()
-            entry.id = storage.save_entry(entry)
-            storage.save_entry_authors(entry, entry.authors)
-            storage.save_entry_maps(entry, entry.maps)
-            storage.save_entry_textfile(entry, entry.text_contents)
-            storage.save_entry_images(entry, entry.graphics)
+            storage.transaction_commit()
+            storage.transaction_start()
             for music in entry.music.values():
-                storage.save_music(music)
-            storage.save_entry_music(entry, entry.music)
-            storage.commit()
+                storage.music.save(music)
+            entry.id = storage.entries.save(entry)
+            storage.transaction_commit()
 
     indexer.close()
 
@@ -89,7 +84,7 @@ def index(options):
     logger = Logger(config.get('paths.logs'), logger_stream.queue, options.verbosity)
     logger_stream.start()
 
-    storage = DBStorage(config)
+    storage = Storage(config)
 
     time_now = int(time.time())
 
@@ -145,7 +140,7 @@ def index(options):
 
             # Skip entries that do not need updating.
             if not options.force:
-                timestamp = storage.get_entry_timestamp_by_path(collection, path_collection_file)
+                timestamp = storage.entries.get_timestamp_by_path(collection, path_collection_file)
                 if timestamp is not None and timestamp >= int(path_system.stat().st_mtime):
                     logger.decision('Skipping {}.'.format(path_system))
                     continue
@@ -170,37 +165,42 @@ def index(options):
     logger_stream.stop()
     logger_stream.join()
 
-    storage.commit()
-    storage.close()
+    storage.transaction_commit()
 
 
 def clean(options):
     config = Config()
     logger = Logger(config.get('paths.logs'), options.verbosity)
-    storage = DBStorage(config)
+    storage = Storage(config)
 
     # TODO: get local files and clean
     # Only remove dead entries if all entries were scanned.
     # Otherwise, any unscanned entries will also be removed.
     # if options.clean and not options.filename:
     #     logger.info('Removing dead entries...')
-    #     storage.remove_dead_entries(paths_system)
+    #
+    # for collection, paths_local in existing_paths.items():
+    #     collection_path = self.config.get('paths.collections')[collection]
+    #
+    #     # Build a list of local paths relative to each collection.
+    #     local_paths = set()
+    #     for path_local in paths_local:
+    #         local_paths.add(path_local.relative_to(collection_path).as_posix())
+    #
+    #     storage.remove_dead_entries(paths_system, local_paths)
 
     logger.info('Removing orphaned maps...')
-    storage.remove_orphan_maps()
-    logger.info('Removing orphaned text files...')
-    storage.remove_orphan_textfiles()
-    logger.info('Removing orphaned images...')
-    storage.remove_orphan_images()
+    storage.maps.remove_orphans()
+    logger.info('Removing orphaned entries...')
+    storage.entries.remove_orphans()
     logger.info('Removing orphaned music...')
-    storage.remove_orphan_music()
+    storage.music.remove_orphans()
     logger.info('Removing orphaned authors...')
-    storage.remove_orphan_authors()
+    storage.authors.remove_orphans()
     logger.info('Removing empty directories...')
-    storage.remove_orphan_directories()
+    storage.directories.remove_orphans()
 
-    storage.commit()
-    storage.close()
+    storage.transaction_commit()
 
 
 def run():
