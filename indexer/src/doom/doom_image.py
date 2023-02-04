@@ -18,14 +18,15 @@ class DoomImage(object):
         self.pixels: Optional[bytes] = None
 
     @classmethod
-    def from_data(cls, data: bytes, palette: Palette):
+    def from_data(cls, data_bytes: bytes, palette: Palette):
         """
         Creates a DoomImage with doom graphics data rendered to an internal buffer.
 
-        :param data:
+        :param data_bytes:
         :param palette:
         :return:
         """
+        data = memoryview(data_bytes)
         width, height, left, top = DoomImage.S_HEADER.unpack_from(data)
         data_len = len(data)
 
@@ -103,7 +104,8 @@ class DoomImage(object):
         :param data:
         :return:
         """
-        if len(data) < 16:
+        data_len = len(data)
+        if data_len < 16:
             return False
 
         # Verify if the header values are sane.
@@ -114,12 +116,12 @@ class DoomImage(object):
             return False
 
         # Verify that offsets are in range of the data.
-        if len(data) < 8 + (width * 4):
+        if data_len < 8 + (width * 4):
             return False
         offset_struct = Struct('<' + ('I' * width))
         offsets = offset_struct.unpack_from(data[8:8 + (width * 4)])
         for offset in offsets:
-            if offset >= len(data):
+            if offset >= data_len:
                 return False
 
         return True
