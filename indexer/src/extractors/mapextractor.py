@@ -72,15 +72,15 @@ class MapExtractor(ExtractorBase):
                     #     nodes = nodes_reader.read()
 
                     # Calculate complexity.
-                    blockmap_generator = BlockmapGenerator(map, 128)
-                    blockmap = blockmap_generator.blockmap
-                    line_lengths = []
-                    for block in blockmap:
-                        if block is None:
-                            continue
-                        line_lengths.append(block.total_length)
-                    if len(line_lengths):
-                        map.complexity = len(map.sectors) / fmean(line_lengths)
+                    # blockmap_generator = BlockmapGenerator(map, 128)
+                    # blockmap = blockmap_generator.blockmap
+                    # line_lengths = []
+                    # for block in blockmap:
+                    #     if block is None:
+                    #         continue
+                    #     line_lengths.append(block.total_length)
+                    # if len(line_lengths):
+                    #     map.complexity = len(map.sectors) / fmean(line_lengths)
 
         for archive in wad_archives:
             archive.close()
