@@ -9,16 +9,16 @@ class AuthorStorage(StorageBase):
     def get_or_create_multiple(self, authors: Iterable[str]) -> Set[int]:
         author_ids = set()
         for author_name in authors:
-            path_alias = url_clean(author_name)
-            if len(path_alias) < 2:
+            alias = url_clean(author_name)
+            if len(alias) < 2:
                 continue
 
-            self.db.cursor.execute('SELECT id FROM authors WHERE name=%s LIMIT 1', (author_name,))
+            self.db.cursor.execute('SELECT id FROM authors WHERE alias=%s LIMIT 1', (alias,))
             row = self.db.cursor.fetchone()
             if row is not None:
                 author_id = row['id']
             else:
-                self.db.cursor.execute('INSERT INTO authors (name, path_alias) VALUES (%s, %s)', (author_name[:255], path_alias))
+                self.db.cursor.execute('INSERT INTO authors (name, alias) VALUES (%s, %s)', (author_name[:255], alias))
                 author_id = self.db.cursor.lastrowid
 
             author_ids.add(author_id)
