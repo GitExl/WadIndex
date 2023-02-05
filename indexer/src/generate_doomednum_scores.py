@@ -1,38 +1,37 @@
 import json
 
-from typing import Dict, Set
+from typing import Dict, Set, List
 from indexer.engine import Engine
 from utils.config import Config
 
-engine_factors = {
-    Engine.DOOM.value: 1.5,
-    Engine.HERETIC.value: 1.5,
-    Engine.HEXEN.value: 1.5,
-    Engine.STRIFE.value: 1.5,
-    Engine.BOOM.value: 1.0,
-    Engine.MBF.value: 1.0,
-    Engine.ZDOOM.value: 1.0,
-    Engine.GZDOOM.value: 1.0,
-    Engine.LEGACY.value: 1.0,
-    Engine.SKULLTAG.value: 1.0,
-    Engine.ZDAEMON.value: 1.0,
-    Engine.DOOMSDAY.value: 1.0,
-    Engine.EDGE.value: 1.0,
-    Engine.ETERNITY.value: 1.0,
-    Engine.DOOMRETRO.value: 1.0,
-    Engine.ZANDRONUM.value: 1.0,
+engine_factors: Dict[Engine, float] = {
+    Engine.DOOM: 1.5,
+    Engine.HERETIC: 1.5,
+    Engine.HEXEN: 1.5,
+    Engine.STRIFE: 1.5,
+    Engine.BOOM: 1.0,
+    Engine.MBF: 1.0,
+    Engine.ZDOOM: 1.0,
+    Engine.GZDOOM: 1.0,
+    Engine.LEGACY: 1.0,
+    Engine.SKULLTAG: 1.0,
+    Engine.ZDAEMON: 1.0,
+    Engine.DOOMSDAY: 1.0,
+    Engine.EDGE: 1.0,
+    Engine.ETERNITY: 1.0,
+    Engine.DOOMRETRO: 1.0,
+    Engine.ZANDRONUM: 1.0,
 }
 
 config = Config()
 
 with open(config.get('extractors.engine.doomednum_table'), 'r') as f:
-    engines = json.load(f)
+    engine_data = json.load(f)
 
 # Create sets of doomednums for each engine.
-engine_doomednums: Dict[str, Set[str]] = {}
-for engine_key, doomednums in engines.items():
-
-    clean_doomednums = []
+engine_doomednums: Dict[str, Set[int]] = {}
+for engine_key, doomednums in engine_data.items():
+    clean_doomednums: List[int] = []
     for doomednum in doomednums:
         if isinstance(doomednum, int):
             clean_doomednums.append(doomednum)
@@ -48,7 +47,8 @@ for engine_key, doomednums in engines.items():
 # List which engines each doomednum appears in.
 doomednum_engines: Dict[int, Set[str]] = {}
 for engine_key, doomednums in engine_doomednums.items():
-    engine_factor = engine_factors.get(engine_key, 1.0)
+    engine = Engine[engine_key]
+    engine_factor = engine_factors.get(engine, 1.0)
 
     for doomednum in doomednums:
         if doomednum not in doomednum_engines:
@@ -56,7 +56,7 @@ for engine_key, doomednums in engine_doomednums.items():
         doomednum_engines[doomednum].add(engine_key)
 
 # Calculate score for each engine in each doomednum.
-doomednum_scores: Dict[str, Dict[str, float]] = {}
+doomednum_scores: Dict[int, Dict[str, float]] = {}
 for doomednum, engine_keys in doomednum_engines.items():
     if len(engine_keys) == len(engine_factors):
         continue
@@ -64,7 +64,8 @@ for doomednum, engine_keys in doomednum_engines.items():
     average = 1 / len(engine_keys)
     presence_scores: Dict[str, float] = {}
     for engine_key in engine_keys:
-        presence_scores[engine_key] = average * engine_factors[engine_key]
+        engine = Engine[engine_key]
+        presence_scores[engine_key] = average * engine_factors[engine]
 
     doomednum_scores[doomednum] = presence_scores
 

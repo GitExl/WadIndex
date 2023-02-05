@@ -32,7 +32,8 @@ class GameExtractor(ExtractorBase):
             lump_scores[file_name] = {}
 
             for game, score in scores.items():
-                lump_scores[file_name][Game(game)] = score
+                game = Game[game]
+                lump_scores[file_name][game] = score
 
         return lump_scores
 

@@ -1,13 +1,13 @@
 {
-  "boom": {
+  "BOOM": {
     "lumps": [
       "ANIMATED",
       "DEHACKED",
       "SWITCHES"
     ]
   },
-  "zdoom": {
-    "inherit": "boom",
+  "ZDOOM": {
+    "inherit": "BOOM",
     "lumps": [
       "ALTHUDCF",
       "ANIMDEFS",
@@ -52,15 +52,15 @@
       "ZMAPINFO"
     ]
   },
-  "gzdoom": {
-    "inherit": "zdoom",
+  "GZDOOM": {
+    "inherit": "ZDOOM",
     "lumps": [
       "GLDEFS",
       "MODELDEF"
     ]
   },
-  "skulltag": {
-    "inherit": "zdoom",
+  "SKULLTAG": {
+    "inherit": "SKULLTAG",
     "lumps": [
       "ANCRINFO",
       "BOTINFO",
@@ -69,23 +69,23 @@
       "SKININFO"
     ]
   },
-  "eternity": {
-    "inherit": "boom",
+  "ETERNITY": {
+    "inherit": "BOOM",
     "lumps": [
       "EDFROOT",
       "EMAPINFO",
       "OPTIONS"
     ]
   },
-  "doomretro": {
-    "inherit": "boom",
+  "DOOMRETRO": {
+    "inherit": "BOOM",
     "lumps": [
       "MAPINFO",
       "RMAPINFO"
     ]
   },
-  "edge": {
-    "inherit": "boom",
+  "EDGE": {
+    "inherit": "BOOM",
     "lumps": [
       "DOOM_DDF"
     ]

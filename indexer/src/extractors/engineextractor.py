@@ -13,8 +13,8 @@ from utils.config import Config
 from utils.logger import Logger
 
 
-EngineLumps = Dict[str, Set[str]]
-DoomednumScores = Dict[int, Dict[str, float]]
+EngineLumps = Dict[Engine, Set[str]]
+DoomednumScores = Dict[int, Dict[Engine, float]]
 
 
 class EngineExtractor(ExtractorBase):
@@ -29,18 +29,19 @@ class EngineExtractor(ExtractorBase):
         engine_lumps: EngineLumps = {}
 
         with open(self.config.get('extractors.engine.lump_table'), 'r') as f:
-            engines = json.load(f)
+            engines_data = json.load(f)
 
-        for engine_key in engines.keys():
-            engine_lumps[engine_key] = self._get_engine_lumps(engines, engine_key)
+        for engine_key in engines_data.keys():
+            engine = Engine[engine_key]
+            engine_lumps[engine] = self._get_engine_lumps(engines_data, engine_key)
 
         return engine_lumps
 
-    def _get_engine_lumps(self, engines: Dict[str, any], engine_key: str) -> Set[str]:
-        engine_info = engines.get(engine_key)
+    def _get_engine_lumps(self, engines_data: Dict[str, any], engine_key: str) -> Set[str]:
+        engine_info = engines_data.get(engine_key)
         inherit = engine_info.get('inherits', None)
         if inherit is not None:
-            lumps = self._get_engine_lumps(engines, engine_key)
+            lumps = self._get_engine_lumps(engines_data, engine_key)
         else:
             lumps = set()
 
@@ -92,15 +93,15 @@ class EngineExtractor(ExtractorBase):
         info.engine = engine
 
     def detect_from_lumps(self, archive: ArchiveBase) -> Engine:
-        scores: Dict[str, float] = {}
-        for engine_key, lump_set in self.engine_lumps.items():
+        scores: Dict[Engine, float] = {}
+        for engine, lump_set in self.engine_lumps.items():
 
             for lump_name in lump_set:
                 if archive.file_find_basename(lump_name) is not None:
-                    if engine_key not in scores:
-                        scores[engine_key] = 1
+                    if engine not in scores:
+                        scores[engine] = 1
                     else:
-                        scores[engine_key] += 1
+                        scores[engine] += 1
 
         if len(scores):
             engine = max(scores.keys(), key=(lambda k: scores[k]))

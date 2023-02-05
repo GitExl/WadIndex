@@ -7,7 +7,7 @@ from indexer.game import Game
 from utils.config import Config
 from utils.logger import Logger
 
-iwads = {
+iwads: Dict[Game, str] = {
     Game.DOOM2: 'DOOM2.WAD',
     Game.DOOM: 'DOOM.WAD',
     Game.HERETIC: 'HERETIC.WAD',
@@ -18,7 +18,7 @@ iwads = {
     Game.HACX: 'HACX.WAD',
 }
 
-iwad_factors = {
+iwad_factors: Dict[Game, float] = {
     Game.DOOM2: 1.05,
     Game.DOOM: 1.0,
     Game.HERETIC: 1.0,
@@ -71,7 +71,7 @@ for lump_name, lump_presence in lump_list.items():
     average = 1 / len(lump_presence)
     presence_scores: Dict[str, float] = {}
     for game in lump_presence:
-        presence_scores[game.value] = average * iwad_factors[game]
+        presence_scores[game.name] = average * iwad_factors[game]
 
     lump_scores[lump_name] = presence_scores
 
