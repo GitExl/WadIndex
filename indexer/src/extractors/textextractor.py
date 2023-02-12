@@ -9,6 +9,9 @@ from extractors.extractorbase import ExtractorBase
 from textparser.textparser import TextParser
 
 
+RE_EMAIL = re.compile(r'([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})')
+
+
 class TextExtractor(ExtractorBase):
 
     def extract(self, info: ExtractedInfo):
@@ -41,6 +44,9 @@ class TextExtractor(ExtractorBase):
         if contents is None:
             self.logger.warn('No text file found.')
             return
+
+        # Remove email addresses before further processing.
+        contents = RE_EMAIL.sub(' ', contents)
 
         text_parser = TextParser(self.logger)
         text_parser.parse(StringIO(contents))
