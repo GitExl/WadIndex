@@ -12,6 +12,7 @@ from doom.language_parser import LocaleStrings
 from doom.map.map import Map
 from indexer.engine import Engine
 from indexer.game import Game
+from utils.author_parser import Author
 
 
 class MusicType(Enum):
@@ -82,7 +83,7 @@ class ExtractedInfo:
     known_bugs: Optional[str] = None
     credits: Optional[str] = None
     comments: Optional[str] = None
-    authors: List[str] = field(default_factory=lambda: [])
+    authors: List[Author] = field(default_factory=lambda: [])
     graphics: Dict[str, GraphicInfo] = field(default_factory=lambda: {})
     maps: List[Map] = field(default_factory=lambda: [])
     music: Dict[str, MusicInfo] = field(default_factory=lambda: {})

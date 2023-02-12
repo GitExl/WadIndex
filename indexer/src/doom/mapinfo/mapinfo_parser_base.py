@@ -2,6 +2,7 @@ from typing import Optional, Dict, List, Tuple
 
 from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
+from utils.author_parser import Author
 
 
 class MapInfoParserError(Exception):
@@ -19,7 +20,7 @@ class MapInfoMap:
     music: Optional[str] = None
     allow_jump: Optional[bool] = None
     allow_crouch: Optional[bool] = None
-    authors: List[str] = []
+    authors: List[Author] = []
 
 
 class MapInfoEpisode:
