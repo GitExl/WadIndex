@@ -45,7 +45,7 @@ class MusicExtractor(ExtractorBase):
 
         # Get music files assigned to maps.
         for map in info.maps:
-            if map.music is None:
+            if map.music is None and map.music != '':
                 continue
             file = info.archive_list.file_find_basename(map.music, False)
             if file is not None:
