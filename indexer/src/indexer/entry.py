@@ -4,6 +4,7 @@ from doom.map.map import Map
 from extractors.extractedinfo import MusicInfo, GraphicInfo
 from indexer.engine import Engine
 from indexer.game import Game
+from utils.author_parser import Author
 
 
 class Entry:
@@ -12,8 +13,8 @@ class Entry:
         self.collection: str = collection
         self.path: str = path
         self.file_modified: int = file_modified
-        self.entry_updated: int = entry_updated
         self.file_size: int = file_size
+        self.entry_updated: int = entry_updated
 
         self.id: Optional[int] = None
         self.directory_id: Optional[int] = None
@@ -32,7 +33,7 @@ class Entry:
         self.comments: Optional[str] = None
 
         self.maps: List[Map] = []
-        self.authors: List[str] = []
+        self.authors: List[Author] = []
         self.text_contents: Optional[str] = None
         self.graphics: Dict[str, GraphicInfo] = {}
         self.music: Dict[str, MusicInfo] = {}
@@ -72,7 +73,10 @@ class Entry:
             row['file_size'],
             row['entry_updated']
         )
+
         entry.id = row['id']
+        # directory_id
+
         entry.title = row['title']
         entry.game = Game(row['game'])
         entry.engine = Engine(row['engine'])
@@ -87,5 +91,11 @@ class Entry:
         entry.credits = row['credits']
         entry.build_time = row['build_time']
         entry.comments = row['comments']
+
+        # maps
+        # authors
+        # text_contents
+        # graphics
+        # music
 
         return entry

@@ -12,58 +12,32 @@ class MapStorage(StorageBase):
         self._authors = authors
 
     def save(self, entry_id: int, map: Map):
-        fields = [
-            'entry_id',
-            'name',
-            'title',
-            'format',
-            'line_count',
-            'side_count',
-            'thing_count',
-            'sector_count',
-            'allow_jump',
-            'allow_crouch',
-            'par_time',
-            'music',
-            'next',
-            'next_secret',
-            'cluster',
-            'complexity',
-            'nodes',
-            'nodes_gl',
-        ]
-        fields_concat = ','.join(fields)
-        fields_concat_placeholder = '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s'
+        map.entry_id = entry_id
+        row = map.to_row()
+        args = list(row.values())
 
-        self.db.cursor.execute(
-            'INSERT INTO maps ({}) VALUES ({})'.format(fields_concat, fields_concat_placeholder),
-            (
-                entry_id,
-                map.name[:8],
-                map.title[:1022] if map.title is not None else None,
-                map.format.value,
-                len(map.lines),
-                len(map.sides),
-                len(map.things),
-                len(map.sectors),
-                map.allow_jump,
-                map.allow_crouch,
-                map.par_time & 0xFFFFFFFF if map.par_time is not None else None,
-                map.music[:255] if map.music is not None else None,
-                map.next[:255] if map.next is not None else None,
-                map.next_secret[:255] if map.next_secret is not None else None,
-                map.cluster & 0xFFFFFFFF if map.cluster is not None else None,
-                map.complexity,
-                map.nodes_type.value,
-                map.nodes_gl_type.value,
-            )
-        )
-        db_id = self.db.cursor.lastrowid
+        self.db.cursor.execute('SELECT id FROM maps WHERE entry_id=%s AND name=%s LIMIT 1', (row['entry_id'], row['name'],))
+        existing_row = self.db.cursor.fetchone()
 
-        # Add authors.
+        if existing_row is not None:
+            set_stmt = ['{}=%s'.format(key) for key in row.keys()]
+            existing_id = existing_row['id']
+            query = 'UPDATE maps SET {} WHERE id={}'.format(','.join(set_stmt), existing_id)
+            self.db.cursor.execute(query, args)
+            map.id = existing_id
+
+        else:
+            col_names = row.keys()
+            value_subs = ['%s'] * len(row)
+            query = 'INSERT INTO maps ({}) VALUES ({})'.format(','.join(col_names), ','.join(value_subs))
+            self.db.cursor.execute(query, args)
+            map.id = self.db.cursor.lastrowid
+
+        # Re-add authors.
+        self.db.cursor.execute('DELETE FROM map_authors WHERE map_id=%s', (map.id,))
         author_ids = self._authors.get_or_create_multiple(map.authors)
         for author_id in author_ids:
-            self.db.cursor.execute('INSERT INTO map_authors VALUES (%s, %s)', (db_id, author_id))
+            self.db.cursor.execute('INSERT INTO map_authors VALUES (%s, %s)', (map.id, author_id))
 
     def remove_orphans(self):
         self.db.cursor.execute('DELETE FROM maps WHERE entry_id NOT IN (SELECT id FROM entry)')

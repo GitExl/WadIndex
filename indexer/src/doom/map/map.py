@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from enum import Enum, Flag, auto
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from doom.nodes.node_types import NodeTypes, NodeTypesGL
+from utils.author_parser import Author
 
 
 class MapFormat(Enum):
@@ -199,6 +200,9 @@ class Map:
         self.namespace = namespace
         self.format: MapFormat = format
 
+        self.id: Optional[int] = None
+        self.entry_id: Optional[int] = None
+
         self.vertices: List[Vertex] = [] if vertices is None else vertices
         self.lines: List[Line] = [] if lines is None else lines
         self.sides: List[Side] = [] if sides is None else sides
@@ -213,7 +217,29 @@ class Map:
         self.next_secret: Optional[str] = None
         self.music: Optional[str] = None
         self.cluster: Optional[int] = None
-        self.authors: List[str] = []
+        self.authors: List[Author] = []
         self.complexity: int = 0
         self.nodes_type: NodeTypes = NodeTypes.NONE
         self.nodes_gl_type: NodeTypesGL = NodeTypesGL.NONE
+
+    def to_row(self) -> Dict[str, any]:
+        return {
+            'entry_id': self.entry_id,
+            'name': self.name[:8],
+            'title': self.title[:1022] if self.title is not None else None,
+            'format': self.format.value,
+            'line_count': len(self.lines),
+            'side_count': len(self.sides),
+            'thing_count': len(self.things),
+            'sector_count': len(self.sectors),
+            'allow_jump': self.allow_jump,
+            'allow_crouch': self.allow_crouch,
+            'par_time': self.par_time & 0xFFFFFFFF if self.par_time is not None else None,
+            'music': self.music[:255] if self.music is not None else None,
+            'next': self.next[:255] if self.next is not None else None,
+            'next_secret': self.next_secret[:255] if self.next_secret is not None else None,
+            'cluster': self.cluster & 0xFFFFFFFF if self.cluster is not None else None,
+            'complexity': self.complexity,
+            'nodes': self.nodes_type.value,
+            'nodes_gl': self.nodes_gl_type.value,
+        }

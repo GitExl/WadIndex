@@ -56,8 +56,6 @@ class EntryStorage(StorageBase):
         if entry.id is None:
             entry.id = self.db.cursor.lastrowid
 
-        self.db.cursor.execute('DELETE FROM map_authors WHERE map_id IN (SELECT id FROM maps WHERE entry_id=%s)', (entry.id,))
-        self.db.cursor.execute('DELETE FROM maps WHERE entry_id=%s', (entry.id,))
         for map in entry.maps:
             self._maps.save(entry.id, map)
 
