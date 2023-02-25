@@ -1,7 +1,7 @@
 from io import StringIO
 from typing import Dict
 
-from archives.archivebase import ArchiveBase
+from archives.archivelist import ArchiveList
 from doom.dehacked_parser import DehackedParser, DehackedParserError
 from doom.strings_map_titles import STRINGS_MAP_TITLES
 from extractors.extractedinfo import ExtractedInfo
@@ -14,13 +14,13 @@ class DehackedExtractor(ExtractorBase):
         if not len(info.maps):
             return
 
-        archive: ArchiveBase = info.archive
-        if archive is None:
-            self.logger.debug('Cannot extract Dehacked info without an archive.')
+        archive_list: ArchiveList = info.archive_list
+        if archive_list is None:
+            self.logger.debug('Cannot extract Dehacked info without an archive list.')
             return
 
         # TODO: also find dehacked files in ZIP as fallback
-        file = archive.file_find_basename('dehacked')
+        file = archive_list.file_find_basename('dehacked', False)
         if file is None:
             return
 

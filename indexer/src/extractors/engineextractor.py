@@ -1,7 +1,7 @@
 import json
 from typing import Dict, Set, List
 
-from archives.archivebase import ArchiveBase
+from archives.archivelist import ArchiveList
 from doom.map.map import Map
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
@@ -75,8 +75,8 @@ class EngineExtractor(ExtractorBase):
                 self.logger.decision('Detected engine "{}" from map data.'.format(engine.name))
 
         # Detect from lump names.
-        if engine == Engine.UNKNOWN and info.main_archive is not None:
-            engine = self.detect_from_lumps(info.archive)
+        if engine == Engine.UNKNOWN and info.archive_list is not None:
+            engine = self.detect_from_lumps(info.archive_list)
             if engine != Game.UNKNOWN:
                 self.logger.decision('Detected engine "{}" from lump names.'.format(engine.name))
 
@@ -92,12 +92,12 @@ class EngineExtractor(ExtractorBase):
 
         info.engine = engine
 
-    def detect_from_lumps(self, archive: ArchiveBase) -> Engine:
+    def detect_from_lumps(self, archive_list: ArchiveList) -> Engine:
         scores: Dict[Engine, float] = {}
         for engine, lump_set in self.engine_lumps.items():
 
             for lump_name in lump_set:
-                if archive.file_find_basename(lump_name) is not None:
+                if archive_list.file_find_basename(lump_name, False) is not None:
                     if engine not in scores:
                         scores[engine] = 1
                     else:

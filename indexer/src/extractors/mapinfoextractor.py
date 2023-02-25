@@ -1,8 +1,8 @@
 import os
 from typing import Optional, List
 
-from archives.archivebase import ArchiveBase
 from archives.archivefilebase import ArchiveFileBase
+from archives.archivelist import ArchiveList
 from doom.strings_builtin import STRINGS_BUILTIN
 from doom.map.map import Map
 from doom.mapinfo.mapinfo_parser_base import MapInfoParserBase, MapInfoParserError, MapInfoMap
@@ -30,14 +30,14 @@ class MapInfoExtractor(ExtractorBase):
         if not len(info.maps):
             return
 
-        archive: ArchiveBase = info.archive
-        if archive is None:
-            self.logger.debug('Cannot extract map info without an archive.')
+        archive_list: ArchiveList = info.archive_list
+        if archive_list is None:
+            self.logger.debug('Cannot extract map info without an archive list.')
             return
 
         mapinfo_files: List[ArchiveFileBase] = []
         for filename in FILE_ORDER:
-            files = archive.file_find_all_basename(filename)
+            files = archive_list.file_find_all_basename(filename, False)
             mapinfo_files.extend(files)
         mapinfo_files.reverse()
 

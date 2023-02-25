@@ -2,7 +2,7 @@ from io import BytesIO
 from pathlib import Path
 from statistics import fmean
 
-from archives.archivebase import ArchiveBase
+from archives.archivelist import ArchiveList
 from archives.wadarchive import WADArchive
 from doom.map.binary_map_reader import BinaryMapReader
 from doom.map.blockmap_generator import BlockmapGenerator
@@ -18,9 +18,9 @@ from indexer.game import Game
 class MapExtractor(ExtractorBase):
 
     def extract(self, info: ExtractedInfo):
-        archive: ArchiveBase = info.archive
-        if archive is None:
-            self.logger.debug('Cannot extract maps without an archive.')
+        archive_list: ArchiveList = info.archive_list
+        if archive_list is None:
+            self.logger.debug('Cannot extract maps without an archive list.')
             return
 
         if info.game == Game.UNKNOWN:
@@ -30,18 +30,22 @@ class MapExtractor(ExtractorBase):
         map_data_finder = MapDataFinder()
 
         # Load maps directly from the archive.
-        map_data_finder.add_from_archive(archive)
-
-        # Load maps from maps/*.wad files inside the archive (ZDoom maps/ namespace).
         wad_archives = []
-        map_wads = archive.file_find_all_regexp(r'maps/.*\.wad')
-        for wad in map_wads:
-            wad_base_name = Path(wad.name).stem
-            wad_data = BytesIO(wad.get_data())
-            wad_archive = WADArchive(wad.name, wad_data, self.logger)
-            map_data_finder.add_from_archive(wad_archive, wad_base_name)
+        for archive in archive_list.archives:
+            if archive.is_main:
+                continue
 
-            wad_archives.append(wad_archive)
+            map_data_finder.add_from_archive(archive)
+
+            # Load maps from maps/*.wad files inside the archive (ZDoom maps/ namespace).
+            map_wads = archive.file_find_all_regexp(r'maps/.*\.wad')
+            for wad in map_wads:
+                wad_base_name = Path(wad.name).stem
+                wad_data = BytesIO(wad.get_data())
+                wad_archive = WADArchive(wad.name, wad_data, self.logger)
+                map_data_finder.add_from_archive(wad_archive, wad_base_name)
+
+                wad_archives.append(wad_archive)
 
         # Some safeguarding against dumb map bomb entries.
         if len(map_data_finder.map_data) > 500:

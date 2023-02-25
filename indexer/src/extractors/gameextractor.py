@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import Dict
 
-from archives.archivebase import ArchiveBase
+from archives.archivelist import ArchiveList
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
 from indexer.game import Game
@@ -52,8 +52,8 @@ class GameExtractor(ExtractorBase):
                 self.logger.decision('Detected game "{}" from path.'.format(game.name))
 
         # Detect from certain lump names.
-        if game == Game.UNKNOWN and info.archive is not None:
-            game = self.detect_from_archive(info.archive)
+        if game == Game.UNKNOWN and info.archive_list is not None:
+            game = self.detect_from_archive_list(info.archive_list)
             if game != Game.UNKNOWN:
                 self.logger.decision('Detected game "{}" from lump names.'.format(game.name))
 
@@ -97,33 +97,34 @@ class GameExtractor(ExtractorBase):
 
         return Game.UNKNOWN
 
-    def detect_from_archive(self, archive: ArchiveBase) -> Game:
+    def detect_from_archive_list(self, archive_list: ArchiveList) -> Game:
 
         # TODO: is this still necessary or is the lump score method better?
-        if archive.file_find_basename('bossback') or archive.file_find_regexp('VILE') or archive.file_find_regexp('CPOS') or archive.file_find_basename('help'):
+        if archive_list.file_find_basename('bossback', False) or archive_list.file_find_regexp('VILE', False) or archive_list.file_find_regexp('CPOS', False) or archive_list.file_find_basename('help', False):
             return Game.DOOM2
 
-        elif archive.file_find_basename('rsky1') or archive.file_find_basename('rsky2') or archive.file_find_basename('rsky3') or archive.file_find_basename('rsky4'):
+        elif archive_list.file_find_basename('rsky1', False) or archive_list.file_find_basename('rsky2', False) or archive_list.file_find_basename('rsky3', False) or archive_list.file_find_basename('rsky4', False):
             return Game.DOOM2
 
-        elif archive.file_find_basename('m_doom') or archive.file_find_regexp('^CWILV.*'):
+        elif archive_list.file_find_basename('m_doom', False) or archive_list.file_find_regexp('^CWILV.*', False):
             return Game.DOOM2
 
-        elif archive.file_find_basename('m_htic') or archive.file_find_basename('title'):
+        elif archive_list.file_find_basename('m_htic', False) or archive_list.file_find_basename('title', False):
             return Game.HERETIC
 
-        elif archive.file_find_basename('help1') and not archive.file_find_basename('help2') or archive.file_find_regexp('^WILV.*'):
+        elif archive_list.file_find_basename('help1', False) and not archive_list.file_find_basename('help2', False) or archive_list.file_find_regexp('^WILV.*', False):
             return Game.DOOM
 
         # Attempt detection through lump scores.
         scores = {}
-        for file in archive.files:
-            if file.name in self.lump_scores:
-                for game, score in self.lump_scores[file.name].items():
-                    if game in scores:
-                        scores[game] += score
-                    else:
-                        scores[game] = score
+        for archive in archive_list.archives:
+            for file in archive.files:
+                if file.name in self.lump_scores:
+                    for game, score in self.lump_scores[file.name].items():
+                        if game in scores:
+                            scores[game] += score
+                        else:
+                            scores[game] = score
 
         if len(scores):
             game = max(scores.keys(), key=(lambda k: scores[k]))

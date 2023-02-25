@@ -23,6 +23,19 @@ class ArchiveList:
 
         return None
 
+    def file_find_all_basename(self, file_basename: str, include_main: bool = True) -> List[ArchiveFileBase]:
+        files: List[ArchiveFileBase] = []
+
+        for archive in reversed(self.archives):
+            if not include_main and archive.is_main:
+                continue
+
+            file = archive.file_find_basename(file_basename)
+            if file is not None:
+                files.append(file)
+
+        return files
+
     def file_find_regexp(self, regexp: str, include_main: bool = True) -> Optional[ArchiveFileBase]:
         for archive in reversed(self.archives):
             if not include_main and archive.is_main:

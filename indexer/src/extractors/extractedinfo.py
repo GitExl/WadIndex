@@ -65,7 +65,7 @@ class ExtractedInfo:
     file_modified: int
 
     main_archive: Optional[ZipFile] = None
-    archive: Optional[ArchiveBase] = None
+    archives: List[ArchiveBase] = field(default_factory=lambda: [])
     archive_list: Optional[ArchiveList] = None
 
     text_keys: Dict[str, any] = field(default_factory=lambda: {})

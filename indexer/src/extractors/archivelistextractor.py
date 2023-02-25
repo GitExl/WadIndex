@@ -28,8 +28,8 @@ class ArchiveListExtractor(ExtractorBase):
         self._add_iwad(Game.HACX, 'HACX.WAD')
 
     def extract(self, info: ExtractedInfo):
-        if info.archive is None:
-            self.logger.warn('Cannot create archive list without main archive.')
+        if not len(info.archives):
+            self.logger.warn('Cannot create archive list without main archives.')
             return
 
         if info.game not in self.iwads:
@@ -42,7 +42,8 @@ class ArchiveListExtractor(ExtractorBase):
 
         info.archive_list = ArchiveList()
         info.archive_list.append(iwad)
-        info.archive_list.append(info.archive)
+        for archive in info.archives:
+            info.archive_list.append(archive)
 
     def cleanup(self, info: ExtractedInfo):
         if info.archive_list is None:
