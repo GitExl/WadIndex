@@ -12,7 +12,7 @@ class AuthorRepository {
       $this->connection = $connection;
   }
 
-  public function get(string $path_alias): ?array {
+  public function get(string $alias): ?array {
     $stmt = $this->connection->prepare('
       SELECT
         a.id AS `id`,
@@ -22,11 +22,11 @@ class AuthorRepository {
       FROM
         authors a
       WHERE
-        path_alias = :path_alias
+        alias = :alias
       LIMIT 1
     ');
     $author = $stmt->executeQuery([
-      'path_alias' => $path_alias,
+      'alias' => $alias,
     ])->fetchAssociative();
 
     if (empty($author)) {
@@ -43,7 +43,7 @@ class AuthorRepository {
         a.name AS `name`,
         a.full_name AS `full_name`,
         a.nickname AS `nickname`,
-        a.path_alias AS `path_alias`
+        a.alias AS `alias`
       FROM
         entry_authors ea
       INNER JOIN authors a ON a.id = ea.author_id AND
@@ -67,7 +67,7 @@ class AuthorRepository {
         a.name AS `name`,
         a.full_name AS `full_name`,
         a.nickname AS `nickname`,
-        a.path_alias AS `path_alias`
+        a.alias AS `alias`
       FROM
         map_authors ma
       INNER JOIN authors a ON a.id = ma.author_id AND

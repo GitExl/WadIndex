@@ -29,10 +29,10 @@ class Authors extends AbstractController {
         $this->images = $images;
     }
 
-    #[Route('/author/{path_alias}', methods: ['GET'])]
+    #[Route('/author/{alias}', methods: ['GET'])]
     #[Cache(public: true, maxage: 3600, mustRevalidate: true)]
-    public function get(string $path_alias): Response {
-        $author = $this->authors->get($path_alias);
+    public function get(string $alias): Response {
+        $author = $this->authors->get($alias);
         if (!$author) {
             throw new NotFoundHttpException();
         }
@@ -48,7 +48,7 @@ class Authors extends AbstractController {
     private function addEntryTeaserData(array &$entries) {
         foreach ($entries as &$entry) {
             $entry['authors'] = $this->authors->getForEntry($entry['id']);
-            $entry['image'] = $this->images->getPrimaryForEntry($entry['id'], $entry['path']);
+            $entry['image'] = $this->images->getPrimaryForEntry($entry['id'], $entry['alias']);
             unset($entry['id']);
         }
         unset($entry);
