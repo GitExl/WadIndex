@@ -11,12 +11,16 @@ services:
     volumes:
       - ./api/:/var/www/html/api:ro
       - ./app/dist:/var/www/html/app:ro
+      - ./storage/graphics:/var/www/html/storage/graphics:ro
+      - ./storage/music:/var/www/html/storage/music:ro
+      - ./storage/map_previews:/var/www/html/storage/map_previews:ro
     depends_on:
       - php
       - app
     extra_hosts:
       api.idgames.local: 127.0.0.1
       app.idgames.local: 127.0.0.1
+      storage.idgames.local: 127.0.0.1
 
   php:
     build: ./php
