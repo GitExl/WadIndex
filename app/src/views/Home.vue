@@ -1,63 +1,42 @@
 <script setup lang="ts">
-import Player from '../components/Player.vue'
+import API from '@/api/API';
+import EntryList from '@/components/EntryList.vue';
+import type { EntryTeaser } from '@/data/EntryTeaser';
+import { onMounted, ref, type Ref } from 'vue';
 import EntrySearch from '../components/EntrySearch.vue'
-import TrackInfo from '../components/TrackInfo.vue'
-import { ref } from 'vue';
 
+const latest: Ref<EntryTeaser[]> = ref([])
+
+onMounted(async () => {
+  latest.value = await API.entries.getLatest();
+})
 </script>
 
 <template>
   <div class="home">
-    <div class="home__top">
-      <div class="home__left">
-        <EntrySearch />
-      </div>
-      <div class="home__right">
-        <!-- <PlayList /> -->
-        <!-- <Entry /> -->
-      </div>
+    <div class="home__header">
+      <img src="@/assets/images/logo.svg">
+      <EntrySearch />
+      <router-link to="/search">Advanced search</router-link>
     </div>
-    <div class="home__bottom">
-      <TrackInfo title="Hangar 7" author="Jimmy"></TrackInfo>
-      <Player url="/midi/hangar7.mid"></Player>
-    </div>
+
+    <h1>Latest entries</h1>
+    <EntryList :entries="latest" />
   </div>
 </template>
 
 <style lang="scss">
-.home {
+.home__header {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 100%;
-}
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5rem;
+  height: 30rem;
 
-.home__top {
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  height: 80%;
-}
-
-.home__left {
-  display: flex;
-  flex-direction: column;
-  width: 30%;
-  height: 100%;
-}
-
-.home__right {
-  width: 70%;
-  height: 100%;
-  background-color: #111;
-}
-
-.home__bottom {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  background-color: #222;
-  padding: 1rem;
-  height: 7rem;
+  img {
+    max-width: 28rem;
+    margin-bottom: 3.25rem;
+  }
 }
 </style>

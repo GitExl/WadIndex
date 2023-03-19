@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import type { Entry } from "@/data/Entry";
+import type { EntryTeaser } from "@/data/EntryTeaser";
 import { ref, type Ref } from "vue";
-import EntryList from "./EntryList.vue";
 
 let searchTimer: number = 0
 
 const searchTerms: Ref<string> = ref('')
 const searching: Ref<boolean> = ref(false)
-const results: Ref<Entry[]> = ref([])
+const results: Ref<EntryTeaser[]> = ref([])
 
 async function search() {
   if (!searchTerms) {
@@ -46,34 +45,23 @@ function keyDown(event: Event) {
 
 <template>
   <div class="entry-search">
-    <input type="search" placeholder="Search" @keydown="keyDown" @input="input" />
-
-    <p v-if="searching" class="entry-search__status">Searching...</p>
-    <EntryList v-else-if="results.length && searchTerms" :entries="results" />
-    <p v-else-if="searchTerms" class="entry-search__status">No results found.</p>
+    <input type="search" placeholder="Search all entries" @keydown="keyDown" @input="input" />
   </div>
 </template>
 
 <style lang="scss">
+@import '@/assets/scss/base.scss';
+
 .entry-search {
   width: 100%;
-  height: 100%;
+  max-width: 26rem;
   display: flex;
   flex-direction: column;
 
   input {
-    padding: 0.5rem;
     margin: 1rem;
     width: calc(100% - 2rem);
-    border: none;
-    background-color: #333;
-    color: #fff;
     margin-bottom: 1rem;
   }
-}
-
-.entry-search__status {
-  text-align: center;
-  margin: 0;
 }
 </style>

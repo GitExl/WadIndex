@@ -1,0 +1,12 @@
+@mixin rect {
+  border: 3px solid transparent;
+
+  &:active,
+  &:hover {
+    border-color: $color-primary;
+  }
+
+  &:hover {
+    background: linear-gradient(180deg, rgba($color-primary, 0.33) 0%, rgba($color-primary, 0.16) 100%);
+  }
+}

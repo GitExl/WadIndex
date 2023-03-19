@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import type { Entry } from '@/data/Entry';
+import type { EntryTeaserData } from '@/data/EntryTeaser';
+import EntryTeaser from './EntryTeaser.vue';
 
 const props = defineProps<{
-  entries: Entry[],
+  entries: EntryTeaserData[],
 }>()
 
 const emit = defineEmits<{
-  (e: 'select', entry: Entry): void
+  (e: 'select', entry: EntryTeaserData): void
 }>()
 
-function selectEntry(entry: Entry) {
+function selectEntry(entry: EntryTeaserData) {
   emit('select', entry)
 }
 </script>
@@ -17,11 +18,7 @@ function selectEntry(entry: Entry) {
 <template>
   <div class="entry-list">
     <ul>
-      <li v-for="entry in entries" :key="entry.id" @click="selectEntry(entry)">
-        <h3>{{ entry.title }}</h3>
-        <p v-if="entry.authors.length" class="entry__authors">By {{ entry.authors?.join(', ') }}</p>
-        <p v-if="entry.description" class="entry__description">{{ entry.description.slice(0, 200) + (200 < entry.description.length ? '&hellip;' : '') }}</p>
-      </li>
+      <EntryTeaser v-for="entry in entries" :key="entry.collection + entry.path" :entry="entry" @click="selectEntry(entry)" />
     </ul>
   </div>
 </template>
@@ -35,32 +32,6 @@ function selectEntry(entry: Entry) {
   ul {
     padding: 0;
     list-style: none;
-  }
-
-  li {
-    padding: 0.5rem;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #124;
-    }
-  }
-
-  h3 {
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 0.125rem;
-  }
-
-  .entry__authors {
-    margin: 0;
-    font-size: 0.85rem;
-    font-style: italic;
-  }
-
-  .entry__description {
-    margin: 0;
-    font-size: 0.85rem;
   }
 }
 </style>
