@@ -24,13 +24,14 @@ function selectEntry(entry: EntryTeaserData) {
 </template>
 
 <style lang="scss">
+@import '@/assets/scss/base.scss';
+
 .entry-list {
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
+  margin-bottom: 1.5rem;
 
   ul {
     padding: 0;
+    margin: 0;
     list-style: none;
   }
 }

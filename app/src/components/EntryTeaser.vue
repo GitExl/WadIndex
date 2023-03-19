@@ -71,13 +71,13 @@ const authors = computed(() => {
     font-size: 1.25rem;
     font-family: 'DejaVu Sans Condensed', sans-serif;
     font-weight: normal;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0;
   }
 
   &__subtitle {
     font-size: 1rem;
     font-weight: 300;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
   }
 
   &__description {

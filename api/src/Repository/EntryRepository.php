@@ -65,7 +65,7 @@ class EntryRepository {
       $this->connection = $connection;
   }
 
-  public function getLatestTeasers(int $count=10): array {
+  public function getLatestTeasers(int $count=20): array {
     $stmt = $this->connection->prepare("
       SELECT
         " . self::FIELDS_TEASER . "
