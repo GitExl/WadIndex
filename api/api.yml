@@ -228,7 +228,7 @@ components:
         nickname:
           type: string
           nullable: true
-        path_alias:
+        alias:
           type: string
 
     Directory:
@@ -264,7 +264,7 @@ components:
             $ref: '#/components/schemas/EntryTeaser'
 
 paths:
-  /latest:
+  /entries/latest:
     get:
       description: Returns the latest entries.
       responses:

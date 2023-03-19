@@ -48,7 +48,7 @@ class EntryRepository {
     e.title AS `title`,
     e.file_modified AS `timestamp`,
     e.game AS `game`,
-    e.description_preview AS `description`,
+    e.description AS `description`,
     (SELECT COUNT(*) FROM maps WHERE entry_id = e.id) AS `map_count`
   ';
 
