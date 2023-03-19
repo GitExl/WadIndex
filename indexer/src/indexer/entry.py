@@ -56,7 +56,6 @@ class Entry:
             'is_cooperative': self.is_cooperative,
             'is_deathmatch': self.is_deathmatch,
             'description': self.description,
-            'description_preview': self.description[:199] if self.description is not None else None,
             'tools_used': self.tools_used,
             'known_bugs': self.known_bugs,
             'credits': self.credits,
