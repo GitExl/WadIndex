@@ -1,5 +1,5 @@
 import { parseImage } from '@/data/IndexImage';
-import type { EntryTeaserData } from '@/data/EntryTeaser';
+import { parseEntryTeaser, type EntryTeaserData } from '@/data/EntryTeaser';
 import APIBase from "./APIBase";
 
 export default class EntriesAPI extends APIBase {
@@ -13,17 +13,22 @@ export default class EntriesAPI extends APIBase {
 
     let entries: EntryTeaserData[] = [];
     for (let item of Object.values(data)) {
-      entries.push({
-        authors: item.authors,
-        collection: String(item.collection),
-        levelCount: Number.parseInt(item.level_count, 10),
-        path: String(item.path),
-        timestamp: Number.parseInt(item.timestamp, 10),
-        title: String(item.title),
-        description: String(item.description),
-        game: String(item.game),
-        image: parseImage(item.image),
-      });
+      entries.push(parseEntryTeaser(item));
+    }
+
+    return entries;
+  }
+
+  public async getUpdated(): Promise<EntryTeaserData[]> {
+    const response = await fetch(import.meta.env.VITE_API_BASE_URL + '/entries/updated');
+    if (!response) {
+      throw new Error();
+    }
+    const data: Record<string, any> = await response.json();
+
+    let entries: EntryTeaserData[] = [];
+    for (let item of Object.values(data)) {
+      entries.push(parseEntryTeaser(item));
     }
 
     return entries;

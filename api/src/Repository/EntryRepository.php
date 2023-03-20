@@ -47,7 +47,9 @@ class EntryRepository {
     e.collection AS `collection`,
     e.title AS `title`,
     e.file_modified AS `timestamp`,
-    e.game AS `game`,
+    e.is_singleplayer AS `is_singleplayer`,
+    e.is_cooperative AS `is_cooperative`,
+    e.is_deathmatch AS `is_deathmatch`,
     e.description AS `description`,
     (SELECT COUNT(*) FROM maps WHERE entry_id = e.id) AS `map_count`
   ';
@@ -65,7 +67,20 @@ class EntryRepository {
       $this->connection = $connection;
   }
 
-  public function getLatestTeasers(int $count=20): array {
+  public function getLatestTeasers(int $count=15): array {
+    $stmt = $this->connection->prepare("
+      SELECT
+        " . self::FIELDS_TEASER . "
+      FROM entry e
+      ORDER BY e.entry_created DESC, e.file_modified DESC
+      LIMIT $count
+    ");
+    $entries = $stmt->executeQuery()->fetchAllAssociative();
+
+    return $entries;
+  }
+
+  public function getUpdatedTeasers(int $count=15): array {
     $stmt = $this->connection->prepare("
       SELECT
         " . self::FIELDS_TEASER . "
@@ -74,11 +89,6 @@ class EntryRepository {
       LIMIT $count
     ");
     $entries = $stmt->executeQuery()->fetchAllAssociative();
-
-    foreach ($entries as &$entry) {
-      $entry['game'] = self::GAME_KEY[$entry['game']];
-    }
-    unset($entry);
 
     return $entries;
   }
@@ -196,10 +206,6 @@ class EntryRepository {
       'directory_id' => $directory_id,
     ])->fetchFirstColumn()[0];
 
-    foreach ($entries as &$entry) {
-      $entry['game'] = self::GAME_KEY[$entry['game']];
-    }
-    unset($entry);
 
     // Get subdirectories.
     if ($directory_id) {

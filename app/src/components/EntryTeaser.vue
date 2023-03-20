@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { EntryTeaserData } from '@/data/EntryTeaser';
+import Tag from '@/components/Tag.vue';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -15,12 +16,14 @@ const thumbnailUrl = computed(() => {
 });
 
 const description = computed(() => {
+  const maxLength = props.entry.image ? 200 : 350
+
   if (props.entry.description) {
-    if (props.entry.description.length < 350) {
+    if (props.entry.description.length < maxLength) {
       return props.entry.description;
     }
 
-    return props.entry.description.slice(0, 350) + '…';
+    return props.entry.description.slice(0, maxLength) + '…';
   }
 
   return undefined;
@@ -42,15 +45,19 @@ const authors = computed(() => {
   <div class="entry-teaser">
     <div class="entry-teaser__info">
       <h2>{{ entry.title }}</h2>
-      <p v-if="entry.authors.length" class="entry-teaser__subtitle">By {{ authors }}</p>
+      <p class="entry-teaser__subtitle">
+        <span v-if="entry.authors.length" class="entry-teaser__authors">By {{ authors }}</span>
+        <Tag v-if="entry.isSingleplayer">SP</Tag>
+        <Tag v-if="entry.isCooperative">COOP</Tag>
+        <Tag v-if="entry.isDeathmatch">DM</Tag>
+      </p>
       <p v-if="entry.description" class="entry-teaser__description">{{ description }}</p>
     </div>
     <div class="entry-teaser__tags">
 
     </div>
-    <div class="entry-teaser__image">
-      <img v-if="thumbnailUrl" :src="thumbnailUrl" loading="lazy">
-      <div v-else class="entry-teaser__placeholder"></div>
+    <div v-if="thumbnailUrl" class="entry-teaser__image">
+      <img :src="thumbnailUrl" loading="lazy">
     </div>
   </div>
 </template>
@@ -75,9 +82,13 @@ const authors = computed(() => {
   }
 
   &__subtitle {
-    font-size: 1rem;
-    font-weight: 300;
     margin-bottom: 0.5rem;
+  }
+
+  &__authors {
+    font-size: 1rem;
+    margin-right: 0.5rem;
+    font-weight: 300;
   }
 
   &__description {
@@ -98,11 +109,6 @@ const authors = computed(() => {
       image-rendering: pixelated;
       display: block;
     }
-  }
-
-  &__placeholder {
-    width: 13rem;
-    // height: 9.75rem;
   }
 }
 </style>

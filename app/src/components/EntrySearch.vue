@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { EntryTeaser } from "@/data/EntryTeaser";
+import type { EntryTeaserData } from "@/data/EntryTeaser";
 import { ref, type Ref } from "vue";
 
 let searchTimer: number = 0
 
 const searchTerms: Ref<string> = ref('')
 const searching: Ref<boolean> = ref(false)
-const results: Ref<EntryTeaser[]> = ref([])
+const results: Ref<EntryTeaserData[]> = ref([])
 
 async function search() {
   if (!searchTerms) {

@@ -1,27 +1,47 @@
 <script setup lang="ts">
 import API from '@/api/API';
 import EntryList from '@/components/EntryList.vue';
-import type { EntryTeaser } from '@/data/EntryTeaser';
+import Layout from '@/components/Layout.vue';
+import type { EntryTeaserData } from '@/data/EntryTeaser';
 import { onMounted, ref, type Ref } from 'vue';
 import EntrySearch from '../components/EntrySearch.vue'
 
-const latest: Ref<EntryTeaser[]> = ref([])
+const latest: Ref<EntryTeaserData[]> = ref([])
+const updated: Ref<EntryTeaserData[]> = ref([])
 
 onMounted(async () => {
-  latest.value = await API.entries.getLatest();
+  const results = await Promise.all([
+    API.entries.getLatest(),
+    API.entries.getUpdated(),
+  ]);
+
+  latest.value = results[0];
+  updated.value = results[1];
 })
 </script>
 
 <template>
   <div class="home">
-    <div class="home__header">
-      <img src="@/assets/images/logo.svg">
-      <EntrySearch />
-      <router-link to="/search">Advanced search</router-link>
-    </div>
+    <Layout type="one-column">
+      <div class="home__header">
+        <img src="@/assets/images/logo.svg">
+        <EntrySearch />
+        <router-link to="/search">Advanced search</router-link>
+      </div>
+    </Layout>
 
-    <h1>Latest entries</h1>
-    <EntryList :entries="latest" />
+    <Layout type="two-column">
+      <div>
+        <h1>New entries</h1>
+        <EntryList :entries="latest" />
+      </div>
+
+      <div>
+        <h1>Recently updated</h1>
+        <EntryList :entries="updated" />
+      </div>
+    </Layout>
+
   </div>
 </template>
 
@@ -31,7 +51,6 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 5rem;
   height: 30rem;
 
   img {

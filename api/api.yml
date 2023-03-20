@@ -277,6 +277,19 @@ paths:
                 items:
                   $ref: '#/components/schemas/EntryTeaser'
 
+  /entries/updated:
+    get:
+      description: Returns recently updated entries.
+      responses:
+        '200':
+          description: A list of recently updated entry teasers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EntryTeaser'
+
   /images/random:
     get:
       description: Returns a small amount of random images.

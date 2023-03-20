@@ -83,6 +83,14 @@ class Entries extends AbstractController {
         return $this->json($entries);
     }
 
+    #[Route('/entries/updated', methods: ['GET'])]
+    #[Cache(public: true, maxage: 3600, mustRevalidate: true)]
+    public function updated(): Response {
+        $entries = $this->entries->getUpdatedTeasers();
+        $this->addEntryTeaserData($entries);
+        return $this->json($entries);
+    }
+
     #[Route('/list/{collection}/{path}', methods: ['GET'], requirements: ['path' => '.+'])]
     #[Cache(public: true, maxage: 3600, mustRevalidate: true)]
     public function list(Request $request, string $collection, ?string $path=NULL): Response {

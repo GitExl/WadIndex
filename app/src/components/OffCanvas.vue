@@ -8,9 +8,7 @@
     </div>
 
     <div class="off-canvas__on">
-      <div class="off-canvas__content">
-        <slot name="on"></slot>
-      </div>
+      <slot name="on"></slot>
     </div>
   </div>
 </template>
@@ -33,10 +31,5 @@
 
 .off-canvas__on {
   flex-grow: 1;
-}
-
-.off-canvas__content {
-  max-width: 60rem;
-  margin: 0 auto;
 }
 </style>

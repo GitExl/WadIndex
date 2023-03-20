@@ -1,3 +1,4 @@
+import time
 from typing import Dict, Optional, List
 
 from doom.map.map import Map
@@ -9,12 +10,13 @@ from utils.author_parser import Author
 
 class Entry:
 
-    def __init__(self, collection: str, path: str, file_modified: int, file_size: int, entry_updated: int):
+    def __init__(self, collection: str, path: str, file_modified: int, file_size: int, entry_updated: int, entry_created: int):
         self.collection: str = collection
         self.path: str = path
         self.file_modified: int = file_modified
         self.file_size: int = file_size
         self.entry_updated: int = entry_updated
+        self.entry_created: int = entry_created
 
         self.id: Optional[int] = None
         self.directory_id: Optional[int] = None
@@ -48,6 +50,7 @@ class Entry:
             'directory_id': self.directory_id,
             'file_modified': self.file_modified,
             'entry_updated': self.entry_updated,
+            'entry_created': self.entry_created,
             'file_size': self.file_size,
             'title': self.title,
             'game': self.game.value if self.game is not None else None,
@@ -70,7 +73,8 @@ class Entry:
             row['path'],
             row['file_modified'],
             row['file_size'],
-            row['entry_updated']
+            row['entry_updated'],
+            row['entry_created']
         )
 
         entry.id = row['id']

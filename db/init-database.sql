@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `entry` (
   `directory_id` int(10) unsigned DEFAULT NULL,
   `file_modified` int(10) unsigned NOT NULL,
   `file_size` int(10) unsigned NOT NULL,
+  `entry_created` int(10) unsigned NOT NULL,
   `entry_updated` int(10) unsigned NOT NULL,
   `title` varchar(255) DEFAULT NULL,
   `game` tinyint(4) NOT NULL DEFAULT 0,
@@ -77,8 +78,10 @@ CREATE TABLE IF NOT EXISTS `entry` (
   `build_time` text DEFAULT NULL,
   `comments` text DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `entries_updated_IDX` (`entry_updated`) USING BTREE,
-  KEY `entries_game_IDX` (`game`) USING BTREE,
+  KEY `entry_entry_created_IDX` (`entry_created`) USING BTREE,
+  KEY `entry_entry_updated_IDX` (`entry_updated`) USING BTREE,
+  KEY `entry_file_modified_IDX` (`file_modified`) USING BTREE,
+  KEY `entry_game_IDX` (`game`) USING BTREE,
   KEY `entry_engine_IDX` (`engine`) USING BTREE,
   KEY `entry_is_singleplayer_IDX` (`is_singleplayer`) USING BTREE,
   KEY `entry_is_cooperative_IDX` (`is_cooperative`) USING BTREE,
@@ -222,4 +225,4 @@ CREATE TABLE IF NOT EXISTS `music` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-26 13:42:35
+-- Dump completed on 2023-03-20 18:13:52

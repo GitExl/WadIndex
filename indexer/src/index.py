@@ -9,6 +9,7 @@ from optparse import OptionParser, OptionGroup
 from indexer.entry import Entry
 from indexer.indexer import Indexer
 from indexer.storage import Storage
+from utils.author_parser import Author
 from utils.config import Config
 from indexer.ignorelist import must_ignore
 from utils.logger import Logger
@@ -37,7 +38,8 @@ def index_process(verbosity: int, stream_queue: Queue, task_queue: Queue, db_loc
                 info.path_idgames.as_posix(),
                 info.file_modified,
                 info.file_size,
-                start_time
+                start_time,
+                start_time,
             )
         else:
             entry.entry_updated = start_time
@@ -60,7 +62,7 @@ def index_process(verbosity: int, stream_queue: Queue, task_queue: Queue, db_loc
         entry.music = info.music
 
         # Combine authors from the main entry and every map.
-        author_set: Set[str] = set(info.authors)
+        author_set: Set[Author] = set(info.authors)
         for map in entry.maps:
             author_set.update(map.authors)
         entry.authors = author_set

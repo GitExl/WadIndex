@@ -27,7 +27,7 @@ function selectEntry(entry: EntryTeaserData) {
 @import '@/assets/scss/base.scss';
 
 .entry-list {
-  margin-bottom: 1.5rem;
+  margin-bottom: 3rem;
 
   ul {
     padding: 0;
