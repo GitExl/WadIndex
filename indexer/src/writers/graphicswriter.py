@@ -28,4 +28,4 @@ class GraphicsWriter(WriterBase):
                 graphic.image.save(path_file, method=6, lossless=True)
 
             path_file_thumb = path_dir / '{}_{}_thumb.webp'.format(info.filename_base, key)
-            graphic.image_thumb.save(path_file_thumb, method=6, quality=85)
+            graphic.image_thumb.save(path_file_thumb, method=6, quality=75)

@@ -21,7 +21,7 @@ class MusicRepository {
         m.type AS `type`
       FROM
         entry_music em
-      LEFT JOIN music m ON m.id = em.music_id
+      INNER JOIN music m ON m.id = em.music_id
       WHERE
         em.entry_id = :entry_id
     ');
@@ -31,7 +31,7 @@ class MusicRepository {
     ])->fetchAllAssociative();
 
     if (empty($musics)) {
-      return NULL;
+      return [];
     }
 
     foreach ($musics as &$music) {

@@ -33,7 +33,6 @@ import OffCanvas from './components/OffCanvas.vue';
       </template>
 
       <template v-slot:on>
-        <Header></Header>
         <router-view></router-view>
 
         <!-- <div class="home__bottom">

@@ -1,4 +1,4 @@
-import { parseImage } from '@/data/IndexImage';
+import { parseEntry, type EntryData } from './../data/Entry';
 import { parseEntryTeaser, type EntryTeaserData } from '@/data/EntryTeaser';
 import APIBase from "./APIBase";
 
@@ -32,6 +32,16 @@ export default class EntriesAPI extends APIBase {
     }
 
     return entries;
+  }
+
+  public async get(collection: string, path: string): Promise<EntryData> {
+    const response = await fetch(import.meta.env.VITE_API_BASE_URL + '/entries/' + collection + '/' + path);
+    if (!response) {
+      throw new Error();
+    }
+    const data: Record<string, any> = await response.json();
+
+    return parseEntry(data);
   }
 
 }

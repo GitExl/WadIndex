@@ -36,8 +36,8 @@ GRAPHIC_LUMP_NAMES_PRIMARY: List[str] = [
     'interpic',
 ]
 
-THUMB_WIDTH = 280
-THUMB_HEIGHT = 210
+THUMB_WIDTH = 320
+THUMB_HEIGHT = 240
 
 
 class GraphicsExtractor(ExtractorBase):

@@ -56,7 +56,7 @@ class ImageRepository {
     ])->fetchAllAssociative();
 
     if (empty($images)) {
-      return NULL;
+      return [];
     }
 
     foreach ($images as &$image) {

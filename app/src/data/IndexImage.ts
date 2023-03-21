@@ -12,9 +12,9 @@ export function parseImage(data?: any): IndexImage|undefined {
   }
 
   return {
-    name: String(data.name),
-    href: String(data.href),
-    hrefThumbnail: String(data.href_thumbnail),
+    name: data.name,
+    href: data.href,
+    hrefThumbnail: data.href_thumbnail,
     width: Number.parseInt(data.width, 10),
     height: Number.parseInt(data.height, 10),
   };

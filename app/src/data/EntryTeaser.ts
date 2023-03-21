@@ -1,5 +1,5 @@
 import { parseImage } from '@/data/IndexImage';
-import type { Author } from "./Author"
+import { parseAuthor, type Author } from "./Author"
 import type { IndexImage } from "./IndexImage"
 
 export interface EntryTeaserData {
@@ -18,13 +18,13 @@ export interface EntryTeaserData {
 
 export function parseEntryTeaser(data: any): EntryTeaserData {
   return {
-    authors: data.authors,
-    collection: String(data.collection),
+    authors: data.authors.map(parseAuthor),
+    collection: data.collection,
     levelCount: Number.parseInt(data.level_count, 10),
-    path: String(data.path),
+    path: data.path,
     timestamp: Number.parseInt(data.timestamp, 10),
-    title: String(data.title),
-    description: String(data.description),
+    title: data.title,
+    description: data.description,
     isSingleplayer: Boolean(data.is_singleplayer),
     isCooperative: Boolean(data.is_cooperative),
     isDeathmatch: Boolean(data.is_deathmatch),

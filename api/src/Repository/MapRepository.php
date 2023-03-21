@@ -33,7 +33,7 @@ class MapRepository {
       SELECT
         ' . self::FIELDS_ENTRY_TEASER . '
       FROM entry e
-      LEFT JOIN maps m ON m.entry_id = e.id
+      INNER JOIN maps m ON m.entry_id = e.id
       WHERE
         e.id=:entry_id
       ORDER BY name ASC
@@ -44,7 +44,7 @@ class MapRepository {
     ])->fetchAllAssociative();
 
     if (empty($maps)) {
-      return NULL;
+      return [];
     }
 
     foreach ($maps as &$map) {

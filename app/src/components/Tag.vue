@@ -15,7 +15,7 @@
   display: inline-block;
   background-color: $color-accent;
   color: #000;
-  padding: 0.1rem 0.45rem;
+  padding: 0.1rem 0.65rem;
   border-radius: 0.5rem;
   line-height: 1;
   font-size: 0.75rem;

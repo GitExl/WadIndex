@@ -2,6 +2,8 @@
 import type { EntryTeaserData } from '@/data/EntryTeaser';
 import Tag from '@/components/Tag.vue';
 import { computed } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
+import AuthorList from './AuthorList.vue';
 
 const props = defineProps<{
   entry: EntryTeaserData
@@ -15,7 +17,7 @@ const thumbnailUrl = computed(() => {
   return undefined;
 });
 
-const description = computed(() => {
+const description = computed((): string|undefined => {
   const maxLength = props.entry.image ? 200 : 350
 
   if (props.entry.description) {
@@ -29,33 +31,26 @@ const description = computed(() => {
   return undefined;
 });
 
-const authors = computed(() => {
-  const listed = props.entry.authors.slice(0, 5).map((item) => {
-    return item.fullName ?? item.name;
-  });
-  if (props.entry.authors.length > 5) {
-    return listed.join(', ') + ' and others';
-  }
-
-  return listed.join(', ');
-});
+const entryLocation = computed((): RouteLocationRaw => {
+  return {
+    path: 'entries/' + props.entry.collection + '/' + props.entry.path,
+  };
+})
 </script>
 
 <template>
-  <div class="entry-teaser">
+  <div class="entry-teaser" @click="$router.push(entryLocation)">
     <div class="entry-teaser__info">
       <h2>{{ entry.title }}</h2>
       <p class="entry-teaser__subtitle">
-        <span v-if="entry.authors.length" class="entry-teaser__authors">By {{ authors }}</span>
+        <AuthorList class="entry-teaser__authors" :authors="entry.authors" :limit="5"></AuthorList>
         <Tag v-if="entry.isSingleplayer">SP</Tag>
         <Tag v-if="entry.isCooperative">COOP</Tag>
         <Tag v-if="entry.isDeathmatch">DM</Tag>
       </p>
       <p v-if="entry.description" class="entry-teaser__description">{{ description }}</p>
     </div>
-    <div class="entry-teaser__tags">
 
-    </div>
     <div v-if="thumbnailUrl" class="entry-teaser__image">
       <img :src="thumbnailUrl" loading="lazy">
     </div>
@@ -85,19 +80,17 @@ const authors = computed(() => {
     margin-bottom: 0.5rem;
   }
 
-  &__authors {
-    font-size: 1rem;
-    margin-right: 0.5rem;
-    font-weight: 300;
-  }
-
   &__description {
-    font-weight: 300;
     color: rgba($color-text, 0.66);
   }
 
   &__info {
     flex-grow: 1;
+  }
+
+  &__authors {
+    font-size: 1rem;
+    margin-right: 0.5rem;
   }
 
   &__image {
