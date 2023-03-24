@@ -43,6 +43,11 @@ const router = createRouter({
       path: '/entries/:path+',
       name: 'entry',
       component: Entry
+    },
+    {
+      path: '/author/:alias',
+      name: 'author',
+      component: Entry
     }
   ]
 })

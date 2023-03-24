@@ -46,6 +46,12 @@ onMounted(async () => {
 </template>
 
 <style lang="scss">
+.home {
+  h1 {
+    margin: 3rem 1rem 1rem 1rem;
+  }
+}
+
 .home__header {
   display: flex;
   flex-direction: column;

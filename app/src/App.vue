@@ -33,7 +33,9 @@ import OffCanvas from './components/OffCanvas.vue';
       </template>
 
       <template v-slot:on>
-        <router-view></router-view>
+        <Suspense>
+          <router-view></router-view>
+        </Suspense>
 
         <!-- <div class="home__bottom">
           <TrackInfo title="Hangar 7" author="Jimmy"></TrackInfo>

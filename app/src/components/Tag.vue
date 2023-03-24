@@ -1,11 +1,18 @@
-<script setup lang="ts">
-</script>
-
 <template>
-  <span class="tag">
+  <span class="tag" :class="{['tag--' + props.type]: true}">
     <slot></slot>
   </span>
 </template>
+
+<script setup lang="ts">
+interface Props {
+  type?: string,
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  type: 'normal',
+})
+</script>
 
 <style lang="scss">
 @import '@/assets/scss/base.scss';
@@ -22,5 +29,11 @@
   font-weight: 700;
   margin-right: 0.25rem;
   vertical-align: text-top;
+
+  &--large {
+    padding: 0.2rem 0.85rem;
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+  }
 }
 </style>

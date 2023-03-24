@@ -24,12 +24,15 @@ $top: 6rem;
   background-color: rgba($color-primary-dark, 0.66);
   height: 100%;
   backdrop-filter: blur(1rem);
+  position: fixed;
+  left: 0;
+  top: 0;
+  min-width: 12rem;
+  z-index: 100;
 
   ul {
-    position: sticky;
     padding: 0;
     margin: 0;
-    top: $top;
     list-style: none;
   }
 

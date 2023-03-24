@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const thumbnailUrl = computed(() => {
   if (props.entry.image) {
-    return import.meta.env.VITE_STORAGE_BASE_URL + '/' + props.entry.image?.hrefThumbnail;
+    return import.meta.env.VITE_STORAGE_BASE_URL + '/' + props.entry.image.hrefThumbnail;
   }
 
   return undefined;
