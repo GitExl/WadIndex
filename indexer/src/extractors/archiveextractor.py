@@ -25,7 +25,7 @@ class ArchiveExtractor(ExtractorBase):
     ]
 
     def extract(self, info: ExtractedInfo):
-        main_fileinfo_list = None
+        main_fileinfo_list = []
         archives: List[ArchiveBase] = []
 
         try:
@@ -35,7 +35,7 @@ class ArchiveExtractor(ExtractorBase):
 
         except zipfile.BadZipFile:
             main_archive = None
-            self.logger.error('Bad ZIP file.')
+            self.logger.error('{} is a bad ZIP file.'.format(info.path_local))
 
         if len(main_fileinfo_list):
             file_list = ', '.join([f.filename for f in main_fileinfo_list])

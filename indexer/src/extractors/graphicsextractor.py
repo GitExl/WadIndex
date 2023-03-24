@@ -1,3 +1,4 @@
+import hashlib
 from io import BytesIO
 from math import ceil
 from typing import List, Optional
@@ -54,22 +55,35 @@ class GraphicsExtractor(ExtractorBase):
             return
         palette = Palette.from_playpal_data(playpal.get_data())
 
-        for filename in GRAPHIC_LUMP_NAMES:
+        for index, filename in enumerate(GRAPHIC_LUMP_NAMES):
             file = archive_list.file_find_basename(filename, include_main=False)
             if not file:
                 continue
 
             image = self.read_lump_as_image(file, palette)
-            if image:
-                if image.width > image.height:
-                    thumb_width = THUMB_WIDTH
-                    thumb_height = ceil(image.height * (THUMB_WIDTH / image.width))
-                else:
-                    thumb_width = ceil(image.width * (THUMB_HEIGHT / image.height))
-                    thumb_height = THUMB_HEIGHT
+            if not image:
+                continue
 
-                image_thumb = image.resize((thumb_width, thumb_height), Image.BICUBIC)
-                info.graphics[filename] = GraphicInfo(image, image_thumb)
+            # Detect and skip duplicate images. Sometimes CREDIT and HELP are identical, for example.
+            duplicate = False
+            image_hash = hashlib.sha1(image.tobytes()).digest()
+            for other_name, other_graphic in info.graphics.items():
+                if image_hash == other_graphic.image_hash:
+                    duplicate = True
+                    break
+            if duplicate:
+                continue
+
+            # Generate a thumbnail image.
+            if image.width > image.height:
+                thumb_width = THUMB_WIDTH
+                thumb_height = ceil(image.height * (THUMB_WIDTH / image.width))
+            else:
+                thumb_width = ceil(image.width * (THUMB_HEIGHT / image.height))
+                thumb_height = THUMB_HEIGHT
+            image_thumb = image.resize((thumb_width, thumb_height), Image.BICUBIC)
+
+            info.graphics[filename] = GraphicInfo(image, image_thumb, image_hash, index)
 
         # Determine primary graphic.
         for name in GRAPHIC_LUMP_NAMES_PRIMARY:

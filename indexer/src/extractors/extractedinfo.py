@@ -51,6 +51,8 @@ class MusicInfo:
 class GraphicInfo:
     image: Image
     image_thumb: Image
+    image_hash: bytes
+    index: int
     is_primary: bool = False
 
 
