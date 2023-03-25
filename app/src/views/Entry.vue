@@ -10,7 +10,8 @@
     </div>
 
     <Layout v-if="entry" type="one-column">
-      <div class="entry__header">
+
+      <div class="entry__section">
         <h1>{{ entry.title }}</h1>
         <AuthorList class="entry__meta-authors" :authors="entry.authors" :limit="10"></AuthorList>
         <div class="entry__meta">
@@ -22,11 +23,11 @@
         <p v-if="entry.description" class="entry__description">{{ entry.description }}</p>
 
         <table class="entry__table">
-          <tr>
-            <td>Engine</td><td>{{ entry.engine }}</td>
+          <tr v-if="engineTitle">
+            <td>Engine</td><td>{{ engineTitle }}</td>
           </tr>
-          <tr>
-            <td>Game</td><td>{{ entry.game }}</td>
+          <tr v-if="gameTitle">
+            <td>Game</td><td>{{ gameTitle }}</td>
           </tr>
           <tr>
             <td>Release date</td><td>{{ entry.timestamp.toDateString() }}</td>
@@ -38,8 +39,9 @@
               <template v-if="readableFileSize">{{ readableFileSize }}</template>
             </td>
           </tr>
-          <tr>
-            <td>Authors</td>
+          <tr v-if="entry.authors.length">
+            <td v-if="entry.authors.length > 1">Authors</td>
+            <td v-else>Author</td>
             <td>
               <ul class="entry__authors" :class="authorListClasses">
                 <li v-for="author of entry.authors" :key="author.alias">
@@ -62,6 +64,29 @@
           </tr>
         </table>
       </div>
+
+      <div v-if="entry.mirrorUrls" class="entry__section">
+        <h2>Download</h2>
+
+        <table class="entry__table">
+          <tr v-for="mirror of entry.mirrorUrls" :key="mirror.url">
+            <td>
+              {{ mirror.title }}<br>
+              <span class="entry__mirror-location">{{ mirror.location }}</span>
+            </td>
+            <td><a :href="mirror.url">{{ mirror.url }}</a></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="entry__section">
+        <h2>Maps</h2>
+      </div>
+
+      <div class="entry__section">
+        <h2>Music</h2>
+      </div>
+
     </Layout>
   </div>
 </template>
@@ -100,7 +125,7 @@ entry.value = await API.entries.get(collection, path);
   slides: {
     origin: 'center',
     perView: 1.25,
-    spacing: 16,
+    spacing: 8,
   },
 
   breakpoints: {
@@ -108,14 +133,14 @@ entry.value = await API.entries.get(collection, path);
       slides: {
         origin: 'center',
         perView: 2.25,
-        spacing: 32,
+        spacing: 16,
       },
     },
     '(min-width: 60rem)': {
       slides: {
         origin: 'center',
         perView: 3.25,
-        spacing: 48,
+        spacing: 32,
       },
     },
   },
@@ -158,6 +183,55 @@ const imageList = computed((): IndexImage[] => {
   return entry.value.images;
 });
 
+const gameTitle = computed((): string|undefined => {
+  if (!entry.value?.game) {
+    return undefined;
+  }
+
+  switch (entry.value?.game) {
+    case 'doom': return 'Doom';
+    case 'doom2': return 'Doom 2';
+    case 'heretic': return 'Heretic';
+    case 'hexen': return 'Hexen';
+    case 'strife': return 'Strife';
+    case 'tnt': return 'TNT: Evilution';
+    case 'plutonia': return 'The Plutonia Experiment';
+    case 'chex': return 'Chex Quest';
+  }
+
+  return entry.value.game;
+});
+
+const engineTitle = computed((): string|undefined => {
+  if (!entry.value?.engine) {
+    return undefined;
+  }
+
+  switch (entry.value?.engine) {
+    case 'unknown': return 'Unknown';
+    case 'doom': return 'Doom';
+    case 'heretic': return 'Heretic';
+    case 'hexen': return 'Hexen';
+    case 'strife': return 'Strife';
+    case 'no_limits': return 'Limit removing';
+    case 'boom': return 'Boom compatible';
+    case 'mbf': return 'Marine\'s Best Friend';
+    case 'zdoom': return 'ZDoom';
+    case 'gzdoom': return 'GZDoom';
+    case 'legacy': return 'Doom Legacy';
+    case 'skulltag': return 'Skulltag';
+    case 'zdaemon': return 'Zdaemon';
+    case 'doomsday': return 'Doomsday';
+    case 'edge': return 'EDGE';
+    case 'eternity': return 'Eternity';
+    case 'doom_retro': return 'Doom Retro';
+    case 'zandronum': return 'Zandronum';
+    case 'odamex': return 'ODamex';
+  }
+
+  return entry.value.engine;
+});
+
 </script>
 
 <style lang="scss">
@@ -167,6 +241,7 @@ const imageList = computed((): IndexImage[] => {
 .entry {
   h1 {
     margin-bottom: 0;
+    font-size: 2.75rem;
   }
 
   &__slider {
@@ -234,7 +309,16 @@ const imageList = computed((): IndexImage[] => {
   }
 
   &__meta {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  &__section {
+    margin-bottom: 3rem;
+  }
+
+  &__mirror-location {
+    color: $color-text;
+    font-size: 0.75rem;
   }
 }
 </style>

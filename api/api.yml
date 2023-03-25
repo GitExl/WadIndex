@@ -121,6 +121,19 @@ components:
         hash:
           type: string
 
+    MirrorUrl:
+      type: object
+      properties:
+        title:
+          type: string
+        url:
+          type: string
+        location:
+          type: string
+        http_only:
+          type: boolean
+          nullable: true
+
     Entry:
       type: object
       properties:
@@ -159,6 +172,10 @@ components:
         comments:
           type: string
           nullable: true
+        mirror_urls:
+          type: array
+          items:
+            $ref: '#/components/schemas/MirrorUrl'
         authors:
           type: array
           items:

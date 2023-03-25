@@ -130,6 +130,7 @@ class EntryRepository {
 
     $entry['game'] = self::GAME_KEY[$entry['game']];
     $entry['engine'] = self::ENGINE_KEY[$entry['engine']];
+    $entry['mirror_urls'] = $this->getMirrorUrlsForCollection($entry['collection'], $entry['path']);
 
     return $entry;
   }
@@ -411,6 +412,41 @@ class EntryRepository {
     }
 
     return implode(' ', $query);
+  }
+
+  private function getMirrorUrlsForCollection(string $collection, string $path): array {
+    if ($collection === 'idgames') {
+      return [
+        [
+          'title' => 'Freie Universität Berlin',
+          'url' => 'https://ftp.fu-berlin.de/pub/pc/games/idgames/' . $path,
+          'location' => 'Germany, Europe',
+        ],
+        [
+          'title' => 'Syringa Networks',
+          'url' => 'http://mirrors.syringanetworks.net/idgames/' . $path,
+          'location' => 'Idaho, US',
+          'http_only' => TRUE,
+        ],
+        [
+          'title' => 'youfailit.net',
+          'url' => 'https://youfailit.net/pub/idgames/' . $path,
+          'location' => 'New York, US',
+        ],
+        [
+          'title' => 'Quaddicted',
+          'url' => 'https://www.quaddicted.com/files/idgames/' . $path,
+          'location' => 'Germany, Europe',
+        ],
+        [
+          'title' => 'Infania Networks',
+          'url' => 'https://ftpmirror1.infania.net/pub/idgames/' . $path,
+          'location' => 'Sweden, Europe',
+        ],
+      ];
+    }
+
+    return [];
   }
 
 }

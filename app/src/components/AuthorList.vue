@@ -23,7 +23,6 @@ const authors = computed((): string => {
     if (props.authors.length > props.limit) {
       return listed.join(', ') + ' and others';
     }
-    return listed.join(', ');
   }
 
   const listed = props.authors.map((item) => {

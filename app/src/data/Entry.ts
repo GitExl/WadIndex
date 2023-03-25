@@ -1,3 +1,4 @@
+import { type MirrorUrl, parseMirrorUrl } from './MirrorUrl';
 import { parseImage } from '@/data/IndexImage';
 import { parseAuthor, type Author } from "./Author"
 import type { IndexImage } from "./IndexImage"
@@ -20,6 +21,7 @@ export interface EntryData {
   knownBugs?: string
   comments?: string
 
+  mirrorUrls: MirrorUrl[]
   authors: Author[]
   images: IndexImage[]
   // music: Music[]
@@ -45,6 +47,7 @@ export function parseEntry(data: any): EntryData {
     knownBugs: data.knownBugs,
     comments: data.comments,
 
+    mirrorUrls: data.mirror_urls?.map(parseMirrorUrl),
     authors: data.authors?.map(parseAuthor),
     images: data.images?.map(parseImage),
   };
