@@ -33,7 +33,7 @@ const description = computed((): string|undefined => {
 
 const entryLocation = computed((): RouteLocationRaw => {
   return {
-    path: 'entries/' + props.entry.collection + '/' + props.entry.path,
+    path: 'entries/' + props.entry.collection + '/' + props.entry.path + '/',
   };
 })
 </script>
@@ -58,8 +58,6 @@ const entryLocation = computed((): RouteLocationRaw => {
 </template>
 
 <style lang="scss">
-@import '@/assets/scss/base.scss';
-
 .entry-teaser {
   @include rect;
 

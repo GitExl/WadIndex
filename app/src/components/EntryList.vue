@@ -24,8 +24,6 @@ function selectEntry(entry: EntryTeaserData) {
 </template>
 
 <style lang="scss">
-@import '@/assets/scss/base.scss';
-
 .entry-list {
   margin-bottom: 3rem;
 

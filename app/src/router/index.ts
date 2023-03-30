@@ -40,9 +40,9 @@ const router = createRouter({
       component: Entry
     },
     {
-      path: '/entries/:path+',
+      path: '/entries/:path(.*)',
       name: 'entry',
-      component: Entry
+      component: Entry,
     },
     {
       path: '/author/:alias',

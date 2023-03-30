@@ -15,8 +15,6 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <style lang="scss">
-@import '@/assets/scss/base.scss';
-
 .tag {
   font-family: 'DejaVu Sans Condensed', sans-serif;
   display: inline-block;

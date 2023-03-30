@@ -12,7 +12,10 @@ export default class GraphicsAPI extends APIBase {
 
     let graphics: IndexImage[] = [];
     for (let item of Object.values(data)) {
-      graphics.push(parseImage(item));
+      const image = parseImage(item);
+      if (image) {
+        graphics.push();
+      }
     }
 
     return graphics;

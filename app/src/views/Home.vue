@@ -22,6 +22,27 @@ onMounted(async () => {
 
 <template>
   <div class="home">
+    <div class="home__background">
+      <div class="home__background-row home__background-row--1">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/btsx_e1_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/biowar_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/dcv_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/abyss24a_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/longtrek_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/projectunity_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/rlmchaos_titlepic_thumb.webp">
+      </div>
+      <div class="home__background-row home__background-row--2">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/tmmc2_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/toon2b_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/v64_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/world_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/techwars_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/dot_titlepic_thumb.webp">
+        <img src="http://storage.idgames.local/graphics/levels/doom2/megawads/requiem_titlepic_thumb.webp">
+      </div>
+    </div>
+
     <Layout type="one-column">
       <div class="home__header">
         <img src="@/assets/images/logo.svg">
@@ -50,18 +71,49 @@ onMounted(async () => {
   h1 {
     margin: 3rem 1rem 1rem 1rem;
   }
-}
 
-.home__header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 30rem;
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 30rem;
 
-  img {
-    max-width: 28rem;
-    margin-bottom: 3.25rem;
+    img {
+      max-width: 28rem;
+      margin-bottom: 3.25rem;
+    }
+  }
+
+  &__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    overflow-x: hidden;
+    padding: 0.25rem;
+    opacity: 0.25;
+    z-index: -10;
+  }
+
+  &__background-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 150%;
+
+    img {
+      width: auto;
+      height: 14rem;
+      margin: 0.5rem;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    &--2 {
+      left: -25%;
+    }
   }
 }
 </style>

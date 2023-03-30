@@ -1,3 +1,11 @@
+<template>
+  <div class="layout" :class="{['layout--' + props.type]: true}">
+    <div class="layout__start"><slot name="start"></slot></div>
+    <div class="layout__middle"><slot></slot></div>
+    <div class="layout__end"><slot name="end"></slot></div>
+  </div>
+</template>
+
 <script setup lang="ts">
 export interface Props {
   type?: string
@@ -8,40 +16,56 @@ const props = withDefaults(defineProps<Props>(), {
 });
 </script>
 
-<template>
-  <div class="layout" :class="{['layout--' + props.type]: true}">
-    <slot></slot>
-  </div>
-</template>
-
 <style lang="scss">
-@import '@/assets/scss/base.scss';
 .layout {
-  margin: 0 auto;
-  padding: 0 1rem;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 60rem) 1fr;
+  grid-template-rows: 1fr;
+  grid-column-gap: 1.5rem;
+  grid-row-gap: 0px;
 
-  @media(min-width: 60rem) {
-    padding: 0 2rem;
-    gap: 1rem;
+  @media (min-width: 100rem) {
+    grid-column-gap: 3rem;
   }
 
-  &--one-column {
-    max-width: 60rem;
+  &__left {
+    grid-area: 1 / 1 / 2 / 2;
+  }
+
+  &__right {
+    grid-area: 1 / 3 / 2 / 4;
+  }
+
+  &__middle {
+    grid-area: 1 / 2 / 6 / 3;
+    gap: 0.5rem;
+    columns: 1;
+    display: relative;
+
+    @media (min-width: 60rem) {
+      gap: 1rem;
+    }
   }
 
   &--two-column {
-    max-width: 60rem;
+    @media (min-width: 100rem) {
+      grid-template-columns: 1fr minmax(0, 100rem) 1fr;
+    }
 
-    @media(min-width: 100rem) {
-      max-width: 100rem;
-      display: flex;
-      flex-direction: row;
+    .layout__middle {
+      columns: 2;
 
-      > * {
-        width: 50%;
+      @media (min-width: 100rem) {
+        max-width: 100rem;
+        display: flex;
+        flex-direction: row;
+
+        > * {
+          width: 50%;
+        }
       }
     }
   }
+
 }
 </style>

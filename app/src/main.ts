@@ -2,6 +2,11 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
+import '@material-design-icons/font/outlined.scss';
+import 'keen-slider/keen-slider.scss';
+
+import '@/assets/scss/base.scss';
+
 const app = createApp(App)
 
 app.use(router)

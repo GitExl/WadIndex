@@ -1,13 +1,10 @@
 @import 'fonts';
-@import 'variables';
-@import 'rect';
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
   margin: 0;
-  position: relative;
   font-weight: 300;
   font-family: 'Noto Sans', sans-serif;
 }

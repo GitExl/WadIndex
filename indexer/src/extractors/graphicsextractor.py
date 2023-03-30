@@ -55,7 +55,7 @@ class GraphicsExtractor(ExtractorBase):
             return
         palette = Palette.from_playpal_data(playpal.get_data())
 
-        for index, filename in enumerate(GRAPHIC_LUMP_NAMES):
+        for filename in GRAPHIC_LUMP_NAMES:
             file = archive_list.file_find_basename(filename, include_main=False)
             if not file:
                 continue
@@ -83,7 +83,7 @@ class GraphicsExtractor(ExtractorBase):
                 thumb_height = THUMB_HEIGHT
             image_thumb = image.resize((thumb_width, thumb_height), Image.BICUBIC)
 
-            info.graphics[filename] = GraphicInfo(image, image_thumb, image_hash, index)
+            info.graphics[filename] = GraphicInfo(image, image_thumb, image_hash, len(info.graphics))
 
         # Determine primary graphic.
         for name in GRAPHIC_LUMP_NAMES_PRIMARY:

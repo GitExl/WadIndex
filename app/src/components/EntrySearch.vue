@@ -50,8 +50,6 @@ function keyDown(event: Event) {
 </template>
 
 <style lang="scss">
-@import '@/assets/scss/base.scss';
-
 .entry-search {
   width: 100%;
   max-width: 26rem;

@@ -49,6 +49,7 @@ class ImageRepository {
         entry_images ei
       WHERE
         entry_id = :entry_id
+      ORDER BY ei.index
     ');
 
     $images = $stmt->executeQuery([

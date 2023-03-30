@@ -14,8 +14,6 @@
 </template>
 
 <style lang="scss">
-@import '@/assets/scss/base.scss';
-
 .off-canvas {
   display: flex;
   flex-direction: row;

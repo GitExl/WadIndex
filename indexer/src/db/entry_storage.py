@@ -66,8 +66,8 @@ class EntryStorage(StorageBase):
             self.db.cursor.execute('DELETE FROM entry_textfile WHERE entry_id=%s', (entry.id,))
 
         self.db.cursor.execute('DELETE FROM entry_images WHERE entry_id=%s', (entry.id,))
-        for name, graphic in sorted(entry.graphics.items(), key=lambda i: i[1].index):
-            self.db.cursor.execute('INSERT INTO entry_images VALUES (%s, %s, %s, %s, %s)', (entry.id, name, graphic.image.width, graphic.image.height, graphic.is_primary))
+        for name, graphic in entry.graphics.items():
+            self.db.cursor.execute('INSERT INTO entry_images VALUES (%s, %s, %s, %s, %s, %s)', (entry.id, name, graphic.index, graphic.image.width, graphic.image.height, graphic.is_primary))
 
         self.db.cursor.execute('DELETE FROM entry_music WHERE entry_id=%s', (entry.id,))
         for name, music in entry.music.items():
