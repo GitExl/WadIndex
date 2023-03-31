@@ -20,12 +20,12 @@ $top: 6rem;
   padding: 1rem;
   padding-top: $top;
   background-color: rgba($color-primary-dark, 0.8);
+  width: $nav-width;
   height: 100%;
   backdrop-filter: blur(1rem);
   position: fixed;
   left: 0;
   top: 0;
-  min-width: 12rem;
   z-index: 100;
 
   ul {

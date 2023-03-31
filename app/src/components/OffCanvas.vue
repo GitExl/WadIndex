@@ -23,8 +23,6 @@
 }
 
 .off-canvas__off {
-  width: 100%;
-  max-width: 14rem;
 }
 
 .off-canvas__on {

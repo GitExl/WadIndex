@@ -1,9 +1,11 @@
 <template>
   <section class="page-section">
-    <h2>
-      <span v-if="icon" class="material-icons-outlined">{{ icon }}</span>
+    <h2 class="page-section__title">
+      <span v-if="icon" class="material-icons-outlined page-section__icon">{{ icon }}</span>
       {{ title }}
     </h2>
+
+    <slot></slot>
   </section>
 </template>
 
@@ -22,11 +24,11 @@ const props = withDefaults(defineProps<Props>(), {
 .page-section {
   margin-bottom: 3rem;
 
-  h2 {
+  &__title {
     position: relative;
   }
 
-  span {
+  &__icon {
     font-size: 2.125rem;
     position: absolute;
     left: -3.25rem;

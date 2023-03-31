@@ -23,6 +23,8 @@ const props = withDefaults(defineProps<Props>(), {
   grid-template-rows: 1fr;
   grid-column-gap: 1.5rem;
   grid-row-gap: 0px;
+  width: 100%;
+  padding-left: $nav-width;
 
   @media (min-width: 100rem) {
     grid-column-gap: 3rem;

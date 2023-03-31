@@ -1,9 +1,9 @@
 <template>
-  <div class="entry">
+  <div class="entry" :class="{'entry--has-slides': slides.length}">
 
     <template v-if="entry">
 
-      <WideSlider v-if="slides" :slides="slides"></WideSlider>
+      <WideSlider v-if="slides.length" :slides="slides"></WideSlider>
 
       <Layout type="one-column" class="entry__main">
 
@@ -21,9 +21,9 @@
           <h1>{{ entry.title }}</h1>
           <AuthorList class="entry__meta-authors" :authors="entry.authors" :limit="10"></AuthorList>
           <div class="entry__meta">
-            <Tag v-if="entry.isSingleplayer" type="large">SP</Tag>
-            <Tag v-if="entry.isCooperative" type="large">COOP</Tag>
-            <Tag v-if="entry.isDeathmatch" type="large">DM</Tag>
+            <Tag v-if="entry.isSingleplayer" type="large">Singleplayer</Tag>
+            <Tag v-if="entry.isCooperative" type="large">Cooperative</Tag>
+            <Tag v-if="entry.isDeathmatch" type="large">Deathmatch</Tag>
           </div>
 
           <p v-if="entry.description" class="entry__description">{{ entry.description }}</p>
@@ -75,7 +75,8 @@
           <table class="entry__table">
             <tr v-for="mirror of entry.mirrorUrls" :key="mirror.url">
               <td>
-                <span v-if="mirror.isHttpOnly" class="material-icons-outlined">http</span> {{ mirror.title }}<br>
+                <span v-if="mirror.isHttpOnly" class="material-icons-outlined">http</span>
+                {{ mirror.title }}<br>
                 <span class="entry__mirror-location">{{ mirror.location }}</span>
               </td>
               <td><a :href="mirror.url">{{ mirror.url }}</a></td>
@@ -225,8 +226,13 @@ const engineTitle = computed((): string|undefined => {
     }
   }
 
+  &--has-slides {
+    .entry__main {
+      background: linear-gradient(0deg, rgba($color-primary-dark, 0) 0%, rgba($color-primary-dark, 0.33) 96%);
+    }
+  }
+
   &__main {
-    background: linear-gradient(0deg, rgba($color-primary-dark, 0) 0%, rgba($color-primary-dark, 0.33) 96%);
     padding-top: 3rem;
   }
 
@@ -269,7 +275,7 @@ const engineTitle = computed((): string|undefined => {
     .material-icons-outlined {
       font-size: 1.25rem;
       vertical-align: middle;
-      margin-right: 0.5rem;
+      margin-right: 0.25rem;
     }
   }
 
