@@ -74,6 +74,12 @@ class GraphicsExtractor(ExtractorBase):
             if duplicate:
                 continue
 
+            # Images with 8:5 aspect ratio are assumed to need aspect ratio correction for square pixels.
+            # Other ratios are probably "correct" either through user error or intention.
+            aspect_ratio = image.width / image.height
+            if aspect_ratio == 8.0 / 5.0:
+                aspect_ratio = 4.0 / 3.0
+
             # Generate a thumbnail image.
             if image.width > image.height:
                 thumb_width = THUMB_WIDTH
@@ -83,7 +89,7 @@ class GraphicsExtractor(ExtractorBase):
                 thumb_height = THUMB_HEIGHT
             image_thumb = image.resize((thumb_width, thumb_height), Image.BICUBIC)
 
-            info.graphics[filename] = GraphicInfo(image, image_thumb, image_hash, len(info.graphics))
+            info.graphics[filename] = GraphicInfo(image, image_thumb, image_hash, aspect_ratio, len(info.graphics))
 
         # Determine primary graphic.
         for name in GRAPHIC_LUMP_NAMES_PRIMARY:
@@ -112,14 +118,6 @@ class GraphicsExtractor(ExtractorBase):
             image = self.read_raw_graphic(320, 200, data, palette)
         elif file.size == 640 * 480:
             image = self.read_raw_graphic(640, 480, data, palette)
-
-        # Apply 4:3 aspect ratio correction, to 8:5 aspect ratio screens. Increase height by 20%.
-        if image:
-            width, height = image.width, image.height
-            aspect_ratio = width / height
-            if aspect_ratio == 8.0 / 5.0:
-                height = ceil(height * 1.2)
-                image = image.resize((width, height), Image.BICUBIC)
 
         if not image:
             self.logger.stream('unknown_graphics_format', 'Cannot identify or read {}'.format(file.name))

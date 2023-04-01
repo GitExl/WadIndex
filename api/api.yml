@@ -237,6 +237,9 @@ components:
           type: integer
         height:
           type: integer
+        aspect_ratio:
+          type: number
+          format: float
 
     Author:
       type: object

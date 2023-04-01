@@ -17,7 +17,8 @@ class ImageRepository {
       SELECT
         ei.name AS `name`,
         ei.width AS `width`,
-        ei.height AS `height`
+        ei.height AS `height`,
+        ei.aspect_ratio AS `aspect_ratio`
       FROM
         entry_images ei
       WHERE
@@ -44,7 +45,8 @@ class ImageRepository {
       SELECT
         ei.name AS `name`,
         ei.width AS `width`,
-        ei.height AS `height`
+        ei.height AS `height`,
+        ei.aspect_ratio AS `aspect_ratio`
       FROM
         entry_images ei
       WHERE
@@ -80,6 +82,7 @@ class ImageRepository {
           ei.name AS `name`,
           ei.width AS `width`,
           ei.height AS `height`,
+          ei.aspect_ratio AS `aspect_ratio`,
           e.path AS `entry_path`
         FROM entry_images ei
         INNER JOIN

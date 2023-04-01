@@ -2,7 +2,7 @@
   <div class="wide-slider">
       <div ref="container" class="keen-slider">
         <div v-for="slide of slides" :key="slide.key" class="keen-slider__slide">
-          <img :src="slide.imageUrl" :width="slide.imageWidth" :height="slide.imageHeight" loading="lazy">
+          <img :src="slide.imageUrl" :width="slide.imageWidth" :height="slide.imageHeight" loading="lazy" :style="{ 'aspect-ratio': slide.aspectRatio ?? 1 }">
         </div>
       </div>
     </div>
@@ -17,6 +17,7 @@ export interface WideSliderSlide {
   imageUrl: string
   imageWidth: number
   imageHeight: number
+  aspectRatio: number
 }
 
 let container: Ref<HTMLElement|undefined> = ref();

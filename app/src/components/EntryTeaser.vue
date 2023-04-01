@@ -12,7 +12,7 @@
     </div>
 
     <div v-if="thumbnailUrl" class="entry-teaser__image">
-      <img :src="thumbnailUrl" loading="lazy">
+      <img :src="thumbnailUrl" :width="entry.image?.width" :height="entry.image?.height" loading="lazy" :style="{ 'aspect-ratio': entry.image?.aspectRatio }">
     </div>
   </div>
 </template>

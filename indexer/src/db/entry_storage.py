@@ -61,13 +61,25 @@ class EntryStorage(StorageBase):
             self._maps.save(entry.id, map)
 
         if entry.text_contents is not None and len(entry.text_contents):
-            self.db.cursor.execute('INSERT INTO entry_textfile VALUES (%s, %s) ON DUPLICATE KEY UPDATE text=%s', (entry.id, entry.text_contents, entry.text_contents))
+            self.db.cursor.execute('INSERT INTO entry_textfile VALUES (%s, %s) ON DUPLICATE KEY UPDATE text=%s', (
+                entry.id,
+                entry.text_contents,
+                entry.text_contents,
+            ))
         else:
             self.db.cursor.execute('DELETE FROM entry_textfile WHERE entry_id=%s', (entry.id,))
 
         self.db.cursor.execute('DELETE FROM entry_images WHERE entry_id=%s', (entry.id,))
         for name, graphic in entry.graphics.items():
-            self.db.cursor.execute('INSERT INTO entry_images VALUES (%s, %s, %s, %s, %s, %s)', (entry.id, name, graphic.index, graphic.image.width, graphic.image.height, graphic.is_primary))
+            self.db.cursor.execute('INSERT INTO entry_images VALUES (%s, %s, %s, %s, %s, %s, %s)', (
+                entry.id,
+                name,
+                graphic.index,
+                graphic.image.width,
+                graphic.image.height,
+                graphic.is_primary,
+                graphic.aspect_ratio,
+            ))
 
         self.db.cursor.execute('DELETE FROM entry_music WHERE entry_id=%s', (entry.id,))
         for name, music in entry.music.items():

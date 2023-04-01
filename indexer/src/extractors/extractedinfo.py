@@ -52,6 +52,7 @@ class GraphicInfo:
     image: Image
     image_thumb: Image
     image_hash: bytes
+    aspect_ratio: float
     index: int
     is_primary: bool = False
 

@@ -167,6 +167,7 @@ const slides = computed((): WideSliderSlide[] => {
       imageUrl: import.meta.env.VITE_STORAGE_BASE_URL + '/' + image.href,
       imageWidth: image.width,
       imageHeight: image.height,
+      aspectRatio: image.aspectRatio
     });
   }
 
