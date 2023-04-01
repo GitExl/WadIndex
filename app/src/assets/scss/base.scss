@@ -42,12 +42,13 @@ img {
 h1, h2, h3, h4, h5, h6 {
   font-family: 'DejaVu Sans', sans-serif;
   font-weight: 100;
+  line-height: 1.15;
   color: $color-accent;
 }
 
 h1 {
   font-size: 2.875rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 h2 {

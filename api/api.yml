@@ -71,6 +71,10 @@ components:
           nullable: true
         format:
           type: string
+        next:
+          type: string
+        next_secret:
+          type: string
         authors:
           type: array
           items:

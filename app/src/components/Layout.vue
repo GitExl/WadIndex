@@ -21,13 +21,13 @@ const props = withDefaults(defineProps<Props>(), {
   display: grid;
   grid-template-columns: 1fr minmax(0, 60rem) 1fr;
   grid-template-rows: 1fr;
-  grid-column-gap: 1.5rem;
+  grid-column-gap: 2.5rem;
   grid-row-gap: 0px;
   width: 100%;
   padding-left: $nav-width;
 
   @media (min-width: 100rem) {
-    grid-column-gap: 3rem;
+    grid-column-gap: 5rem;
   }
 
   &__left {

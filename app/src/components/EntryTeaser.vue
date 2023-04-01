@@ -1,3 +1,22 @@
+<template>
+  <div class="entry-teaser" @click="$router.push(entryLocation)">
+    <div class="entry-teaser__info">
+      <h2>{{ entry.title }}</h2>
+      <p class="entry-teaser__subtitle">
+        <AuthorList class="entry-teaser__authors" :authors="entry.authors" :limit="5"></AuthorList>
+        <Tag v-if="entry.isSingleplayer">SP</Tag>
+        <Tag v-if="entry.isCooperative">COOP</Tag>
+        <Tag v-if="entry.isDeathmatch">DM</Tag>
+      </p>
+      <p v-if="entry.description" class="entry-teaser__description">{{ description }}</p>
+    </div>
+
+    <div v-if="thumbnailUrl" class="entry-teaser__image">
+      <img :src="thumbnailUrl" loading="lazy">
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import type { EntryTeaserData } from '@/data/EntryTeaser';
 import Tag from '@/components/Tag.vue';
@@ -37,25 +56,6 @@ const entryLocation = computed((): RouteLocationRaw => {
   };
 })
 </script>
-
-<template>
-  <div class="entry-teaser" @click="$router.push(entryLocation)">
-    <div class="entry-teaser__info">
-      <h2>{{ entry.title }}</h2>
-      <p class="entry-teaser__subtitle">
-        <AuthorList class="entry-teaser__authors" :authors="entry.authors" :limit="5"></AuthorList>
-        <Tag v-if="entry.isSingleplayer">SP</Tag>
-        <Tag v-if="entry.isCooperative">COOP</Tag>
-        <Tag v-if="entry.isDeathmatch">DM</Tag>
-      </p>
-      <p v-if="entry.description" class="entry-teaser__description">{{ description }}</p>
-    </div>
-
-    <div v-if="thumbnailUrl" class="entry-teaser__image">
-      <img :src="thumbnailUrl" loading="lazy">
-    </div>
-  </div>
-</template>
 
 <style lang="scss">
 .entry-teaser {

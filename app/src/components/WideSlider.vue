@@ -68,6 +68,7 @@ onBeforeUnmount(() => {
   img {
     width: 100%;
     height: auto;
+    image-rendering: pixelated;
   }
 }
 </style>

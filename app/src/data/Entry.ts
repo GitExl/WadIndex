@@ -2,6 +2,7 @@ import { type MirrorUrl, parseMirrorUrl } from './MirrorUrl';
 import { parseImage } from '@/data/IndexImage';
 import { parseAuthor, type Author } from "./Author"
 import type { IndexImage } from "./IndexImage"
+import { parseLevelTeaserData, type LevelTeaserData } from './LevelTeaser';
 
 export interface EntryData {
   collection: string
@@ -24,8 +25,8 @@ export interface EntryData {
   mirrorUrls: MirrorUrl[]
   authors: Author[]
   images: IndexImage[]
+  levels: LevelTeaserData[]
   // music: Music[]
-  // levels: Level[]
 }
 
 export function parseEntry(data: any): EntryData {
@@ -50,5 +51,6 @@ export function parseEntry(data: any): EntryData {
     mirrorUrls: data.mirror_urls?.map(parseMirrorUrl),
     authors: data.authors?.map(parseAuthor),
     images: data.images?.map(parseImage),
+    levels: data.maps?.map(parseLevelTeaserData),
   };
 }

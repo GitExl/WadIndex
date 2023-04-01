@@ -1,9 +1,3 @@
-<script setup lang="ts">
-import NavMenu from './components/NavMenu.vue';
-import OffCanvas from './components/OffCanvas.vue';
-
-</script>
-
 <template>
   <div class="app">
     <OffCanvas>
@@ -24,6 +18,11 @@ import OffCanvas from './components/OffCanvas.vue';
     </OffCanvas>
   </div>
 </template>
+
+<script setup lang="ts">
+import NavMenu from './components/NavMenu.vue';
+import OffCanvas from './components/OffCanvas.vue';
+</script>
 
 <style lang="scss">
 .app {

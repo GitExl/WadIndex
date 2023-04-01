@@ -42,7 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
     background-color: rgba($color-accent, 0.33);
     display: inline-block;
     line-height: 1;
-    padding: 0.25rem 0.5rem;
+    padding: 0.25rem 0.5rem 0.2rem 0.5rem;
     border-radius: 0.5rem;
     position: absolute;
     right: 0;

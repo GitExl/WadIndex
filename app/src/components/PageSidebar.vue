@@ -1,9 +1,9 @@
 <template>
-  <div class="page-sidebar">
+  <aside class="page-sidebar">
     <ul class="page-sidebar__inset">
       <slot></slot>
     </ul>
-  </div>
+  </aside>
 </template>
 
 <style lang="scss">

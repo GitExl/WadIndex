@@ -4,10 +4,13 @@ import EntryList from '@/components/EntryList.vue';
 import Layout from '@/components/Layout.vue';
 import type { EntryTeaserData } from '@/data/EntryTeaser';
 import { onMounted, ref, type Ref } from 'vue';
+import { useTitle } from 'vue-page-title';
 import EntrySearch from '../components/EntrySearch.vue'
 
 const latest: Ref<EntryTeaserData[]> = ref([])
 const updated: Ref<EntryTeaserData[]> = ref([])
+
+useTitle('');
 
 onMounted(async () => {
   const results = await Promise.all([

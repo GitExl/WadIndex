@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="nav-menu">
+  <nav class="nav-menu">
     <ul>
       <li><router-link to="/">Home</router-link></li>
       <li><router-link to="/search">Search</router-link></li>
@@ -10,7 +10,7 @@
       <li><router-link to="/queue">Music queue</router-link></li>
       <li><router-link to="/about">About</router-link></li>
     </ul>
-  </div>
+  </nav>
 </template>
 
 <style lang="scss">

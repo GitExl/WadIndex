@@ -32,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
     font-size: 2.125rem;
     position: absolute;
     left: -3.25rem;
-    top: 0.6125rem;
+    top: 0.25rem;
   }
 }
 </style>

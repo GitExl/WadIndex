@@ -85,6 +85,11 @@
         </PageSection>
 
         <PageSection id="maps" title="Maps" icon="near_me">
+
+          <TeaserList layout="columns">
+            <LevelTeaser v-for="level of entry.levels" :level="level" :key="level.name"></LevelTeaser>
+          </TeaserList>
+
         </PageSection>
 
         <PageSection id="music" title="Music" icon="music_note">
@@ -110,6 +115,9 @@ import PageSidebarLink from '@/components/PageSidebarLink.vue';
 import type { WideSliderSlide } from '@/components/WideSlider.vue';
 import WideSlider from '@/components/WideSlider.vue';
 import PageSection from '@/components/PageSection.vue';
+import LevelTeaser from '@/components/LevelTeaser.vue';
+import TeaserList from '@/components/TeaserList.vue';
+import { useTitle } from 'vue-page-title';
 
 
 const route = useRoute();
@@ -123,6 +131,8 @@ const path = segments.slice(1, -1).join('/');
 
 entry.value = await API.entries.get(collection, path);
 
+
+useTitle(entry.value?.title);
 
 const readableFileSize = computed((): string|undefined => {
   if (!entry.value) {
@@ -220,7 +230,7 @@ const engineTitle = computed((): string|undefined => {
     margin-bottom: 3rem;
 
     h1 {
-      margin-bottom: 0;
+      margin-bottom: 0.75rem;
       margin-top: -0.5rem;
       font-size: 2.75rem;
     }
