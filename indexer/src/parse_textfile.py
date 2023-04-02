@@ -1,3 +1,4 @@
+import codecs
 import pprint
 from sys import argv, exit
 
@@ -10,10 +11,10 @@ if len(argv) < 2:
     exit(-1)
 
 config = Config()
-logger = Logger(config.get('paths.logs'), Logger.VERBOSITY_DEBUG)
+logger = Logger(config.get('paths.logs'), None, Logger.VERBOSITY_DEBUG)
 
 filename = argv[1]
-with open(filename, 'r') as f:
+with codecs.open(filename, 'r', 'latin_1') as f:
     parser = TextParser(logger)
     parser.parse(f)
 

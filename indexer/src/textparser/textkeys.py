@@ -4,207 +4,203 @@ from indexer.engine import Engine
 from indexer.game import Game
 
 
-class KeyType(Enum):
-    TEXT = 'text'
-    BOOL = 'bool'
-    GAME = 'game'
-    DIFFICULTY = 'difficulty'
-    MAP_NUMBER = 'map_number'
-    DATETIME = 'datetime'
-    INTEGER = 'integer'
-    GAME_STYLE = 'game_style'
-    ENGINE = 'engine'
+class TextKeyStore(Enum):
+    STORE = 0
+    BINARY_OR = 1
+
+
+class TextKeyTransform(Enum):
+    TEXT = 0
+    BOOL = 1
+    DIFFICULTY = 2
+    ENGINE = 3
+    GAME = 4
+
+
+class TextKeyType(Enum):
+    SINGLE = 0
+    ARRAY = 1
+    SET = 2
+
+
+class TextKeyProcess(Enum):
+    TEXT_TO_MARKDOWN = 0
 
 
 TEXT_KEYS = {
     'authors': {
-        'type': KeyType.TEXT,
+        'type': TextKeyType.SET,
         'keys': {'author', 'authors', 'author(s)', 'autor', 'original author'},
-        'array': True,
     },
     'title': {
-        'type': KeyType.TEXT,
         'keys': {'title', 'level name', 'name'},
-        'single_line': True,
     },
     'game_style_singleplayer': {
-        'type': KeyType.BOOL,
+        'store': TextKeyStore.BINARY_OR,
+        'transform': TextKeyTransform.BOOL,
         'keys': {'single player', 'singleplayer'},
     },
     'based_on': {
-        'type': KeyType.TEXT,
         'keys': {'base', 'idea base'},
     },
     'description': {
-        'type': KeyType.TEXT,
+        'type': TextKeyType.ARRAY,
+        'process': TextKeyProcess.TEXT_TO_MARKDOWN,
         'keys': {'description', 'instructions', 'play information', 'wad description', 'log entry'},
     },
     'difficulty_levels': {
-        'type': KeyType.DIFFICULTY,
+        'store': TextKeyStore.BINARY_OR,
+        'transform': TextKeyTransform.DIFFICULTY,
         'keys': {'difficulty settings', 'difficulty'},
     },
     'game_style_cooperative': {
-        'type': KeyType.BOOL,
+        'store': TextKeyStore.BINARY_OR,
+        'transform': TextKeyTransform.BOOL,
         'keys': {'cooperative 2-4 player', 'cooperative', 'cooperative 2-8 player', 'co-op', 'coop 2-4 player', 'coop'},
     },
     'game_style_deathmatch': {
-        'type': KeyType.BOOL,
+        'store': TextKeyStore.BINARY_OR,
+        'transform': TextKeyTransform.BOOL,
         'keys': {'deathmatch 2-4 player', 'deathmatch', 'deathmatch 2-8 player'},
     },
     'tools_used': {
-        'type': KeyType.TEXT,
+        'type': TextKeyType.SET,
+        'process': TextKeyProcess.TEXT_TO_MARKDOWN,
         'keys': {
             'editor(s) used', 'editors used', 'editor used', 'tools used', 'editors', 'utilities used', 'editor',
             'main editor(s) used', 'tools(s) used',
         },
     },
-    'email': {
-        'type': KeyType.TEXT,
-        'keys': {'email address', 'e-mail', 'e-mail address', 'email'},
-    },
     'known_bugs': {
-        'type': KeyType.TEXT,
         'keys': {'known bugs', 'bugs', 'unknown bugs'},
     },
     'copyright': {
-        'type': KeyType.TEXT,
+        'type': TextKeyType.ARRAY,
+        'process': TextKeyProcess.TEXT_TO_MARKDOWN,
         'keys': {'copyright / permissions'},
     },
     'filename': {
-        'type': KeyType.TEXT,
         'keys': {'filename'},
     },
     'credits': {
-        'type': KeyType.TEXT,
+        'type': TextKeyType.ARRAY,
+        'process': TextKeyProcess.TEXT_TO_MARKDOWN,
         'keys': {
             'additional credits to', 'additional credits', 'credits', 'credits to', 'special thanks to', 'thanks to',
             'big thanks to', 'special thanks', 'additional credit to',
         },
     },
     'build_time': {
-        'type': KeyType.TEXT,
         'keys': {'build time', 'time taken', 'construction time', 'time', 'building time'},
     },
     'author_info': {
-        'type': KeyType.TEXT,
         'keys': {'misc. author info', 'misc author info', 'author info', 'misc. developer info'},
     },
     'other': {
-        'type': KeyType.TEXT,
         'keys': {'other'},
     },
     'game': {
-        'type': KeyType.GAME,
+        'store': TextKeyStore.BINARY_OR,
+        'transform': TextKeyTransform.GAME,
         'keys': {'game', 'required game', 'game version required', 'iwad needed', 'doom version', 'game and version used'},
     },
     'content_graphics': {
-        'type': KeyType.BOOL,
+        'store': TextKeyStore.BINARY_OR,
+        'transform': TextKeyTransform.BOOL,
         'keys': {
             'new graphics', 'graphics', 'graphic addon only', 'sprites', 'textures', 'sprite edit', 'new sprites',
             'new textures',
         },
     },
     'content_sounds': {
-        'type': KeyType.BOOL,
+        'store': TextKeyStore.BINARY_OR,
+        'transform': TextKeyTransform.BOOL,
         'keys': {'new sounds', 'sounds', 'sound pwad only'},
     },
     'music': {
-        'type': KeyType.TEXT,
         'keys': {'music', 'music track'},
     },
-    'map_number': {
-        'type': KeyType.MAP_NUMBER,
-        'keys': {'map #', 'episode and level #', 'level #', 'level', 'map', 'map number'},
-    },
     'content_demos': {
-        'type': KeyType.BOOL,
+        'store': TextKeyStore.BINARY_OR,
+        'transform': TextKeyTransform.BOOL,
         'keys': {'demos replaced', 'demos', '.lmp only', 'new demos'},
     },
     'content_music': {
-        'type': KeyType.BOOL,
+        'store': TextKeyStore.BINARY_OR,
         'keys': {'new music', 'music pwad only', 'midi', 'new musics'},
     },
     'date_released': {
-        'type': KeyType.DATETIME,
         'keys': {'release date', 'date', 'date released', 'date of release'},
     },
     'content_dehacked': {
-        'type': KeyType.BOOL,
+        'store': TextKeyStore.BINARY_OR,
+        'transform': TextKeyTransform.BOOL,
         'keys': {'dehacked/bex patch', 'dehack patch only'},
     },
     'game_style_primary': {
-        'type': KeyType.GAME_STYLE,
         'keys': {'primary purpose'},
     },
     'game_style_other': {
-        'type': KeyType.GAME_STYLE,
         'keys': {'other game styles'},
     },
     'other_files_required': {
-        'type': KeyType.TEXT,
         'keys': {'other files required', 'required to have in dir'},
     },
     'author_other_files': {
-        'type': KeyType.TEXT,
         'keys': {'other files by author'},
     },
     'engine': {
-        'type': KeyType.ENGINE,
+        'transform': TextKeyTransform.ENGINE,
         'keys': {'advanced engine needed', 'source port', 'engine', 'port'},
     },
     'links': {
-        'type': KeyType.TEXT,
         'keys': {
             'the usual', 'ftp sites', 'web sites', 'bbs numbers', 'homepage', 'web page', 'ftp', 'website',
             'web site', 'home page', 'www', 'bbs', 'internet', 'web', 'www sites'
         },
     },
     'do_not_run_with': {
-        'type': KeyType.TEXT,
+        'type': TextKeyType.ARRAY,
+        'process': TextKeyProcess.TEXT_TO_MARKDOWN,
         'keys': {'may not run with...', 'may not run with', 'will not run with...'},
     },
     'archive_maintainer': {
-        'type': KeyType.TEXT,
         'keys': {'archive maintainer'},
     },
     'tested_with': {
-        'type': KeyType.TEXT,
         'keys': {'tested with'},
     },
     'update_to': {
-        'type': KeyType.TEXT,
         'keys': {'update to'},
     },
     'where_to_get': {
-        'type': KeyType.TEXT,
         'keys': {'where to get this wad'},
     },
     'date_completed': {
-        'type': KeyType.DATETIME,
         'keys': {'date finished', 'date completed', 'completion date'},
     },
     'content_levels': {
-        'type': KeyType.BOOL,
-        'keys': {'new level wad', 'new levels', 'levels', 'levels replaced'},
+        'store': TextKeyStore.BINARY_OR,
+        'transform': TextKeyTransform.BOOL,
+        'keys': {'new level wad', 'new levels', 'levels', 'levels replaced', 'new levels'},
     },
     'review': {
-        'type': KeyType.TEXT,
         'keys': {'review'},
     },
     'story': {
-        'type': KeyType.TEXT,
-        'keys': {'story', 'the story', 'story line'},
+        'type': TextKeyType.ARRAY,
+        'process': TextKeyProcess.TEXT_TO_MARKDOWN,
+        'keys': {'story', 'the story', 'story line', 'the story so far'},
     },
     'theme': {
-        'type': KeyType.TEXT,
         'keys': {'theme', 'themes'},
     },
     'inspiration': {
-        'type': KeyType.TEXT,
         'keys': {'inspiration'},
     },
     'comments': {
-        'type': KeyType.TEXT,
+        'type': TextKeyType.ARRAY,
+        'process': TextKeyProcess.TEXT_TO_MARKDOWN,
         'keys': {
             'comments', 'author\'s comment', 'info', 'author\'s comments', 'note', 'notes', 'additional notes',
             'uploader\'s note', 'important notes', 'play notes', 'misc. info', 'things to look out for',
@@ -213,15 +209,12 @@ TEXT_KEYS = {
         },
     },
     'hints': {
-        'type': KeyType.TEXT,
         'keys': {'hints', 'tips', 'hint'},
     },
     'content_decorate': {
-        'type': KeyType.TEXT,
         'keys': {'decorate'},
     },
     'content_weapons': {
-        'type': KeyType.TEXT,
         'keys': {'weapons', 'new weapons'},
     },
 }

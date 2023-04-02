@@ -5,8 +5,9 @@ from typing import TextIO, Tuple, Optional, List
 
 from indexer.engine import Engine
 from indexer.game import Game
+from textparser.textkeys import TextKeyStore, TEXT_KEYS, TEXT_BOOLEAN, TEXT_GAMES, TEXT_ENGINE, TEXT_DIFFICULTY, \
+    TextKeyTransform, TextKeyType, TextKeyProcess
 from utils.logger import Logger
-from textparser.textkeys import TEXT_ENGINE, TEXT_KEYS, KeyType, TEXT_GAMES, TEXT_BOOLEAN, TEXT_DIFFICULTY
 
 
 KEY_VALUE_MIN_TRAILING_WHITESPACE = 3
@@ -36,7 +37,6 @@ class TextParser:
             is_blank = len(line.strip()) == 0
             if is_blank:
                 newline_count += 1
-                continue
 
             # After some newlines, assume a break in between key\values.
             elif newline_count > 2:
@@ -47,12 +47,13 @@ class TextParser:
             newline_count = 0
 
             # Headers are treated as the key of a new key\value pair.
-            header = self.detect_header(line)
-            if header is not None:
-                self.add_pair(key, values)
-                key = header.lower()
-                values = []
-                continue
+            if not is_blank:
+                header = self.detect_header(line)
+                if header is not None:
+                    self.add_pair(key, values)
+                    key = header.lower()
+                    values = []
+                    continue
 
             # Detect key\value pairs or just values to append to the current pair.
             detect_key, detect_value = self.detect_key_value(line)
@@ -61,7 +62,7 @@ class TextParser:
                 key = detect_key
                 values = [detect_value]
 
-            elif detect_value is not None and len(detect_value):
+            elif detect_value is not None:
                 values.append(detect_value)
 
         # Add the last key\value pair if any.
@@ -72,6 +73,14 @@ class TextParser:
             if not self.parse_pair(key, value) and self.logger.verbosity == Logger.VERBOSITY_DEBUG:
                 self.logger.stream('pairs', '{} :: {}'.format(key, value))
                 self.logger.stream('keys', key)
+
+        # Postprocess data
+        for key, value in  self.info.items():
+            type_info = TEXT_KEYS.get(key)
+
+            process = type_info.get('process', None)
+            if process == TextKeyProcess.TEXT_TO_MARKDOWN:
+                self.info[key] = self.text_to_markdown(value)
 
     def add_pair(self, key: Optional[str], values: List[str]):
         if len(values) == 0 or key is None or len(key) == 0:
@@ -144,64 +153,53 @@ class TextParser:
         if not parser_key:
             return False
 
-        # Parse value from the key's type.
-        if parser_data['type'] == KeyType.TEXT:
+        # Skip single value keys if a value already exists.
+        type = parser_data.get('type', TextKeyType.SINGLE)
+        if type == TextKeyType.SINGLE and parser_key in self.info:
+            return True
+
+        transform = parser_data.get('transform', TextKeyTransform.TEXT)
+        store = parser_data.get('store', TextKeyStore.STORE)
+
+        # Transform value.
+        if transform == TextKeyTransform.TEXT:
             value = str(value).strip()
-        elif parser_data['type'] == KeyType.BOOL:
+            value = RE_WHITESPACE_COLLAPSE.sub(' ', value)
+        elif transform == TextKeyTransform.BOOL:
             value = self.parse_bool(value)
-        elif parser_data['type'] == KeyType.GAME:
-            value = self.parse_game(value)
-        elif parser_data['type'] == KeyType.DIFFICULTY:
+        elif transform == TextKeyTransform.DIFFICULTY:
             value = self.parse_difficulty(value)
-        elif parser_data['type'] == KeyType.ENGINE:
+        elif transform == TextKeyTransform.GAME:
+            value = self.parse_game(value)
+        elif transform == TextKeyTransform.ENGINE:
             value = self.parse_engine(value)
+        elif transform is not None:
+            raise Exception('Unimplemented textparser key transform "{}".'.format(transform))
 
-        # TODO
-        elif parser_data['type'] == KeyType.MAP_NUMBER:
-            value = str(value).strip()
-        elif parser_data['type'] == KeyType.INTEGER:
-            value = str(value).strip()
-        elif parser_data['type'] == KeyType.GAME_STYLE:
-            value = str(value).strip()
-        elif parser_data['type'] == KeyType.DATETIME:
-            value = str(value).strip()
-
+        # Store value with possible existing value.
+        if store == TextKeyStore.STORE:
+            pass
+        elif store == TextKeyStore.BINARY_OR:
+            if value is None:
+                return True
+            if parser_key in self.info:
+                value = self.info[parser_key] | value
         else:
-            raise Exception('Unimplemented parser for key type "{}"'.format(parser_data['type']))
+            raise Exception('Unimplemented textparser key store "{}".'.format(store))
 
-        # Append the value based on the type.
-        if parser_data.get('array', False):
+        # Place into requested data structure.
+        if type == TextKeyType.SINGLE:
+            self.info[parser_key] = value
+        elif type == TextKeyType.ARRAY:
             if parser_key not in self.info:
-                self.info[parser_key] = [value]
-            else:
-                self.info[parser_key].append(value)
-
+                self.info[parser_key] = []
+            self.info[parser_key].append(value)
+        elif type == TextKeyType.SET:
+            if parser_key not in self.info:
+                self.info[parser_key] = set()
+            self.info[parser_key].add(value)
         else:
-            if parser_data['type'] == KeyType.TEXT:
-                if not len(value):
-                    return True
-                value = RE_WHITESPACE_COLLAPSE.sub(' ', value)
-
-                if parser_key not in self.info:
-                    self.info[parser_key] = value
-                elif not parser_data.get('single_line', False):
-                    self.info[parser_key] += ' ' + value
-
-            elif parser_data['type'] == KeyType.DIFFICULTY:
-                if value is not None:
-                    if parser_key not in self.info:
-                        self.info[parser_key] = value
-                    else:
-                        self.info[parser_key] |= value
-
-            elif parser_data['type'] == KeyType.BOOL:
-                if parser_key not in self.info:
-                    self.info[parser_key] = value
-                else:
-                    self.info[parser_key] |= value
-
-            else:
-                self.info[parser_key] = value
+            raise Exception('Unimplemented textparser key type "{}".'.format(store))
 
         return True
 
@@ -231,6 +229,9 @@ class TextParser:
             return True
         elif parser_key == 'false':
             return False
+
+        if value.isnumeric() and int(value) > 0:
+            return True
 
         if self.logger.verbosity == Logger.VERBOSITY_DEBUG:
             self.logger.stream('text_parser_value_bool', '{}'.format(value))
@@ -273,3 +274,23 @@ class TextParser:
             self.logger.stream('text_parser_value_difficulty', '{}'.format(value))
 
         return None
+
+    @staticmethod
+    def text_to_markdown(data) -> str:
+        if isinstance(data, str):
+            data = [data]
+        if isinstance(data, set):
+            data = list(data)
+
+        paragraphs = []
+
+        lines = []
+        for data_line in data:
+            if len(data_line) == 0:
+                paragraphs.append(' '.join(lines))
+                lines.clear()
+                continue
+
+            lines.append(data_line)
+
+        return '\n\n'.join(paragraphs).strip()
