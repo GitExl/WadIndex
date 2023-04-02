@@ -70,7 +70,7 @@ class ImageRepository {
     return $images;
   }
 
-  public function getRandom(int $count=15): array {
+  public function getRandom(int $count=9): array {
     $images = [];
 
     for ($i = 0; $i < $count; $i++) {

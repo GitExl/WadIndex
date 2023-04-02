@@ -4,7 +4,7 @@ import APIBase from "./APIBase";
 export default class GraphicsAPI extends APIBase {
 
   public async getRandom(): Promise<IndexImage[]> {
-    const response = await fetch(import.meta.env.VITE_API_BASE_URL + '/graphics/random');
+    const response = await fetch(import.meta.env.VITE_API_BASE_URL + '/images/random');
     if (!response) {
       throw new Error();
     }
@@ -14,7 +14,7 @@ export default class GraphicsAPI extends APIBase {
     for (let item of Object.values(data)) {
       const image = parseImage(item);
       if (image) {
-        graphics.push();
+        graphics.push(image);
       }
     }
 
