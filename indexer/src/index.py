@@ -11,7 +11,7 @@ from indexer.indexer import Indexer
 from indexer.storage import Storage
 from utils.author_parser import Author
 from utils.config import Config
-from indexer.ignorelist import must_ignore
+from indexer.ignorelist import must_ignore, must_skip_graphics
 from utils.logger import Logger
 from utils.logger_stream import LoggerStream
 
@@ -26,7 +26,11 @@ def index_process(verbosity: int, stream_queue: Queue, task_queue: Queue, db_loc
     for (collection, path_system, path_collection_file, start_time) in iter(task_queue.get, None):
         logger.info('Processing {}...'.format(path_collection_file))
 
-        info = indexer.index_file(path_system, path_collection_file)
+        skip_graphics_reason = must_skip_graphics(path_collection_file)
+        if skip_graphics_reason is not None:
+            logger.info('Skipping graphics for {} because {}.'.format(path_system, skip_graphics_reason))
+
+        info = indexer.index_file(path_system, path_collection_file, skip_graphics_reason is not None)
         if info is None:
             return None
 

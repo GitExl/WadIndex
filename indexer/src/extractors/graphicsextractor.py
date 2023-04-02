@@ -60,7 +60,7 @@ class GraphicsExtractor(ExtractorBase):
             if not file:
                 continue
 
-            image = self.read_lump_as_image(file, palette)
+            image = self.read_lump_as_image(file, palette, info)
             if not image:
                 continue
 
@@ -97,7 +97,7 @@ class GraphicsExtractor(ExtractorBase):
                 info.graphics[name].is_primary = True
                 break
 
-    def read_lump_as_image(self, file: ArchiveFileBase, palette: Palette) -> Optional[Image.Image]:
+    def read_lump_as_image(self, file: ArchiveFileBase, palette: Palette, info: ExtractedInfo) -> Optional[Image.Image]:
         image: Optional[Image.Image] = None
 
         # Attempt to identify the file looking for PNG or partial JPEG magic bytes.
@@ -120,7 +120,7 @@ class GraphicsExtractor(ExtractorBase):
             image = self.read_raw_graphic(640, 480, data, palette)
 
         if not image:
-            self.logger.stream('unknown_graphics_format', 'Cannot identify or read {}'.format(file.name))
+            self.logger.stream('unknown_graphics_format', 'Cannot identify or read {} in {}'.format(file.name, info.main_archive.filename))
             self.logger.warn('Graphics data is of unknown type.')
 
         return image
