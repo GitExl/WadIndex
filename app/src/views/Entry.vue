@@ -87,13 +87,13 @@
           </table>
         </PageSection>
 
-        <PageSection id="maps" title="Maps" icon="near_me">
+        <PageSection v-if="entry.levels.length" id="maps" title="Maps" icon="near_me">
           <TeaserList layout="columns">
             <LevelTeaser v-for="level of entry.levels" :level="level" :key="level.name"></LevelTeaser>
           </TeaserList>
         </PageSection>
 
-        <PageSection id="music" title="Music" icon="music_note">
+        <PageSection v-if="entry.music.length" id="music" title="Music" icon="music_note">
           <TeaserList layout="columns">
             <MusicTeaser v-for="music of entry.music" :music="music" :key="music.name"></MusicTeaser>
           </TeaserList>
@@ -244,7 +244,19 @@ const engineTitle = computed((): string|undefined => {
 
   &--has-slides {
     .entry__main {
-      background: linear-gradient(0deg, rgba($color-primary-dark, 0) 0%, rgba($color-primary-dark, 0.33) 96%);
+      position: relative;
+
+      &:before {
+        content: '';
+        display: block;
+        width: 100%;
+        height: 100%;
+        max-height: 40rem;
+        background: linear-gradient(0deg, rgba($color-primary-dark, 0) 0%, rgba($color-primary-dark, 0.33) 96%);
+        position: absolute;
+        top: 0;
+        z-index: -10;
+      }
     }
   }
 

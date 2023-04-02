@@ -23,6 +23,7 @@
 }
 
 .off-canvas__off {
+  min-height: 100vh;
 }
 
 .off-canvas__on {

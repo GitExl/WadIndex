@@ -24,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   grid-column-gap: 2.5rem;
   grid-row-gap: 0px;
   width: 100%;
+  min-height: 100%;
   padding-left: $nav-width;
 
   @media (min-width: 100rem) {

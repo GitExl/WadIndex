@@ -5,14 +5,17 @@ import Home from '../views/Home.vue'
 const router = createRouter({
   history: createWebHistory(),
 
-  // Doesn't work well with in page nav
-  // scrollBehavior(to, from, savedPosition) {
-  //   if (savedPosition) {
-  //     return savedPosition
-  //   } else {
-  //     return { top: 0 }
-  //   }
-  // },
+  scrollBehavior(to, from, savedPosition) {
+    if (to.path === from.path && to.hash !== from.hash) {
+      return { selector: to.hash };
+    }
+
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { top: 0 };
+    }
+  },
 
   routes: [
     {
