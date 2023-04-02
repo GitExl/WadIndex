@@ -19,7 +19,7 @@ $top: 6rem;
 .nav-menu {
   padding: 1rem;
   padding-top: $top;
-  background-color: rgba($color-primary-dark, 0.8);
+  background-color: rgba($color-primary-dark, 0.66);
   width: $nav-width;
   height: 100%;
   backdrop-filter: blur(1rem);

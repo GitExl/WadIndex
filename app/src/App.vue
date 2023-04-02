@@ -14,6 +14,8 @@
           <TrackInfo title="Hangar 7" author="Jimmy"></TrackInfo>
           <Player url="/midi/hangar7.mid"></Player>
         </div> -->
+
+        <PageFooter></PageFooter>
       </template>
     </OffCanvas>
   </div>
@@ -22,6 +24,7 @@
 <script setup lang="ts">
 import NavMenu from './components/NavMenu.vue';
 import OffCanvas from './components/OffCanvas.vue';
+import PageFooter from './components/PageFooter.vue';
 </script>
 
 <style lang="scss">

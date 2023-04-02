@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 <style lang="scss">
 .layout {
   display: grid;
-  grid-template-columns: 1fr minmax(0, 60rem) 1fr;
+  grid-template-columns: 1fr minmax(0, $layout-max-width) 1fr;
   grid-template-rows: 1fr;
   grid-column-gap: 2.5rem;
   grid-row-gap: 0px;
@@ -51,7 +51,7 @@ const props = withDefaults(defineProps<Props>(), {
 
   &--two-column {
     @media (min-width: 100rem) {
-      grid-template-columns: 1fr minmax(0, 100rem) 1fr;
+      grid-template-columns: 1fr minmax(0, $layout-max-width-wide) 1fr;
     }
 
     .layout__middle {

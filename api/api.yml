@@ -22,7 +22,7 @@ components:
         par_time:
           type: integer
         music:
-          $ref: '#/components/schemas/MapMusic'
+          $ref: '#/components/schemas/MusicTeaser'
           nullable: true
         next:
           $ref: '#/components/schemas/MapTeaser'
@@ -110,7 +110,7 @@ components:
           type: string
           nullable: true
 
-    MapMusic:
+    MusicTeaser:
       type: object
       properties:
         name:
@@ -191,7 +191,7 @@ components:
         music:
           type: array
           items:
-            $ref: '#/components/schemas/MapMusic'
+            $ref: '#/components/schemas/MusicTeaser'
         images:
           type: array
           items:

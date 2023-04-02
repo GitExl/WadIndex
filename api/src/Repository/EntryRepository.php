@@ -55,7 +55,7 @@ class EntryRepository {
   ';
 
   private const FIELDS_MINIMAL = '
-    e.entry_id AS `id`,
+    e.id AS `id`,
     e.collection AS `collection`,
     e.path AS `path`,
     e.title AS `title`
@@ -246,18 +246,24 @@ class EntryRepository {
     ];
   }
 
-  public function getForMusic(int $music_id): array {
-    $stmt = $this->connection->prepare('
+  public function getTeasersForMusic(int $music_id, bool $single=FALSE): array {
+    $query = '
       SELECT
         em.name AS `name`,
-        ' . self::FIELDS_MINIMAL . '
+        ' . self::FIELDS_TEASER . '
       FROM
         entry_music em
       LEFT JOIN entry e ON e.id = em.entry_id
       WHERE
         em.music_id = :music_id
       ORDER BY e.file_modified ASC
-    ');
+    ';
+
+    if ($single) {
+      $query .= ' LIMIT 1';
+    }
+
+    $stmt = $this->connection->prepare($query);
     $entries = $stmt->executeQuery([
       'music_id' => $music_id,
     ])->fetchAllAssociative();

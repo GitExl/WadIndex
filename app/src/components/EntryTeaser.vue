@@ -52,7 +52,7 @@ const description = computed((): string|undefined => {
 
 const entryLocation = computed((): RouteLocationRaw => {
   return {
-    path: 'entries/' + props.entry.collection + '/' + props.entry.path + '/',
+    path: '/entries/' + props.entry.collection + '/' + props.entry.path + '/',
   };
 })
 </script>

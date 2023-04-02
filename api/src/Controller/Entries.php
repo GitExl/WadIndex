@@ -56,7 +56,9 @@ class Entries extends AbstractController {
         unset($author);
 
         $entry['images'] = $this->images->getAllForEntry($entry['id'], $entry['path']);
-        $entry['music'] = $this->music->getAllForEntry($entry['id']);
+
+        $entry['music'] = $this->music->getAllTeasersForEntry($entry['id']);
+        unset($entry['music']['id']);
 
         $entry['maps'] = $this->maps->getAllTeasersForEntry($entry['id']);
         foreach ($entry['maps'] as &$map) {

@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
   padding: 0.1rem 0.65rem;
   border-radius: 0.5rem;
   line-height: 1;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   margin-right: 0.25rem;
   vertical-align: text-top;

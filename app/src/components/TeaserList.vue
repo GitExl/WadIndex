@@ -1,7 +1,7 @@
 <template>
-  <ul class="teaser-list" :class="{ ['teaser-list--layout-' + props.layout]: true }">
+  <div class="teaser-list" :class="{ ['teaser-list--layout-' + props.layout]: true }">
     <slot></slot>
-  </ul>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -16,8 +16,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 <style lang="scss">
 .teaser-list {
-  list-style: none;
-  padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 1.25rem;
@@ -26,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
     flex-direction: row;
 
     > * {
-      width: calc(50% - 1.25rem);
+      width: calc(50% - 0.75rem);
     }
   }
 

@@ -11,8 +11,8 @@
           <PageSidebar>
             <PageSidebarLink href="#general">General</PageSidebarLink>
             <PageSidebarLink v-if="entry.mirrorUrls" href="#download" icon="cloud_download">Download</PageSidebarLink>
-            <PageSidebarLink href="#maps" icon="near_me" :counter="32">Maps</PageSidebarLink>
-            <PageSidebarLink href="#music" icon="music_note" :counter="18">Music</PageSidebarLink>
+            <PageSidebarLink href="#maps" icon="near_me" :counter="entry.levels.length">Maps</PageSidebarLink>
+            <PageSidebarLink href="#music" icon="music_note" :counter="entry.music.length">Music</PageSidebarLink>
             <PageSidebarLink href="#" icon="description">Text file</PageSidebarLink>
           </PageSidebar>
         </template>
@@ -60,13 +60,16 @@
               </td>
             </tr>
             <tr v-if="entry.toolsUsed">
-              <td>Tools used</td><td>{{ entry.toolsUsed }}</td>
+              <td>Tools used</td><td class="entry__tools">{{ entry.toolsUsed }}</td>
             </tr>
             <tr v-if="entry.knownBugs">
               <td>Known bugs</td><td>{{ entry.knownBugs }}</td>
             </tr>
             <tr v-if="entry.comments">
-              <td>Comments</td><td>{{ entry.comments }}</td>
+              <td>Comments</td><td class="entry__comments">{{ entry.comments }}</td>
+            </tr>
+            <tr v-if="entry.credits">
+              <td>Additional credits</td><td class="entry__credits">{{ entry.credits }}</td>
             </tr>
           </table>
         </div>
@@ -85,14 +88,15 @@
         </PageSection>
 
         <PageSection id="maps" title="Maps" icon="near_me">
-
           <TeaserList layout="columns">
             <LevelTeaser v-for="level of entry.levels" :level="level" :key="level.name"></LevelTeaser>
           </TeaserList>
-
         </PageSection>
 
         <PageSection id="music" title="Music" icon="music_note">
+          <TeaserList layout="columns">
+            <MusicTeaser v-for="music of entry.music" :music="music" :key="music.name"></MusicTeaser>
+          </TeaserList>
         </PageSection>
       </Layout>
 
@@ -118,6 +122,7 @@ import PageSection from '@/components/PageSection.vue';
 import LevelTeaser from '@/components/LevelTeaser.vue';
 import TeaserList from '@/components/TeaserList.vue';
 import { useTitle } from 'vue-page-title';
+import MusicTeaser from '@/components/MusicTeaser.vue';
 
 
 const route = useRoute();
@@ -231,7 +236,7 @@ const engineTitle = computed((): string|undefined => {
     margin-bottom: 3rem;
 
     h1 {
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.625rem;
       margin-top: -0.5rem;
       font-size: 2.75rem;
     }
@@ -303,6 +308,13 @@ const engineTitle = computed((): string|undefined => {
 
   &__description {
     margin-bottom: 2rem;
+  }
+
+  &__description,
+  &__tools,
+  &__comments,
+  &__credits {
+    white-space: pre-wrap;
   }
 
   &__meta {

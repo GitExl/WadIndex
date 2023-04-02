@@ -12,9 +12,10 @@ class MusicRepository {
       $this->connection = $connection;
   }
 
-  public function getAllForEntry(int $entry_id): ?array {
+  public function getAllTeasersForEntry(int $entry_id): ?array {
     $stmt = $this->connection->prepare('
       SELECT
+        em.music_id AS `id`,
         em.name AS `name`,
         m.hash AS `hash`,
         m.duration AS `duration`,

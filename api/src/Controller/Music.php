@@ -29,7 +29,7 @@ class Music extends AbstractController {
             throw new NotFoundHttpException();
         }
 
-        $music['heard_in'] = $this->entries->getForMusic($music['id']);
+        $music['heard_in'] = $this->entries->getTeasersForMusic($music['id']);
         unset($music['id']);
 
         return $this->json($music);

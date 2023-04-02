@@ -1,3 +1,4 @@
+import { type MusicTeaserData, parseMusicTeaserData } from './MusicTeaser';
 import { type MirrorUrl, parseMirrorUrl } from './MirrorUrl';
 import { parseImage } from '@/data/IndexImage';
 import { parseAuthor, type Author } from "./Author"
@@ -26,7 +27,7 @@ export interface EntryData {
   authors: Author[]
   images: IndexImage[]
   levels: LevelTeaserData[]
-  // music: Music[]
+  music: MusicTeaserData[]
 }
 
 export function parseEntry(data: any): EntryData {
@@ -52,5 +53,6 @@ export function parseEntry(data: any): EntryData {
     authors: data.authors?.map(parseAuthor),
     images: data.images?.map(parseImage),
     levels: data.maps?.map(parseLevelTeaserData),
+    music: data.music?.map(parseMusicTeaserData),
   };
 }

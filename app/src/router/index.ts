@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
 
   // Doesn't work well with in page nav
   // scrollBehavior(to, from, savedPosition) {
@@ -48,6 +48,16 @@ const router = createRouter({
     {
       path: '/author/:alias',
       name: 'author',
+      component: Entry
+    },
+    {
+      path: '/music/:hash',
+      name: 'music',
+      component: Entry
+    },
+    {
+      path: '/map/:path(.*)',
+      name: 'map',
       component: Entry
     }
   ]

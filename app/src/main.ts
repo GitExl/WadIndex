@@ -16,10 +16,4 @@ app.use(
   })
 );
 
-app.config.globalProperties.$filters = {
-  truncate: function (text: string, stop: number, clamp: number) {
-    return text.slice(0, stop) + (stop < text.length ? clamp || '&hellip;' : '')
-  }
-}
-
 app.mount('#app')
