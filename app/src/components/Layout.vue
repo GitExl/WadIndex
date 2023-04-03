@@ -21,14 +21,13 @@ const props = withDefaults(defineProps<Props>(), {
   display: grid;
   grid-template-columns: 1fr minmax(0, $layout-max-width) 1fr;
   grid-template-rows: 1fr;
-  grid-column-gap: 2.5rem;
+  grid-column-gap: 1rem;
   grid-row-gap: 0px;
   width: 100%;
-  min-height: 100%;
   padding-left: $nav-width;
 
-  @media (min-width: 100rem) {
-    grid-column-gap: 5rem;
+  @media (min-width: 80rem) {
+    grid-column-gap: 3rem;
   }
 
   &__left {
@@ -41,13 +40,8 @@ const props = withDefaults(defineProps<Props>(), {
 
   &__middle {
     grid-area: 1 / 2 / 6 / 3;
-    gap: 0.5rem;
     columns: 1;
     display: relative;
-
-    @media (min-width: 60rem) {
-      gap: 1rem;
-    }
   }
 
   &--two-column {

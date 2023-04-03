@@ -9,11 +9,15 @@
 
         <template v-slot:start>
           <PageSidebar>
-            <PageSidebarLink href="#general">General</PageSidebarLink>
-            <PageSidebarLink v-if="entry.mirrorUrls" href="#download" icon="cloud_download">Download</PageSidebarLink>
-            <PageSidebarLink href="#maps" icon="near_me" :counter="entry.levels.length">Maps</PageSidebarLink>
-            <PageSidebarLink href="#music" icon="music_note" :counter="entry.music.length">Music</PageSidebarLink>
-            <PageSidebarLink href="#" icon="description">Text file</PageSidebarLink>
+
+            <LocalNav>
+              <LocalNavLink href="#general">General</LocalNavLink>
+              <LocalNavLink v-if="entry.mirrorUrls" href="#download" icon="cloud_download">Download</LocalNavLink>
+              <LocalNavLink href="#maps" icon="near_me" :counter="entry.levels.length">Maps</LocalNavLink>
+              <LocalNavLink href="#music" icon="music_note" :counter="entry.music.length">Music</LocalNavLink>
+              <LocalNavLink href="#" icon="description">Text file</LocalNavLink>
+            </LocalNav>
+
           </PageSidebar>
         </template>
 
@@ -115,7 +119,7 @@ import type { EntryData } from '@/data/Entry'
 import { humanFileSize } from '@/utils/FileSize';
 import { ref, type Ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import PageSidebarLink from '@/components/PageSidebarLink.vue';
+import PageSidebarLink from '@/components/LocalNavLink.vue';
 import type { WideSliderSlide } from '@/components/WideSlider.vue';
 import WideSlider from '@/components/WideSlider.vue';
 import PageSection from '@/components/PageSection.vue';
@@ -123,6 +127,8 @@ import LevelTeaser from '@/components/LevelTeaser.vue';
 import TeaserList from '@/components/TeaserList.vue';
 import { useTitle } from 'vue-page-title';
 import MusicTeaser from '@/components/MusicTeaser.vue';
+import LocalNavLink from '@/components/LocalNavLink.vue';
+import LocalNav from '@/components/LocalNav.vue';
 
 
 const route = useRoute();
@@ -232,6 +238,8 @@ const engineTitle = computed((): string|undefined => {
 
 <style lang="scss">
 .entry {
+  height: 100%;
+
   &__head {
     margin-bottom: 3rem;
 

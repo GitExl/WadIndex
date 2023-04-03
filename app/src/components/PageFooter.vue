@@ -16,7 +16,7 @@
 <style lang="scss">
 .page-footer {
   background-color: #000;
-  padding: 2rem 0;
+  padding: 2rem;
   margin-left: $nav-width;
 
   &__content {

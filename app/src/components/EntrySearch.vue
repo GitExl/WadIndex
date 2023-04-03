@@ -1,3 +1,9 @@
+<template>
+  <div class="entry-search">
+    <input type="search" placeholder="Search all entries" @keydown="keyDown" @input="input" />
+  </div>
+</template>
+
 <script setup lang="ts">
 import type { EntryTeaserData } from "@/data/EntryTeaser";
 import { ref, type Ref } from "vue";
@@ -43,12 +49,6 @@ function keyDown(event: Event) {
 }
 </script>
 
-<template>
-  <div class="entry-search">
-    <input type="search" placeholder="Search all entries" @keydown="keyDown" @input="input" />
-  </div>
-</template>
-
 <style lang="scss">
 .entry-search {
   width: 100%;
@@ -57,9 +57,7 @@ function keyDown(event: Event) {
   flex-direction: column;
 
   input {
-    margin: 1rem;
-    width: calc(100% - 2rem);
-    margin-bottom: 1rem;
+    width: 100%;
   }
 }
 </style>

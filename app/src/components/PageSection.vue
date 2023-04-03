@@ -29,10 +29,14 @@ const props = withDefaults(defineProps<Props>(), {
   }
 
   &__icon {
-    font-size: 2.125rem;
-    position: absolute;
-    left: -3.25rem;
+    position: relative;
     top: 0.25rem;
+    font-size: 2.125rem;
+
+    @media (min-width: 80rem) {
+      position: absolute;
+      left: -3rem;
+    }
   }
 }
 </style>

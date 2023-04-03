@@ -28,5 +28,6 @@
 
 .off-canvas__on {
   flex-grow: 1;
+  min-height: 100vh;
 }
 </style>

@@ -1,8 +1,6 @@
 <template>
   <aside class="page-sidebar">
-    <ul class="page-sidebar__inset">
-      <slot></slot>
-    </ul>
+    <slot></slot>
   </aside>
 </template>
 
@@ -10,16 +8,9 @@
 .page-sidebar {
   width: 100%;
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
   position: sticky;
   top: 3rem;
-
-  &__inset {
-    width: 100%;
-    max-width: 11rem;
-    list-style: none;
-    padding: 0;
-  }
 }
 </style>

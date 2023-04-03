@@ -1,9 +1,9 @@
 <template>
-  <li class="page-sidebar-link">
+  <li class="local-nav-link">
     <a :href="href">
-      <span v-if="icon" class="page-sidebar-link__icon material-icons-outlined">{{ icon }}</span>
-      <span class="page-sidebar-link__link"><slot></slot></span>
-      <span v-if="counter" class="page-sidebar-link__counter">{{ counter }}</span>
+      <span v-if="icon" class="local-nav-link__icon material-icons-outlined">{{ icon }}</span>
+      <span class="local-nav-link__link"><slot></slot></span>
+      <span v-if="counter" class="local-nav-link__counter">{{ counter }}</span>
     </a>
   </li>
 </template>
@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <style lang="scss">
-.page-sidebar-link {
+.local-nav-link {
   position: relative;
 
   a {

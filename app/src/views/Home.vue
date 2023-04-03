@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+
     <div class="home__background">
       <div class="home__background-row home__background-row--1">
         <img v-for="image of randomSplit[0]" :src="storageBaseUrl + '/' + image.hrefThumbnail" :width="image.width" :height="image.height" :style="{ 'aspect-ratio': image.aspectRatio }">
@@ -12,7 +13,7 @@
     <Layout type="one-column">
       <div class="home__header">
         <img src="@/assets/images/logo.svg">
-        <EntrySearch />
+        <EntrySearch class="home__entry-search" />
         <router-link to="/search">Advanced search</router-link>
       </div>
     </Layout>
@@ -88,7 +89,7 @@ const storageBaseUrl = import.meta.env.VITE_STORAGE_BASE_URL;
 
     img {
       max-width: 28rem;
-      margin-bottom: 3.25rem;
+      margin-bottom: 2.25rem;
     }
   }
 
@@ -100,7 +101,7 @@ const storageBaseUrl = import.meta.env.VITE_STORAGE_BASE_URL;
     left: 0;
     overflow-x: hidden;
     padding: 0.25rem;
-    opacity: 0.25;
+    opacity: 0.2;
     z-index: -10;
   }
 
@@ -119,6 +120,10 @@ const storageBaseUrl = import.meta.env.VITE_STORAGE_BASE_URL;
       display: block;
       image-rendering: pixelated;
     }
+  }
+
+  &__entry-search {
+    margin: 1rem;
   }
 }
 </style>
