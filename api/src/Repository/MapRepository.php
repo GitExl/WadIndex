@@ -21,7 +21,8 @@ class MapRepository {
     m.music AS `music_name`,
     m.format AS `format`,
     m.next AS `next`,
-    m.next_secret AS `next_secret`
+    m.next_secret AS `next_secret`,
+    m.par_time AS `par_time`
   ';
 
   private Connection $connection;

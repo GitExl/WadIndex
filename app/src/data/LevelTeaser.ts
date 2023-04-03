@@ -10,6 +10,7 @@ export interface LevelTeaserData {
   next: string
   nextSecret: string
   authors: Author[]
+  parTime: number
 }
 
 export function parseLevelTeaserData(data: any): LevelTeaserData {
@@ -23,5 +24,6 @@ export function parseLevelTeaserData(data: any): LevelTeaserData {
     next: data.next,
     nextSecret: data.next_secret,
     authors: data.authors?.map(parseAuthor),
+    parTime: data.par_time
   }
 }

@@ -14,6 +14,11 @@
       <div><AuthorList :authors="level.authors" :limit="2"></AuthorList></div>
     </InfoBlockRow>
 
+    <InfoBlockRow v-if="level.parTime">
+      <div>Par time</div>
+      <div>{{ formattedParTime }}</div>
+    </InfoBlockRow>
+
     <InfoBlockRow v-if="level.musicName">
       <div>Music</div>
       <a class="level-teaser__monospaced" :href="'#music-' + level.musicName">{{ level.musicName }}</a>
@@ -50,6 +55,20 @@ const link = computed((): RouteLocationRaw => {
     path: '/map/' + props.level.collection + '/' + props.level.path + '/' + props.level.name + '/',
   };
 })
+
+const formattedParTime = computed((): string|undefined => {
+  if (!props.level.parTime) {
+    return undefined;
+  }
+
+  const minutes = Math.floor(props.level.parTime / 60);
+  const seconds = props.level.parTime % 60;
+  if (seconds < 10) {
+    return minutes + ':0' + seconds;
+  }
+
+  return minutes + ':' + seconds;
+});
 </script>
 
 <style lang="scss">
