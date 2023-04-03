@@ -96,8 +96,8 @@ const storageBaseUrl = import.meta.env.VITE_STORAGE_BASE_URL;
     position: absolute;
     top: 0;
     right: 0;
-    width: calc(100% - $nav-width);
-    left: $nav-width;
+    width: 100%;
+    left: 0;
     overflow-x: hidden;
     padding: 0.25rem;
     opacity: 0.25;
@@ -108,8 +108,9 @@ const storageBaseUrl = import.meta.env.VITE_STORAGE_BASE_URL;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    width: 100%;
+    width: calc(100% - $nav-width);
     position: relative;
+    left: $nav-width;
 
     img {
       width: auto;

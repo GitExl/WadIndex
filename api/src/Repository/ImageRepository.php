@@ -70,13 +70,12 @@ class ImageRepository {
     return $images;
   }
 
-  public function getRandom(int $count=9): array {
+  public function getRandom(int $count=13): array {
     $images = [];
 
     for ($i = 0; $i < $count; $i++) {
 
-      // Method to quickly get a random entry_id from the entry_images table, then
-      // get the primary image for that entry.
+      // Use random column to quickly get a single random image.
       $stmt = $this->connection->prepare('
         SELECT
           ei.name AS `name`,
@@ -85,19 +84,11 @@ class ImageRepository {
           ei.aspect_ratio AS `aspect_ratio`,
           e.path AS `entry_path`
         FROM entry_images ei
-        INNER JOIN
-          (SELECT CEIL(
-            (SELECT MIN(entry_id) FROM entry_images) +
-            (
-              RAND() *
-              (SELECT MAX(entry_id) FROM entry_images) - (SELECT MIN(entry_id) FROM entry_images)
-            )
-          ) AS entry_id)
-        AS x
-        LEFT JOIN entry e ON e.id = ei.entry_id
+        INNER JOIN entry e ON e.id = ei.entry_id
         WHERE
-          ei.entry_id >= x.entry_id AND
-          ei.is_primary = 1
+          ei.is_primary = 1 AND
+          ei.random >= ' . random_int(0, 0xFFFFFFFF) . '
+        ORDER BY random ASC
         LIMIT 1
       ');
       $image = $stmt->executeQuery()->fetchAssociative();

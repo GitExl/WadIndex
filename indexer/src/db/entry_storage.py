@@ -1,5 +1,6 @@
 from operator import attrgetter
 from pathlib import Path
+from random import randrange
 from typing import Optional, Set
 
 from db.author_storage import AuthorStorage
@@ -71,7 +72,7 @@ class EntryStorage(StorageBase):
 
         self.db.cursor.execute('DELETE FROM entry_images WHERE entry_id=%s', (entry.id,))
         for name, graphic in entry.graphics.items():
-            self.db.cursor.execute('INSERT INTO entry_images VALUES (%s, %s, %s, %s, %s, %s, %s)', (
+            self.db.cursor.execute('INSERT INTO entry_images VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', (
                 entry.id,
                 name,
                 graphic.index,
@@ -79,6 +80,7 @@ class EntryStorage(StorageBase):
                 graphic.image.height,
                 graphic.is_primary,
                 graphic.aspect_ratio,
+                randrange(0, 0xFFFFFFFF),
             ))
 
         self.db.cursor.execute('DELETE FROM entry_music WHERE entry_id=%s', (entry.id,))
