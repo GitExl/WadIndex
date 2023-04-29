@@ -47,6 +47,8 @@ def index_process(verbosity: int, stream_queue: Queue, task_queue: Queue, db_loc
             )
         else:
             entry.entry_updated = start_time
+            entry.file_modified = info.file_modified
+            entry.file_size = info.file_size
 
         entry.title = info.title
         entry.game = info.game

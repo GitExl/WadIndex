@@ -6,7 +6,7 @@ from utils import author_parser
 class PropertyExtractor(ExtractorBase):
 
     def extract(self, info: ExtractedInfo):
-        info.title = info.text_keys.get('title', None)
+        info.title = info.text_keys.get('title', info.filename_base)
         if info.title is not None and len(info.title) > 255:
             info.title = '{}...'.format(info.title[:252])
 

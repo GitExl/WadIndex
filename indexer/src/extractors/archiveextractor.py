@@ -92,13 +92,21 @@ class ArchiveExtractor(ExtractorBase):
             # Look for a file with the same basename as the ZIP.
             wad_filename = '{}.{}'.format(file_basename, extension).lower()
             for info in archive.infolist():
+
+                # Skip __ files (thanks MacOS)
+                if info.filename.startswith('__'):
+                    continue
+
                 if basename(info.filename).lower() == wad_filename:
                     return [info]
 
             files: List[ZipInfo] = []
             for info in archive.infolist():
+                if info.filename.startswith('__'):
+                    continue
                 if info.filename.lower().endswith(extension):
                     files.append(info)
+
             if len(files):
                 files.sort(key=lambda file: file.filename)
                 return files
