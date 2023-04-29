@@ -327,7 +327,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Image'
 
-  /search:
+  /entries/search:
     get:
       description: Returns entries matching a search query.
       parameters:
@@ -347,11 +347,14 @@ paths:
               type: string
               enum: [title, description, filename, textfile]
             default: [title, description, filename]
-        - name: collection
+        - name: collections
           in: query
-          description: The collection to search in.
+          description: The collections to search in.
+          required: true
           schema:
-            type: string
+            type: array
+            items:
+              type: string
         - name: filter_gameplay
           in: query
           description: Filter by the type of gameplay.
@@ -471,7 +474,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Music'
 
-  /list/{collection}/{path}:
+  /entries/list/{collection}/{path}:
     get:
       description: Returns all entries and subdirectories of a path.
       parameters:

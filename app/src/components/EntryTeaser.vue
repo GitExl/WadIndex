@@ -1,13 +1,15 @@
 <template>
-  <div class="entry-teaser" @click="$router.push(entryLocation)">
+  <div class="entry-teaser">
     <div class="entry-teaser__info">
-      <h2>{{ entry.title }}</h2>
+      <h2><router-link :to="href">{{ entry.title }}</router-link></h2>
+
       <p class="entry-teaser__subtitle">
         <AuthorList class="entry-teaser__authors" :authors="entry.authors" :limit="5"></AuthorList>
         <Tag v-if="entry.isSingleplayer">SP</Tag>
         <Tag v-if="entry.isCooperative">COOP</Tag>
         <Tag v-if="entry.isDeathmatch">DM</Tag>
       </p>
+
       <p v-if="entry.description" class="entry-teaser__description">{{ description }}</p>
     </div>
 
@@ -21,7 +23,6 @@
 import type { EntryTeaserData } from '@/data/EntryTeaser';
 import Tag from '@/components/Tag.vue';
 import { computed } from 'vue';
-import type { RouteLocationRaw } from 'vue-router';
 import AuthorList from './AuthorList.vue';
 
 const props = defineProps<{
@@ -50,17 +51,16 @@ const description = computed((): string|undefined => {
   return undefined;
 });
 
-const entryLocation = computed((): RouteLocationRaw => {
-  return {
-    path: '/entries/' + props.entry.collection + '/' + props.entry.path + '/',
-  };
-})
+const href = computed((): string => {
+  return '/entries/' + props.entry.collection + '/' + props.entry.path + '/';
+});
 </script>
 
 <style lang="scss">
 .entry-teaser {
   @include rect;
 
+  position: relative;
   padding: 1rem;
   display: flex;
   flex-direction: row;
@@ -68,10 +68,25 @@ const entryLocation = computed((): RouteLocationRaw => {
   width: 100%;
 
   h2 {
-    font-size: 1.25rem;
-    font-family: 'DejaVu Sans Condensed', sans-serif;
-    font-weight: normal;
     margin-bottom: 0;
+
+    a {
+      display: block;
+      color: $color-accent;
+      font-size: 1.25rem;
+      font-family: 'DejaVu Sans Condensed', sans-serif;
+      font-weight: normal;
+      text-decoration: none;
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+    }
   }
 
   &__subtitle {

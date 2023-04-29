@@ -1,8 +1,8 @@
 <template>
   <div class="layout" :class="{['layout--' + props.type]: true}">
-    <div class="layout__start"><slot name="start"></slot></div>
+    <div v-if="$slots.start" class="layout__start"><slot name="start"></slot></div>
     <div class="layout__middle"><slot></slot></div>
-    <div class="layout__end"><slot name="end"></slot></div>
+    <div v-if="$slots.end" class="layout__end"><slot name="end"></slot></div>
   </div>
 </template>
 
@@ -30,18 +30,17 @@ const props = withDefaults(defineProps<Props>(), {
     grid-column-gap: 3rem;
   }
 
-  &__left {
-    grid-area: 1 / 1 / 2 / 2;
+  &__start {
+    padding-left: 2rem;
   }
 
-  &__right {
-    grid-area: 1 / 3 / 2 / 4;
+  &__end {
+    padding-right: 2rem;
   }
 
   &__middle {
     grid-area: 1 / 2 / 6 / 3;
     columns: 1;
-    display: relative;
   }
 
   &--two-column {

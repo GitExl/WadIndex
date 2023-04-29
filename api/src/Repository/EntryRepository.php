@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use DateInterval;
+use DateTime;
 use Doctrine\DBAL\Connection;
 use InvalidArgumentException;
 
@@ -67,26 +69,42 @@ class EntryRepository {
       $this->connection = $connection;
   }
 
-  public function getLatestTeasers(int $count=15): array {
+  public function getLatestTeasers(int $max_results=20): array {
+    $time_ago = new DateTime();
+    $time_ago->modify('1 month ago');
+    $time_ago_f = $time_ago->getTimestamp();
+
     $stmt = $this->connection->prepare("
       SELECT
         " . self::FIELDS_TEASER . "
       FROM entry e
-      ORDER BY e.entry_created DESC, e.file_modified DESC
-      LIMIT $count
+      WHERE
+        e.entry_created > $time_ago_f
+      ORDER BY
+        e.entry_created DESC,
+        e.file_modified DESC
+      LIMIT $max_results
     ");
     $entries = $stmt->executeQuery()->fetchAllAssociative();
 
     return $entries;
   }
 
-  public function getUpdatedTeasers(int $count=15): array {
+  public function getUpdatedTeasers(int $max_results=20): array {
+    $time_ago = new DateTime();
+    $time_ago->modify('1 month ago');
+    $time_ago_f = $time_ago->getTimestamp();
+
     $stmt = $this->connection->prepare("
       SELECT
         " . self::FIELDS_TEASER . "
       FROM entry e
-      ORDER BY e.file_modified DESC
-      LIMIT $count
+      WHERE
+        e.file_modified > $time_ago_f AND
+        e.file_modified > e.entry_created
+      ORDER BY
+        e.file_modified DESC
+      LIMIT $max_results
     ");
     $entries = $stmt->executeQuery()->fetchAllAssociative();
 
@@ -332,15 +350,13 @@ class EntryRepository {
       }
     }
 
-    $query = $this->buildSearchQuery(self::FIELDS_TEASER, $matches, $joins, $params->filterGame, $params->filterGameplay, $sort_field, $sort_order, $params->limit, $params->offset);
+    $query = $this->buildSearchQuery(self::FIELDS_TEASER, $matches, $joins, $params->collections, $params->filterGame, $params->filterGameplay, $sort_field, $sort_order, $params->limit, $params->offset);
     $stmt = $this->connection->prepare($query);
-    $stmt->bindValue('collection', $params->collection);
     $stmt->bindValue('search_key', $params->searchKey);
     $entries = $stmt->executeQuery()->fetchAllAssociative();
 
-    $count_query = $this->buildSearchQuery('COUNT(*)', $matches, $joins, $params->filterGame, $params->filterGameplay);
+    $count_query = $this->buildSearchQuery('COUNT(*)', $matches, $joins, $params->collections, $params->filterGame, $params->filterGameplay);
     $stmt = $this->connection->prepare($count_query);
-    $stmt->bindValue('collection', $params->collection);
     $stmt->bindValue('search_key', $params->searchKey);
     $entries_total = $stmt->executeQuery()->fetchFirstColumn()[0];
 
@@ -354,6 +370,7 @@ class EntryRepository {
     string $fields,
     array $matches,
     array $joins,
+    array $collections,
     array $games,
     array $gameplay_types,
     ?string $sort_field=NULL,
@@ -381,7 +398,8 @@ class EntryRepository {
     $query[] = 'WHERE (' . implode(' OR ', $matches) . ')';
 
     // Filter by collection.
-    $query[] = 'AND e.collection = :collection';
+    $collections = implode(', ', array_map(static function($collection) { return "'" . $collection . "'"; }, $collections));
+    $query[] = "AND e.collection IN ($collections)";
 
     // Filter by game.
     $game_ids = array_map(function ($game_str) {

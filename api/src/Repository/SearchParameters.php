@@ -41,7 +41,7 @@ class SearchParameters {
   ];
 
   #[Assert\NotBlank]
-  public string $collection = 'idgames';
+  public array $collections = [];
 
   #[Assert\NotBlank]
   public string $searchKey = '';
@@ -70,7 +70,7 @@ class SearchParameters {
 
   public static function fromRequest(Request $request): SearchParameters {
     $params = new SearchParameters();
-    $params->collection = $request->query->get('collection', 'idgames');
+    $params->collections = self::parseArrayQueryParam($request->query->get('collections', ''));
     $params->searchKey = $request->query->get('search_key', '');
     $params->searchFields = self::parseArrayQueryParam($request->query->get('search_fields', ''));
     $params->filterGameplay = self::parseArrayQueryParam($request->query->get('filter_gameplay', ''));

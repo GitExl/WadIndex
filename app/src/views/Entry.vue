@@ -119,7 +119,6 @@ import type { EntryData } from '@/data/Entry'
 import { humanFileSize } from '@/utils/FileSize';
 import { ref, type Ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import PageSidebarLink from '@/components/LocalNavLink.vue';
 import type { WideSliderSlide } from '@/components/WideSlider.vue';
 import WideSlider from '@/components/WideSlider.vue';
 import PageSection from '@/components/PageSection.vue';

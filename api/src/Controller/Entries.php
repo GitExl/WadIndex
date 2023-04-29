@@ -93,7 +93,7 @@ class Entries extends AbstractController {
         return $this->json($entries);
     }
 
-    #[Route('/list/{collection}/{path}', methods: ['GET'], requirements: ['path' => '.+'])]
+    #[Route('/entries/list/{collection}/{path}', methods: ['GET'], requirements: ['path' => '.+'])]
     #[Cache(public: true, maxage: 3600, mustRevalidate: true)]
     public function list(Request $request, string $collection, ?string $path=NULL): Response {
         $params = ListParameters::fromRequest($request, $collection, $path);
@@ -115,7 +115,7 @@ class Entries extends AbstractController {
         return $this->json($listing);
     }
 
-    #[Route('/search', methods: ['GET'])]
+    #[Route('/entries/search', methods: ['GET'])]
     #[Cache(public: true, maxage: 3600, mustRevalidate: true)]
     public function search(Request $request) {
         $params = SearchParameters::fromRequest($request);

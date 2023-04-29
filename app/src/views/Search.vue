@@ -8,29 +8,39 @@
 
           <EntrySearch class="search__entry-search" />
 
-          <div class="filters">
-            <h3 class="filters__title">Search in</h3>
-            <ul class="filters__list">
-              <li class="filters__filter">
-                <input id="checkbox-1" type="checkbox"> <label for="checkbox-1">Title</label>
-              </li>
-              <li class="filters__filter">
-                <input id="checkbox-2" type="checkbox"> <label for="checkbox-2">Description</label>
-              </li>
-              <li class="filters__filter">
-                <input id="checkbox-3" type="checkbox"> <label for="checkbox-3">Filename</label>
-              </li>
-              <li class="filters__filter">
-                <input id="checkbox-4" type="checkbox"> <label for="checkbox-4">Text file</label>
-              </li>
-            </ul>
-          </div>
+          <SearchFilters title="Search in">
+            <FilterCheckbox name="in-title" title="Title"></FilterCheckbox>
+            <FilterCheckbox name="in-description" title="Description"></FilterCheckbox>
+            <FilterCheckbox name="in-filename" title="Filename"></FilterCheckbox>
+            <FilterCheckbox name="in-textfile" title="Text file"></FilterCheckbox>
+          </SearchFilters>
+
+          <SearchFilters title="Gameplay">
+            <FilterCheckbox name="gameplay-any" title="Any"></FilterCheckbox>
+            <FilterCheckbox name="gameplay-sp" title="Singleplayer"></FilterCheckbox>
+            <FilterCheckbox name="gameplay-dm" title="Deathmatch"></FilterCheckbox>
+            <FilterCheckbox name="gameplay-coop" title="Cooperative"></FilterCheckbox>
+          </SearchFilters>
+
+          <SearchFilters title="Game">
+            <FilterCheckbox name="game-any" title="Any"></FilterCheckbox>
+            <FilterCheckbox name="game-doom" title="Doom"></FilterCheckbox>
+            <FilterCheckbox name="game-doom2" title="Doom 2"></FilterCheckbox>
+            <FilterCheckbox name="game-tnt" title="TNT"></FilterCheckbox>
+            <FilterCheckbox name="game-putonia" title="Plutonia"></FilterCheckbox>
+            <FilterCheckbox name="game-heretic" title="Heretic"></FilterCheckbox>
+            <FilterCheckbox name="game-hexen" title="Hexen"></FilterCheckbox>
+          </SearchFilters>
 
         </PageSidebar>
       </template>
 
       <div class="search__head">
         <h1>Search</h1>
+      </div>
+
+      <div class="search__info">
+        <EntryList v-if="results" :entries="results?.entries" />
       </div>
 
     </Layout>
@@ -44,22 +54,32 @@ import { useRoute } from 'vue-router';
 import { useTitle } from 'vue-page-title';
 import PageSidebar from '@/components/PageSidebar.vue';
 import EntrySearch from '@/components/EntrySearch.vue';
+import { ref, type Ref } from 'vue';
+import API from '@/api/API';
+import type { SearchResults } from '@/api/EntriesAPI';
+import EntryList from '@/components/EntryList.vue';
+import SearchFilters from '@/components/SearchFilters.vue';
+import FilterCheckbox from '@/components/FilterCheckbox.vue';
 
 const route = useRoute();
 
+const results: Ref<SearchResults|undefined> = ref();
+
 useTitle('Search');
+
+results.value = await API.entries.search('alien', ['idgames'], [], [], []);
 </script>
 
 <style lang="scss">
 .search {
   height: 100%;
+  padding-top: 3rem;
 
   &__head {
-    margin-bottom: 3rem;
-
     h1 {
       margin-bottom: 0.625rem;
       margin-top: -0.5rem;
+      margin-left: 1rem;
       font-size: 2.75rem;
     }
   }
