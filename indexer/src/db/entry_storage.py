@@ -1,4 +1,3 @@
-from operator import attrgetter
 from pathlib import Path
 from random import randrange
 from typing import Optional, Set

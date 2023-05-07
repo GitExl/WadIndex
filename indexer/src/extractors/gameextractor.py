@@ -85,6 +85,8 @@ class GameExtractor(ExtractorBase):
             return Game.HEXEN
         elif path_str.find('hacx') > -1:
             return Game.HACX
+        elif path_str.find('doom64') > -1:
+            return Game.DOOM64
 
         return Game.UNKNOWN
 

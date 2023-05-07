@@ -12,3 +12,4 @@ class Game(Enum):
     STRIFE = 7
     CHEX = 8
     HACX = 9
+    DOOM64 = 10

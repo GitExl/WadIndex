@@ -21,3 +21,5 @@ class Engine(Enum):
     DOOMRETRO = 16
     ZANDRONUM = 17
     ODAMEX = 18
+    DOOM64 = 19
+    DOOM64EX = 20

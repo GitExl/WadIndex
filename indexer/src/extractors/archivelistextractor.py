@@ -26,6 +26,7 @@ class ArchiveListExtractor(ExtractorBase):
         self._add_iwad(Game.PLUTONIA, 'PLUTONIA.WAD')
         self._add_iwad(Game.STRIFE, 'STRIFE0.WAD')
         self._add_iwad(Game.HACX, 'HACX.WAD')
+        self._add_iwad(Game.DOOM64, 'DOOM64.WAD')
 
     def extract(self, info: ExtractedInfo):
         if not len(info.archives):
@@ -33,7 +34,7 @@ class ArchiveListExtractor(ExtractorBase):
             return
 
         if info.game not in self.iwads:
-            self.logger.warn('Cannot create archive list for archive for an unknown game.')
+            self.logger.warn('Cannot create archive list for a game without an IWAD.')
             return
 
         iwad = self.iwads[info.game]

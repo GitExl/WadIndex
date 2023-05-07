@@ -89,5 +89,17 @@
     "lumps": [
       "DOOM_DDF"
     ]
+  },
+  "DOOM64": {
+    "lumps": [
+    ]
+  },
+  "DOOM64EX": {
+    "inherit": "DOOM64",
+    "lumps": [
+      "SKYDEFS",
+      "MAPINFO",
+      "ANIMDEFS"
+    ]
   }
 }

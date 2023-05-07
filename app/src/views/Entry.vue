@@ -198,6 +198,7 @@ const gameTitle = computed((): string|undefined => {
     case 'tnt': return 'TNT: Evilution';
     case 'plutonia': return 'The Plutonia Experiment';
     case 'chex': return 'Chex Quest';
+    case 'doom64': return 'Doom 64';
   }
 
   return entry.value.game;
@@ -227,7 +228,9 @@ const engineTitle = computed((): string|undefined => {
     case 'eternity': return 'Eternity';
     case 'doom_retro': return 'Doom Retro';
     case 'zandronum': return 'Zandronum';
-    case 'odamex': return 'ODamex';
+    case 'odamex': return 'Odamex';
+    case 'doom64': return 'Doom 64';
+    case 'doom64ex': return 'Doom64 EX';
   }
 
   return entry.value.engine;

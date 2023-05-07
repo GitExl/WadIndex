@@ -16,6 +16,7 @@ iwads: Dict[Game, str] = {
     Game.PLUTONIA: 'PLUTONIA.WAD',
     Game.STRIFE: 'STRIFE0.WAD',
     Game.HACX: 'HACX.WAD',
+    Game.DOOM64: 'DOOM64.WAD',
 }
 
 iwad_factors: Dict[Game, float] = {
@@ -27,6 +28,7 @@ iwad_factors: Dict[Game, float] = {
     Game.PLUTONIA: 0.75,
     Game.STRIFE: 1.0,
     Game.HACX: 0.5,
+    Game.DOOM64: 0.5,
 }
 
 ignore = {

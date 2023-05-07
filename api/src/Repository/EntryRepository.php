@@ -20,6 +20,7 @@ class EntryRepository {
     7 => 'strife',
     8 => 'chex_quest',
     9 => 'hacx',
+    10 => 'doom64',
   ];
 
   private const ENGINE_KEY = [
@@ -41,6 +42,9 @@ class EntryRepository {
     15 => 'eternity',
     16 => 'doom_retro',
     17 => 'zandronum',
+    18 => 'odamex',
+    19 => 'doom64',
+    20 => 'doom64ex',
   ];
 
   private const FIELDS_TEASER = '

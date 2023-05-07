@@ -220,6 +220,9 @@ TEXT_KEYS = {
 }
 
 TEXT_GAMES = {
+    Game.DOOM64: {
+        'keys': {'doom 64'},
+    },
     Game.DOOM2: {
         'keys': {
             'doom 2', 'doom2', 'doom ii', 'doomii', 'doom 2 ver 1.9', 'doom ][', 'doom / doom2', 'doom/doom2',
@@ -319,6 +322,12 @@ TEXT_ENGINE = {
         'keys': {'eternity'},
     },
     Engine.ODAMEX: {
-        'keys': {'odamex'}
-    }
+        'keys': {'odamex'},
+    },
+    Engine.DOOM64: {
+        'keys': {'doom 64', 'doom 64 (nightdive rerelease)'},
+    },
+    Engine.DOOM64EX: {
+        'keys': {'doom 64 ex'},
+    },
 }
