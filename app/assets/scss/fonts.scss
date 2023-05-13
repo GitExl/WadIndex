@@ -1,0 +1,55 @@
+@font-face {
+  font-family: 'DejaVu Sans';
+  src: url('@/assets/fonts/dejavusans-webfont.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DejaVu Sans Condensed';
+  src: url('@/assets/fonts/dejavusanscondensed-webfont.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DejaVu Sans';
+  src: url('@/assets/fonts/dejavusans-extralight-webfont.woff2') format('woff2');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Mono';
+  src: url('@/assets/fonts/notomono-regular-webfont.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('@/assets/fonts/notosans-bold-webfont.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('@/assets/fonts/notosans-light-webfont.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('@/assets/fonts/notosans-lightitalic-webfont.woff2') format('woff2');
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('@/assets/fonts/notosans-regular-webfont.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}

@@ -4,7 +4,8 @@ services:
     build: ./nginx
     env_file: .env
     networks:
-      - internal
+      internal:
+        ipv4_address: 10.5.0.10
     ports:
       - 80:80
       - 443:443
@@ -18,15 +19,16 @@ services:
       - php
       - app
     extra_hosts:
-      api.idgames.local: 127.0.0.1
-      app.idgames.local: 127.0.0.1
-      storage.idgames.local: 127.0.0.1
+      api.idgames.local: 10.5.0.10
+      app.idgames.local: 10.5.0.10
+      storage.idgames.local: 10.5.0.10
 
   php:
     build: ./php
     env_file: .env
     networks:
-      - internal
+      internal:
+        ipv4_address: 10.5.0.20
     expose:
       - 9000
     volumes:
@@ -39,7 +41,8 @@ services:
     build: ./db
     env_file: .env
     networks:
-      - internal
+      internal:
+        ipv4_address: 10.5.0.30
     expose:
       - 3306
     volumes:
@@ -49,16 +52,21 @@ services:
     build: ./app
     env_file: .env
     networks:
-      - internal
+      internal:
+        ipv4_address: 10.5.0.40
     volumes:
       - ./app/:/var/app
+    extra_hosts:
+      api.idgames.local: 10.5.0.10
+      storage.idgames.local: 10.5.0.10
 
   indexer:
     build: ./indexer
     env_file: .env
     init: true
     networks:
-      - internal
+      internal:
+        ipv4_address: 10.5.0.50
     volumes:
       - ./indexer:/usr/src/app
       - "$INDEXER_PATH_COLLECTIONS:/var/collections"
@@ -70,7 +78,12 @@ services:
     depends_on:
       - db
 
+
 networks:
 
   internal:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
