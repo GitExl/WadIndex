@@ -30,7 +30,7 @@ services:
       internal:
         ipv4_address: 10.5.0.20
     expose:
-      - 9000
+      - 9000:9000
     volumes:
       - ./api/:/var/www/html/api
       - ./php/php-extra.ini:/usr/local/etc/php/conf.d/php-extra.ini

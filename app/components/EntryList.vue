@@ -3,7 +3,7 @@ import type { EntryTeaserData } from '@/data/EntryTeaser';
 import EntryTeaser from './EntryTeaser.vue';
 
 const props = defineProps<{
-  entries: EntryTeaserData[],
+  entries: EntryTeaserData[] | null,
 }>()
 
 const emit = defineEmits<{
@@ -17,7 +17,7 @@ function selectEntry(entry: EntryTeaserData) {
 
 <template>
   <div class="entry-list">
-    <ul>
+    <ul v-if="entries">
       <EntryTeaser v-for="entry in entries" :key="entry.collection + entry.path" :entry="entry" @click="selectEntry(entry)" />
     </ul>
   </div>

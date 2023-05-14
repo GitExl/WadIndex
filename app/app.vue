@@ -7,10 +7,9 @@
 
       <template v-slot:on>
 
-        <router-view v-slot="{ Component }">
           <Suspense timeout="2000">
             <template #default>
-              <component :is="Component" :key="route.path"></component>
+              <NuxtPage></NuxtPage>
             </template>
 
             <template #fallback>
@@ -19,7 +18,6 @@
               </Layout>
             </template>
           </Suspense>
-        </router-view>
 
         <PageFooter></PageFooter>
       </template>
@@ -29,6 +27,15 @@
 
 <script setup lang="ts">
 const route = useRoute();
+
+useHead({
+  titleTemplate: (subtitle: string | undefined) => {
+    if (subtitle) {
+      return subtitle + ' - The WAD Index';
+    }
+    return 'The WAD Index';
+  }
+})
 </script>
 
 <style lang="scss">

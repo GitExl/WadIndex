@@ -110,34 +110,21 @@
 </template>
 
 <script setup lang="ts">
-import type { EntryData } from '@/data/Entry'
 import { humanFileSize } from '@/utils/FileSize';
-import { ref, type Ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
-
+import { WideSliderSlide } from '~/components/WideSlider.vue';
 
 const route = useRoute();
 const api = useApi();
 const runtimeConfig = useRuntimeConfig();
 
-const entry: Ref<EntryData|undefined> = ref();
-
-const segments = route.params.slug as string[];
-const collection = segments[0];
-const path = segments.slice(1, -1).join('/');
-
-entry.value = await api.entries.get(collection, path);
-
-useSeoMeta({
-  title: entry.value?.title,
-});
+const slug = computed((): string[] => route.params.slug as string[])
 
 const readableFileSize = computed((): string|undefined => {
   if (!entry.value) {
     return undefined;
   }
 
-  return humanFileSize(entry.value?.size);
+  return humanFileSize(entry.value.size);
 });
 
 const authorListClasses = computed((): Record<string, boolean> => {
@@ -224,6 +211,15 @@ const engineTitle = computed((): string|undefined => {
   return entry.value.engine;
 });
 
+console.log(route);
+
+const collection = slug.value[0];
+const path = slug.value.slice(1, -1).join('/');
+const { data: entry } = useAsyncData('entry-' + collection + '-' + path, () => api.entries.get(collection, path));
+
+useSeoMeta({
+  title: entry.value?.title,
+});
 </script>
 
 <style lang="scss">

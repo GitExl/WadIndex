@@ -49,18 +49,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref } from 'vue';
-import type { SearchResults } from '@/api/EntriesAPI';
+const api = useApi();
 
-const results: Ref<SearchResults|undefined> = ref();
+const { data: results } = useAsyncData(() => api.entries.search('alien', ['idgames'], [], [], []));
 
 useSeoMeta({
   title: 'Search',
 });
-
-const api = useApi();
-
-results.value = await api.entries.search('alien', ['idgames'], [], [], []);
 </script>
 
 <style lang="scss">

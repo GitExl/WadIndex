@@ -34,32 +34,16 @@
 </template>
 
 <script setup lang="ts">
-import type { EntryTeaserData } from '@/data/EntryTeaser';
-import type { IndexImage } from '@/data/IndexImage';
-import { ref, type Ref, computed } from 'vue';
-
-const random: Ref<IndexImage[]> = ref([])
-const latest: Ref<EntryTeaserData[]> = ref([])
-const updated: Ref<EntryTeaserData[]> = ref([])
+const runtimeConfig = useRuntimeConfig();
+const api = useApi();
+const storageBaseUrl = runtimeConfig.public.otherUrl;
 
 useSeoMeta({
   title: '',
 });
 
-const api = useApi();
-
-const results = await Promise.all([
-  api.graphics.getRandom(),
-  api.entries.getLatest(),
-  api.entries.getUpdated(),
-]);
-
-random.value = results[0];
-latest.value = results[1];
-updated.value = results[2];
-
 const randomSplit = computed(() => {
-  if (!random.value.length) {
+  if (!random.value || !random.value.length) {
     return [[], []];
   }
 
@@ -70,8 +54,11 @@ const randomSplit = computed(() => {
   ];
 });
 
-const runtimeConfig = useRuntimeConfig();
-const storageBaseUrl = runtimeConfig.public.otherUrl;
+const [{ data: random }, { data: latest }, { data: updated }] = await Promise.all([
+  useAsyncData('graphics-random', () => api.graphics.getRandom()),
+  useAsyncData('entries-latest', () => api.entries.getLatest()),
+  useAsyncData('entries-updated', () => api.entries.getUpdated()),
+]);
 </script>
 
 <style lang="scss">
