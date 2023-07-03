@@ -7,17 +7,17 @@
 
       <template v-slot:on>
 
-          <Suspense timeout="2000">
-            <template #default>
+          <!-- <Suspense timeout="2000">
+            <template #default> -->
               <NuxtPage></NuxtPage>
-            </template>
+            <!-- </template>
 
             <template #fallback>
               <Layout type="one-column" class="app__loader">
                 <img src="@/assets/images/skull.gif" width="150" height=150 />
               </Layout>
             </template>
-          </Suspense>
+          </Suspense> -->
 
         <PageFooter></PageFooter>
       </template>
@@ -26,8 +26,6 @@
 </template>
 
 <script setup lang="ts">
-const route = useRoute();
-
 useHead({
   titleTemplate: (subtitle: string | undefined) => {
     if (subtitle) {

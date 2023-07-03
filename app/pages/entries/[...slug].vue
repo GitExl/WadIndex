@@ -33,61 +33,65 @@
           <p v-if="entry.description" class="entry__description">{{ entry.description }}</p>
 
           <table class="entry__table">
-            <tr v-if="engineTitle">
-              <td>Engine</td><td>{{ engineTitle }}</td>
-            </tr>
-            <tr v-if="gameTitle">
-              <td>Game</td><td>{{ gameTitle }}</td>
-            </tr>
-            <tr>
-              <td>Release date</td><td>{{ entry.timestamp.toDateString() }}</td>
-            </tr>
-            <tr>
-              <td>File</td>
-              <td>
-                <span class="entry__file">{{ entry.path.split('/').pop() }}</span><br>
-                <template v-if="readableFileSize">{{ readableFileSize }}</template>
-              </td>
-            </tr>
-            <tr v-if="entry.authors.length">
-              <td v-if="entry.authors.length > 1">Authors</td>
-              <td v-else>Author</td>
-              <td>
-                <ul class="entry__authors" :class="authorListClasses">
-                  <li v-for="author of entry.authors" :key="author.alias">
-                    <NuxtLink :to="'/authors/' + author.alias">
-                      <template v-if="author.fullName">{{ author.fullName }}</template>
-                      <template v-else>{{ author.name }}</template>
-                    </NuxtLink>
-                  </li>
-                </ul>
-              </td>
-            </tr>
-            <tr v-if="entry.toolsUsed">
-              <td>Tools used</td><td class="entry__tools">{{ entry.toolsUsed }}</td>
-            </tr>
-            <tr v-if="entry.knownBugs">
-              <td>Known bugs</td><td>{{ entry.knownBugs }}</td>
-            </tr>
-            <tr v-if="entry.comments">
-              <td>Comments</td><td class="entry__comments">{{ entry.comments }}</td>
-            </tr>
-            <tr v-if="entry.credits">
-              <td>Additional credits</td><td class="entry__credits">{{ entry.credits }}</td>
-            </tr>
+            <tbody>
+              <tr v-if="engineTitle">
+                <td>Engine</td><td>{{ engineTitle }}</td>
+              </tr>
+              <tr v-if="gameTitle">
+                <td>Game</td><td>{{ gameTitle }}</td>
+              </tr>
+              <tr>
+                <td>Release date</td><td><ClientOnly>{{ entry.timestamp.toLocaleDateString() }}</ClientOnly></td>
+              </tr>
+              <tr>
+                <td>File</td>
+                <td>
+                  <span class="entry__file">{{ entry.path.split('/').pop() }}</span><br>
+                  <template v-if="readableFileSize">{{ readableFileSize }}</template>
+                </td>
+              </tr>
+              <tr v-if="entry.authors.length">
+                <td v-if="entry.authors.length > 1">Authors</td>
+                <td v-else>Author</td>
+                <td>
+                  <ul class="entry__authors" :class="authorListClasses">
+                    <li v-for="author of entry.authors" :key="author.alias">
+                      <NuxtLink :to="'/authors/' + author.alias">
+                        <template v-if="author.fullName">{{ author.fullName }}</template>
+                        <template v-else>{{ author.name }}</template>
+                      </NuxtLink>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr v-if="entry.toolsUsed">
+                <td>Tools used</td><td class="entry__tools">{{ entry.toolsUsed }}</td>
+              </tr>
+              <tr v-if="entry.knownBugs">
+                <td>Known bugs</td><td>{{ entry.knownBugs }}</td>
+              </tr>
+              <tr v-if="entry.comments">
+                <td>Comments</td><td class="entry__comments">{{ entry.comments }}</td>
+              </tr>
+              <tr v-if="entry.credits">
+                <td>Additional credits</td><td class="entry__credits">{{ entry.credits }}</td>
+              </tr>
+            </tbody>
           </table>
         </div>
 
         <PageSection v-if="entry.mirrorUrls" id="download" title="Download" icon="cloud_download">
           <table class="entry__table">
-            <tr v-for="mirror of entry.mirrorUrls" :key="mirror.url">
-              <td>
-                <span v-if="mirror.isHttpOnly" class="material-icons-outlined">http</span>
-                {{ mirror.title }}<br>
-                <span class="entry__mirror-location">{{ mirror.location }}</span>
-              </td>
-              <td><a :href="mirror.url">{{ mirror.url }}</a></td>
-            </tr>
+            <tbody>
+              <tr v-for="mirror of entry.mirrorUrls" :key="mirror.url">
+                <td>
+                  <span v-if="mirror.isHttpOnly" class="material-icons-outlined">http</span>
+                  {{ mirror.title }}<br>
+                  <span class="entry__mirror-location">{{ mirror.location }}</span>
+                </td>
+                <td><a :href="mirror.url">{{ mirror.url }}</a></td>
+              </tr>
+            </tbody>
           </table>
         </PageSection>
 
@@ -117,7 +121,14 @@ const route = useRoute();
 const api = useApi();
 const runtimeConfig = useRuntimeConfig();
 
-const slug = computed((): string[] => route.params.slug as string[])
+const slug = route.params.slug as string[];
+const collection = slug[0];
+const path = slug.slice(1, -1).join('/');
+const { data: entry } = useAsyncData(() => api.entries.get(collection, path));
+
+useSeoMeta({
+  title: entry.value?.title,
+});
 
 const readableFileSize = computed((): string|undefined => {
   if (!entry.value) {
@@ -209,16 +220,6 @@ const engineTitle = computed((): string|undefined => {
   }
 
   return entry.value.engine;
-});
-
-console.log(route);
-
-const collection = slug.value[0];
-const path = slug.value.slice(1, -1).join('/');
-const { data: entry } = useAsyncData('entry-' + collection + '-' + path, () => api.entries.get(collection, path));
-
-useSeoMeta({
-  title: entry.value?.title,
 });
 </script>
 

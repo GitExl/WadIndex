@@ -55,9 +55,9 @@ const randomSplit = computed(() => {
 });
 
 const [{ data: random }, { data: latest }, { data: updated }] = await Promise.all([
-  useAsyncData('graphics-random', () => api.graphics.getRandom()),
-  useAsyncData('entries-latest', () => api.entries.getLatest()),
-  useAsyncData('entries-updated', () => api.entries.getUpdated()),
+  useAsyncData(() => api.graphics.getRandom()),
+  useAsyncData(() => api.entries.getLatest()),
+  useAsyncData(() => api.entries.getUpdated()),
 ]);
 </script>
 
