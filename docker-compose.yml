@@ -15,6 +15,7 @@ services:
       - ./storage/graphics:/var/www/html/storage/graphics:ro
       - ./storage/music:/var/www/html/storage/music:ro
       - ./storage/map_previews:/var/www/html/storage/map_previews:ro
+      - ./storage/map_images:/var/www/html/storage/map_images:ro
     depends_on:
       - php
       - app
@@ -75,6 +76,7 @@ services:
       - ./storage/graphics:/var/indexer/storage/graphics
       - ./storage/music:/var/indexer/storage/music
       - ./storage/map_previews:/var/indexer/storage/map_previews
+      - ./storage/map_images:/var/indexer/storage/map_images
     depends_on:
       - db
 

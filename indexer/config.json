@@ -25,6 +25,9 @@
     },
     "map_previews": {
       "output_path": "/var/indexer/storage/map_previews"
+    },
+    "map_images": {
+      "output_path": "/var/indexer/storage/map_images"
     }
   },
   "ignore": [

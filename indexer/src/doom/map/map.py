@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum, Flag, auto
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Tuple
 
 from doom.nodes.node_types import NodeTypes, NodeTypesGL
 from utils.author_parser import Author
@@ -190,6 +190,9 @@ class Thing:
     arg0str: Optional[str]
 
 
+MapBounds = Tuple[float, float, float, float]
+
+
 class Map:
 
     def __init__(self, name: str, namespace: MapNamespace, format: MapFormat,
@@ -221,6 +224,25 @@ class Map:
         self.complexity: int = 0
         self.nodes_type: NodeTypes = NodeTypes.NONE
         self.nodes_gl_type: NodeTypesGL = NodeTypesGL.NONE
+
+        self._bounds: Optional[MapBounds] = None
+
+    def get_bounds(self) -> MapBounds:
+        if self._bounds is not None:
+            return self._bounds
+
+        x1 = 32678.0
+        y1 = 32678.0
+        x2 = -32678.0
+        y2 = -32678.0
+        for v in self.vertices:
+            x1 = min(x1, v.x)
+            y1 = min(y1, v.y)
+            x2 = max(x2, v.x)
+            y2 = max(y2, v.y)
+
+        self._bounds = (x1, y1, x2, y2)
+        return self._bounds
 
     def to_row(self) -> Dict[str, any]:
         return {

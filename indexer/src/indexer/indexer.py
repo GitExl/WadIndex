@@ -19,6 +19,7 @@ from extractors.textextractor import TextExtractor
 
 from utils.config import Config
 from utils.logger import Logger
+from writers.mapimagewriter import MapImageWriter
 from writers.mappreviewwriter import MapPreviewWriter
 
 from writers.musicwriter import MusicWriter
@@ -46,6 +47,7 @@ WRITERS = [
     GraphicsWriter,
     MusicWriter,
     MapPreviewWriter,
+    MapImageWriter,
 ]
 
 
