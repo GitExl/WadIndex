@@ -13,6 +13,7 @@ RE_AUTHOR_NICKNAME_AKA = re.compile(r'(.*?)\s(?:aka|a\.k\.a|a\.k\.a\.)\s(.*)', r
 RE_AUTHOR_NICKNAME_LAST = re.compile(r'(.*?)\s[\(\[](.*)[\)\]]')
 
 AUTHOR_WORDS_EXCLUDE = {
+    'By',
     'and',
     'others',
 }
