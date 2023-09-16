@@ -1,4 +1,4 @@
-FROM pypy:3.9-7.3.11
+FROM pypy:3.10-7.3.12
 
 RUN apt-get update && apt-get install -y \
   p7zip-full \
