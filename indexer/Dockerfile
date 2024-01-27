@@ -1,4 +1,4 @@
-FROM pypy:3.10-7.3.12
+FROM pypy:3.10-7.3.15
 
 RUN apt-get update && apt-get install -y \
   p7zip-full \
@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /usr/src/app
 
 COPY requirements.txt ./
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 

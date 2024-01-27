@@ -1,2 +1,2 @@
 0 10 * * 6 /bin/bash /usr/src/app/idgames_sync.sh > /proc/1/fd/1 2>/proc/1/fd/2
-0 12 * * 6 /bin/bash /usr/src/app/index_update.sh > /proc/1/fd/1 2>/proc/1/fd/2
+0 11 * * 6 /bin/bash /usr/src/app/index_update.sh > /proc/1/fd/1 2>/proc/1/fd/2

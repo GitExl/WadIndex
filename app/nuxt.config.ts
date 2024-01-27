@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  css: ['@/assets/scss/base.scss'],
+  css: ['@/node_modules/@material-design-icons/font/index.css', '@/assets/scss/base.scss'],
   vite: {
     css: {
       preprocessorOptions: {
