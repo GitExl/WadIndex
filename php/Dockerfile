@@ -14,7 +14,7 @@ RUN curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases
   intl \
   opcache
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=2.6.6
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=2.8.1
 ENV PATH="$PATH:/root/.composer/vendor/bin"
 
 RUN curl -sS https://get.symfony.com/cli/installer | bash

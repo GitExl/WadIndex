@@ -1,4 +1,4 @@
-FROM mariadb:11.2.2-jammy
+FROM mariadb:11.5.2-noble
 
 ADD my.cnf /etc/mysql/conf.d
 RUN chmod -R 444 /etc/mysql/conf.d
