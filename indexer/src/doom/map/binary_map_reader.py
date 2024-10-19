@@ -1,5 +1,5 @@
 from struct import Struct
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 from doom.map.map import Map, MapNamespace, Line, LineFlags, Sector, Side, Thing, ThingFlags, Vertex, MapFormat
 from doom.map.map_data_finder import MapData
@@ -198,16 +198,37 @@ class BinaryMapReader(MapReaderBase):
             namespace = MapNamespace.HEXEN
         # TODO: ZDoom, Eternity?
 
-        vertices = BinaryMapReader._read_binary_data(map_data, 'VERTEXES', unpack_vertex, STRUCT_VERTEX)
-        sides = BinaryMapReader._read_binary_data(map_data, 'SIDEDEFS', unpack_side, STRUCT_SIDE)
-        sectors = BinaryMapReader._read_binary_data(map_data, 'SECTORS', unpack_sector, STRUCT_SECTOR)
+        vertices: List[Vertex] = BinaryMapReader._read_binary_data(map_data, 'VERTEXES', unpack_vertex, STRUCT_VERTEX)
+        sides: List[Side] = BinaryMapReader._read_binary_data(map_data, 'SIDEDEFS', unpack_side, STRUCT_SIDE)
+        sectors: List[Sector] = BinaryMapReader._read_binary_data(map_data, 'SECTORS', unpack_sector, STRUCT_SECTOR)
 
         if map_data.format == MapFormat.DOOM:
-            lines = BinaryMapReader._read_binary_data(map_data, 'LINEDEFS', unpack_line_doom, STRUCT_LINE_DOOM)
-            things = BinaryMapReader._read_binary_data(map_data, 'THINGS', unpack_thing_doom, STRUCT_THING_DOOM)
+            lines: List[Line] = BinaryMapReader._read_binary_data(map_data, 'LINEDEFS', unpack_line_doom, STRUCT_LINE_DOOM)
+            things: List[Thing] = BinaryMapReader._read_binary_data(map_data, 'THINGS', unpack_thing_doom, STRUCT_THING_DOOM)
         else:
-            lines = BinaryMapReader._read_binary_data(map_data, 'LINEDEFS', unpack_line_hexen, STRUCT_LINE_HEXEN)
-            things = BinaryMapReader._read_binary_data(map_data, 'THINGS', unpack_thing_hexen, STRUCT_THING_HEXEN)
+            lines: List[Line] = BinaryMapReader._read_binary_data(map_data, 'LINEDEFS', unpack_line_hexen, STRUCT_LINE_HEXEN)
+            things: List[Thing] = BinaryMapReader._read_binary_data(map_data, 'THINGS', unpack_thing_hexen, STRUCT_THING_HEXEN)
+
+        for index, side in enumerate(sides):
+            sides[index] = Side(
+                side.sector,
+                side.texture_upper.decode('latin1').partition('\x00')[0],
+                side.texture_mid.decode('latin1').partition('\x00')[0],
+                side.texture_lower.decode('latin1').partition('\x00')[0],
+                side.texture_x,
+                side.texture_y,
+            )
+
+        for index, sector in enumerate(sectors):
+            sectors[index] = Sector(
+                sector.z_floor,
+                sector.z_ceiling,
+                sector.texture_floor.decode('latin1').partition('\x00')[0],
+                sector.texture_ceiling.decode('latin1').partition('\x00')[0],
+                sector.ids,
+                sector.type,
+                sector.light,
+            )
 
         return Map(map_name, namespace, map_data.format, vertices, lines, sides, sectors, things)
 

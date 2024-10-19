@@ -85,7 +85,7 @@ class MusicExtractor(ExtractorBase):
 
             name_path = Path(file.name)
             name = name_path.stem
-            info.music[name] = MusicInfo(name, music_type, data, data_hash, duration)
+            info.music[name] = MusicInfo(name, music_type, data, data_hash, file.size, duration)
 
     @staticmethod
     def get_music_source(game: Game) -> Game:

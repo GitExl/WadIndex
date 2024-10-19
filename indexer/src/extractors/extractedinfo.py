@@ -36,6 +36,7 @@ class MusicInfo:
     type: MusicType
     data: bytes
     hash: bytes
+    size: int
     duration: Optional[int] = None
     id: Optional[int] = None
 
@@ -44,6 +45,7 @@ class MusicInfo:
             'type': self.type.value,
             'hash': self.hash,
             'duration': self.duration,
+            'size': self.size,
         }
 
 

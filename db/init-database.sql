@@ -207,6 +207,7 @@ CREATE TABLE IF NOT EXISTS `music` (
   `type` varchar(8) NOT NULL,
   `hash` binary(20) NOT NULL,
   `duration` int(10) unsigned DEFAULT NULL,
+  `size` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `music_hash_IDX` (`hash`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -1,3 +1,4 @@
+import re
 from io import StringIO
 from typing import Dict
 
@@ -6,6 +7,9 @@ from doom.dehacked_parser import DehackedParser, DehackedParserError
 from doom.strings_map_titles import STRINGS_MAP_TITLES
 from extractors.extractedinfo import ExtractedInfo
 from extractors.extractorbase import ExtractorBase
+
+
+RE_DEHACKED_FILE = re.compile(r'(\.deh|\.bex)', re.IGNORECASE)
 
 
 class DehackedExtractor(ExtractorBase):
@@ -19,8 +23,15 @@ class DehackedExtractor(ExtractorBase):
             self.logger.debug('Cannot extract Dehacked info without an archive list.')
             return
 
-        # TODO: also find dehacked files in ZIP as fallback
         file = archive_list.file_find_basename('dehacked', False)
+        if file is None:
+
+            # Find deh/bex files in main archive as fallback.
+            for file_info in info.main_archive.infolist():
+                if RE_DEHACKED_FILE.match(file_info.filename):
+                    file = info.main_archive.open(file_info.filename)
+                    break
+
         if file is None:
             return
 
