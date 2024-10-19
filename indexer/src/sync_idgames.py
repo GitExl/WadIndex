@@ -61,6 +61,11 @@ def sync():
             files_delete.append(file_local)
 
 
+    if len(files_delete) > 20:
+        logger.warn('Deleting more than 20 files, aborting.')
+        return
+
+
     download_list: List = []
 
     logger.info('Deleting {} files.'.format(len(files_delete)))
@@ -81,7 +86,7 @@ def sync():
         path_local = path_idgames / file_update.path
         download_list.append((url_remote, path_local, downloader))
 
-    ThreadPool(6).starmap(file_download, download_list)
+    ThreadPool(1).starmap(file_download, download_list)
 
 
 sync()

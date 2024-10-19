@@ -41,9 +41,9 @@
     "lmps/COMPET-N/doom2/movie/10nm####.zip"
   ],
   "mirrors": [
-    "https://www.quaddicted.com/files/idgames",
-    "https://ftpmirror1.infania.net/pub/idgames",
-    "https://youfailit.net/pub/idgames"
+    "https://ftp.fu-berlin.de/pc/games/idgames",
+    "https://mirror.braindrainlan.nu/pub/idgames",
+    "https://ftpmirror1.infania.net/pub/idgames"
   ],
   "db": {
     "host": "$MARIADB_HOST",

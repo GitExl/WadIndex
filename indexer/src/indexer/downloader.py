@@ -15,18 +15,18 @@ class Downloader:
         self.mirror_list: List[str] = mirror_list
 
     def download(self, src_url: str, dest_path: Path):
-        self.logger.info('Downloading {}'.format(src_url))
-
         try:
             modified_timestamp = None
 
             dest_path.parent.mkdir(parents=True, exist_ok=True)
             for mirror_url in self.mirror_list:
                 mirror_src_url = '{}/{}'.format(mirror_url, src_url)
+                self.logger.info('Downloading {}'.format(mirror_src_url))
 
                 with dest_path.open('wb') as file_dest:
 
                     # TODO: use ftplib if the source is ftp:// so we can use the primary Berlin FTP source
+                    # TODO: write to temp file first, and move when done to prevent script interruptions from leaving partial files behind
                     with request.urlopen(mirror_src_url) as request_src:
                         shutil.copyfileobj(request_src, file_dest)
 
