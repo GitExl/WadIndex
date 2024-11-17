@@ -1,6 +1,9 @@
-@import 'keen-slider/keen-slider';
+@use 'sass:color';
 
-@import 'fonts';
+@use 'keen-slider/keen-slider';
+
+@use 'fonts';
+@use 'variables';
 
 *,
 *::before,
@@ -27,7 +30,7 @@ a {
   color: $color-primary-light;
 
   &:hover {
-    color: lighten($color-primary-light, 14%);
+    color: color.adjust($color-primary-light, $lightness: 14%);
   }
 }
 

@@ -7,7 +7,7 @@ services:
   app:
     init: true
     ports:
-      - 3001:3000
+      - 3000:3000
       - 24678:24678
     environment:
       - CHOKIDAR_USEPOLLING=true

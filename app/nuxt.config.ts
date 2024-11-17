@@ -1,11 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  css: ['@/node_modules/@material-design-icons/font/index.css', '@/assets/scss/base.scss'],
+  css: [
+    '@/node_modules/@material-design-icons/font/index.css',
+    '@/assets/scss/base.scss',
+  ],
+
   vite: {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: '@use "@/assets/scss/defs.scss" as *;',
+          additionalData: '@use "~/assets/scss/variables.scss" as *; @use "~/assets/scss/mixins.scss" as *;',
+          api: 'modern'
         },
       },
     },
@@ -23,5 +28,7 @@ export default defineNuxtConfig({
       apiBase: process.env.API_BASE_URL,
       otherUrl: process.env.STORAGE_BASE_URL
     }
-  }
+  },
+
+  compatibilityDate: '2024-11-17'
 })
