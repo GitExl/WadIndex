@@ -1,18 +1,11 @@
 <template>
   <div class="entry-search">
-    <input type="search" placeholder="Search all entries" />
+    <input type="search" placeholder="Search all entries" v-model.trim="model" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref } from "vue";
-
-const searchTerms: Ref<string> = ref('')
-
-function input(event: Event) {
-  const target = event.target as HTMLInputElement
-  searchTerms.value = target.value
-}
+const model = defineModel();
 </script>
 
 <style lang="scss">

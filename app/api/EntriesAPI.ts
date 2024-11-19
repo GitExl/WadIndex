@@ -54,32 +54,42 @@ export default class EntriesAPI extends APIBase {
     offset: number=0, limit: number=30
   ): Promise<SearchResults> {
 
-    const params = new URLSearchParams({
-      collections: collections.join(','),
-      search_key: searchKey,
-      search_fields: searchFields.join(','),
-      filter_gameplay: filterGameplay.join(','),
-      filter_game: filterGame.join(','),
-      sort_field: sortField,
-      sort_order: sortOrder,
-      offset: String(offset),
-      limit: String(limit),
-    });
-    const data: Record<string, any> = await this.fetch('/entries/search?' + params.toString());
-    if (!data) {
-      throw new Error();
-    }
-
     let entries: EntryTeaserData[] = [];
-    for (let item of Object.values(data.entries)) {
-      entries.push(parseEntryTeaser(item));
+    let entriesTotal: number = 0;
+    let entriesOffset: number = 0;
+    let entriesLimit: number = 0;
+
+    if (searchKey.length > 2) {
+      const params = new URLSearchParams({
+        collections: collections.join(','),
+        search_key: searchKey,
+        search_fields: searchFields.join(','),
+        filter_gameplay: filterGameplay.join(','),
+        filter_game: filterGame.join(','),
+        sort_field: sortField,
+        sort_order: sortOrder,
+        offset: String(offset),
+        limit: String(limit),
+      });
+      const data: Record<string, any> = await this.fetch('/entries/search?' + params.toString());
+      if (!data) {
+        throw new Error();
+      }
+
+      for (let item of Object.values(data.entries)) {
+        entries.push(parseEntryTeaser(item));
+      }
+
+      entriesTotal = data.entries_total;
+      entriesOffset = data.offset;
+      entriesLimit = data.limit;
     }
 
     return {
       entries: entries,
-      entriesTotal: data.entries_total,
-      offset: data.offset,
-      limit: data.limit,
+      entriesTotal: entriesTotal,
+      offset: entriesOffset,
+      limit: entriesLimit,
     };
   }
 }

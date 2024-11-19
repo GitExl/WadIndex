@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use DateInterval;
 use DateTime;
 use Doctrine\DBAL\Connection;
 use InvalidArgumentException;
@@ -340,28 +339,36 @@ class EntryRepository {
     $matches = [];
     foreach ($params->searchFields as $field) {
       if ($field == 'title') {
-        $matches[] = 'MATCH(e.`title`) AGAINST(:search_key)';
+        $matches[] = 'MATCH(e.`title`) AGAINST(:search_key IN BOOLEAN MODE)';
       }
       elseif ($field == 'filename') {
-        $matches[] = 'MATCH(e.`path`) AGAINST(:search_key)';
+        $matches[] = 'MATCH(e.`path`) AGAINST(:search_key IN BOOLEAN MODE)';
       }
       elseif ($field == 'description') {
-        $matches[] = 'MATCH(e.`description`) AGAINST(:search_key)';
+        $matches[] = 'MATCH(e.`description`) AGAINST(:search_key IN BOOLEAN MODE)';
       }
       elseif ($field == 'textfile') {
-        $matches[] = 'MATCH(et.`text`) AGAINST(:search_key)';
+        $matches[] = 'MATCH(et.`text`) AGAINST(:search_key IN BOOLEAN MODE)';
         $joins[] = 'LEFT JOIN entry_textfile et ON et.entry_id = e.id';
       }
     }
 
+    $key = $params->searchKey;
+    $words = explode(' ', $key);
+    foreach ($words as &$word) {
+      $word = $word . '*';
+    }
+    unset($word);
+    $key = implode(' ', $words);
+
     $query = $this->buildSearchQuery(self::FIELDS_TEASER, $matches, $joins, $params->collections, $params->filterGame, $params->filterGameplay, $sort_field, $sort_order, $params->limit, $params->offset);
     $stmt = $this->connection->prepare($query);
-    $stmt->bindValue('search_key', $params->searchKey);
+    $stmt->bindValue('search_key', $key);
     $entries = $stmt->executeQuery()->fetchAllAssociative();
 
     $count_query = $this->buildSearchQuery('COUNT(*)', $matches, $joins, $params->collections, $params->filterGame, $params->filterGameplay);
     $stmt = $this->connection->prepare($count_query);
-    $stmt->bindValue('search_key', $params->searchKey);
+    $stmt->bindValue('search_key', $key);
     $entries_total = $stmt->executeQuery()->fetchFirstColumn()[0];
 
     return [

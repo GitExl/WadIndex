@@ -1,16 +1,35 @@
 <template>
   <li class="filter-checkbox">
-    <input :id="name" type="checkbox"> <label :for="name">{{ title }}</label>
+    <input :id="name + '-' + value" :name="name" type="checkbox" v-model="model" :value="value">
+    <label :for="name + '-' + value">{{ label }}</label>
   </li>
 </template>
 
 <script setup lang="ts">
-export interface Props {
-  name: string
-  title: string
-}
+const props = defineProps({
+  name: {
+    type: String,
+    required: true,
+  },
+  label: {
+    type: String,
+    required: true,
+  },
+  value: {
+    type: String,
+    required: true,
+  },
+  modelValue: {
+    type: Array<string>,
+  }
+});
 
-const props = defineProps<Props>();
+const emit = defineEmits(['update:modelValue']);
+
+const model = computed({
+  get: () => props.modelValue,
+  set: item => emit('update:modelValue', item)
+});
 </script>
 
 <style lang="scss">
