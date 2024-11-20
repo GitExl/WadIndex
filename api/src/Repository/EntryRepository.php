@@ -56,6 +56,7 @@ class EntryRepository {
     e.is_cooperative AS `is_cooperative`,
     e.is_deathmatch AS `is_deathmatch`,
     e.description AS `description`,
+    e.entry_updated AS `updated`,
     (SELECT COUNT(*) FROM maps WHERE entry_id = e.id) AS `map_count`
   ';
 
@@ -323,8 +324,8 @@ class EntryRepository {
     elseif ($params->sortField === 'title') {
       $sort_field = 'title';
     }
-    elseif ($params->sortField === 'date') {
-      $sort_field = 'date';
+    elseif ($params->sortField === 'updated') {
+      $sort_field = 'updated';
     }
 
     if ($params->sortOrder === 'asc') {

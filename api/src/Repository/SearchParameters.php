@@ -32,7 +32,7 @@ class SearchParameters {
   private const SORT_FIELD = [
     'relevance',
     'title',
-    'date',
+    'updated',
   ];
 
   private const SORT_ORDER = [

@@ -8,6 +8,8 @@
 
           <EntrySearch class="search__entry-search" v-model="search" />
 
+          <SearchSort title="Sort by" :options="sortOptions" name="sort" v-model="sort" />
+
           <SearchFilters title="Search in">
             <FilterCheckbox name="in" value="title" label="Title" v-model="filterIn"></FilterCheckbox>
             <FilterCheckbox name="in" value="filename" label="Filename" v-model="filterIn"></FilterCheckbox>
@@ -41,7 +43,10 @@
         <template v-if="status === 'pending'">
           Loading...
         </template>
-        <EntryList v-else-if="results" :entries="results?.entries" />
+        <EntryList v-else-if="results?.entries.length" :entries="results?.entries" />
+        <template v-else-if="search">
+          No entries found.
+        </template>
       </div>
 
     </Layout>
@@ -51,10 +56,39 @@
 
 <script setup lang="ts">
 import debounce from 'lodash.debounce'
+import type { SearchSortOptions } from '~/components/SearchSort.vue'
 
 const api = useApi();
 const router = useRouter();
 const route = useRoute();
+
+const sortOptions: SearchSortOptions = {
+  relevance: {
+    title: 'Relevance',
+    field: 'relevance',
+    order: 'desc',
+  },
+  titleAZ: {
+    title: 'Title A-Z',
+    field: 'title',
+    order: 'asc',
+  },
+  titleZA: {
+    title: 'Title Z-A',
+    field: 'title',
+    order: 'desc',
+  },
+  newest: {
+    title: 'Newest first',
+    field: 'updated',
+    order: 'desc',
+  },
+  oldest: {
+    title: 'Oldest first',
+    field: 'updated',
+    order: 'asc',
+  },
+}
 
 declare type LocationQueryValue = string | null;
 function parseQueryArray(input: LocationQueryValue | LocationQueryValue[]): string[] {
@@ -67,9 +101,9 @@ function parseQueryArray(input: LocationQueryValue | LocationQueryValue[]): stri
   return [input as string];
 }
 
-function parseQueryString(input: LocationQueryValue | LocationQueryValue[]): string {
+function parseQueryString(input: LocationQueryValue | LocationQueryValue[], def: string = ''): string {
   if (!input) {
-    return '';
+    return def;
   }
   if (Array.isArray(input)) {
     return (input as string[])[0];
@@ -78,26 +112,33 @@ function parseQueryString(input: LocationQueryValue | LocationQueryValue[]): str
 }
 
 const search: Ref<string> = ref(parseQueryString(route.query.search));
+const sort: Ref<string> = ref(parseQueryString(route.query.sort, 'relevance'));
 const filterIn: Ref<string[]> = ref(parseQueryArray(route.query.filterIn));
 const filterGameplay: Ref<string[]> = ref(parseQueryArray(route.query.filterGameplay));
 const filterGame: Ref<string[]> = ref(parseQueryArray(route.query.filterGame));
 
-const { data: results, refresh, status } = useAsyncData(() => api.entries.search(search.value, ['idgames'], filterIn.value, filterGameplay.value, filterGame.value));
+const sortOption = computed(() => {
+  return sortOptions[sort.value];
+});
 
-watch(() => route.query.search, async newValue => {
-  search.value = parseQueryString(newValue);
-  refresh();
-});
-watch(() => route.query.filterIn, async newValue => {
-  filterIn.value = parseQueryArray(newValue);
-  refresh();
-});
-watch(() => route.query.filterGameplay, async newValue => {
-  filterGameplay.value = parseQueryArray(newValue);
-  refresh();
-});
-watch(() => route.query.filterGame, async newValue => {
-  filterGame.value = parseQueryArray(newValue);
+const { data: results, refresh, status } = useAsyncData(
+  () => api.entries.search(
+    search.value,
+    ['idgames'],
+    filterIn.value,
+    filterGameplay.value,
+    filterGame.value,
+    sortOption.value.field,
+    sortOption.value.order
+  )
+);
+
+watch(() => route.query, newQuery => {
+  search.value = parseQueryString(newQuery.search);
+  sort.value = parseQueryString(newQuery.sort, 'relevance');
+  filterIn.value = parseQueryArray(newQuery.filterIn);
+  filterGameplay.value = parseQueryArray(newQuery.filterGameplay);
+  filterGame.value = parseQueryArray(newQuery.filterGame);
   refresh();
 });
 
@@ -106,6 +147,7 @@ function updateArgs() {
     name: route.name,
     query: {
       search: search.value,
+      sort: sort.value,
       filterIn: filterIn.value,
       filterGameplay: filterGameplay.value,
       filterGame: filterGame.value,
@@ -114,16 +156,7 @@ function updateArgs() {
 }
 const updateArgsDebounced = debounce(updateArgs, 500);
 
-watch(search, () => {
-  updateArgsDebounced();
-})
-watch(filterIn, () => {
-  updateArgsDebounced();
-})
-watch(filterGameplay, () => {
-  updateArgsDebounced();
-})
-watch(filterGame, () => {
+watch([search, sort, filterIn, filterGameplay, filterGame], () => {
   updateArgsDebounced();
 })
 
