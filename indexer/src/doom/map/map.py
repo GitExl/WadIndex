@@ -225,6 +225,10 @@ class Map:
         self.nodes_type: NodeTypes = NodeTypes.NONE
         self.nodes_gl_type: NodeTypesGL = NodeTypesGL.NONE
 
+        self.enemy_count_sp: Optional[int] = None
+        self.enemy_count_coop: Optional[int] = None
+        self.enemy_count_dm: Optional[int] = None
+
         self._bounds: Optional[MapBounds] = None
 
     def get_bounds(self) -> MapBounds:
@@ -262,6 +266,11 @@ class Map:
             'next_secret': self.next_secret[:255] if self.next_secret is not None else None,
             'cluster': self.cluster & 0xFFFFFFFF if self.cluster is not None else None,
             'complexity': self.complexity,
+
             'nodes': self.nodes_type.value,
             'nodes_gl': self.nodes_gl_type.value,
+
+            'enemy_count_sp': self.enemy_count_sp,
+            'enemy_count_coop': self.enemy_count_coop,
+            'enemy_count_dm': self.enemy_count_dm,
         }

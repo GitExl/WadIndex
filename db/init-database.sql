@@ -196,6 +196,9 @@ CREATE TABLE IF NOT EXISTS `maps` (
   `complexity` float NOT NULL,
   `nodes` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `nodes_gl` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `enemy_count_sp` int(10) unsigned DEFAULT NULL,
+  `enemy_count_coop` int(10) unsigned DEFAULT NULL,
+  `enemy_count_dm` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `maps_entry_id_IDX` (`entry_id`,`name`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=59441 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
